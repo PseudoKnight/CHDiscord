@@ -6,7 +6,7 @@
 
     <groupId>me.pseudoknight</groupId>
     <artifactId>CHDiscord</artifactId>
-    <version>0.0.1</version>
+    <version>1.0.0</version>
 
     <repositories>
         <repository>
@@ -14,8 +14,9 @@
             <url>http://mvn2.sk89q.com/repo</url>
         </repository>
         <repository>
-            <id>Scarsz-Jenkins</id>
-            <url>https://ci.scarsz.me/plugin/repository/everything/</url>
+            <id>jcenter</id>
+            <name>jcenter-bintray</name>
+            <url>http://jcenter.bintray.com</url>
         </repository>
     </repositories>
 
@@ -26,9 +27,9 @@
             <version>3.3.2-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>github.scarsz.discordsrv</groupId>
-            <artifactId>DiscordSRV</artifactId>
-            <version>15.5</version>
+            <groupId>net.dv8tion</groupId>
+            <artifactId>JDA</artifactId>
+            <version>3.6.0_354</version>
         </dependency>
     </dependencies>
 
@@ -41,11 +42,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.7.0</version>
                 <configuration>
                     <showDeprecation>true</showDeprecation>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <compilerArgument>-XDignore.symbol.file</compilerArgument>
                 </configuration>
             </plugin>
@@ -117,6 +118,60 @@
                         <argument>${basedir}/target/classes</argument>
                     </arguments>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>ShadedBundle</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>net.dv8tion:JDA:jar:*</include>
+                                    <include>com.neovisionaries:nv-websocket-client:jar:*</include>
+                                    <include>org.apache.commons:commons-collections4:jar:*</include>
+                                    <include>com.squareup.okhttp3:okhttp:jar:*</include>
+                                    <include>org.json:json:jar:*</include>
+                                    <include>com.squareup.okio:okio:jar:*</include>
+                                </includes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>net.dv8tion:JDA:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>natives/**</exclude>
+                                        <exclude>tomp2p/opuswrapper/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <relocations>
+                                <relocation>
+                                    <pattern>okio</pattern>
+                                    <shadedPattern>libs.okio</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>okhttp3</pattern>
+                                    <shadedPattern>libs.okhttp3</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.json</pattern>
+                                    <shadedPattern>libs.org.json</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache.commons.commons-collections4</pattern>
+                                    <shadedPattern>libs.org.apache.commons.commons-collections4</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

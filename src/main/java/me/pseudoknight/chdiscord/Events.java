@@ -45,8 +45,8 @@ public class Events {
 
 		@Override
 		public boolean matches(Map<String, Construct> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-			if (e instanceof DiscordSRVListener.DiscordMessageReceivedEvent) {
-				DiscordSRVListener.DiscordMessageReceivedEvent event = (DiscordSRVListener.DiscordMessageReceivedEvent)e;
+			if (e instanceof DiscordListener.DiscordMessageReceivedEvent) {
+				DiscordListener.DiscordMessageReceivedEvent event = (DiscordListener.DiscordMessageReceivedEvent)e;
 
 				if(prefilter.containsKey("username") && !event.getMember().getUser().getName().equals(prefilter.get("username").val())) {
 					return false;
@@ -67,15 +67,15 @@ public class Events {
 
 		@Override
 		public Map<String, Construct> evaluate(BindableEvent e) throws EventException {
-			if (e instanceof DiscordSRVListener.DiscordMessageReceivedEvent) {
-				DiscordSRVListener.DiscordMessageReceivedEvent event = (DiscordSRVListener.DiscordMessageReceivedEvent) e;
+			if (e instanceof DiscordListener.DiscordMessageReceivedEvent) {
+				DiscordListener.DiscordMessageReceivedEvent event = (DiscordListener.DiscordMessageReceivedEvent) e;
 				Target t = Target.UNKNOWN;
 				Map<String, Construct> map = new HashMap<>();
 
 				map.put("username", new CString(event.getMember().getUser().getName(), t));
 				map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
 				map.put("channel", new CString(event.getChannel().getName(), t));
-				map.put("message", new CString(event.getMessage().getContent(), t));
+				map.put("message", new CString(event.getMessage().getContentRaw(), t));
 
 				return map;
 			}
