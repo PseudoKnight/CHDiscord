@@ -1,10 +1,15 @@
 # CHDiscord
 
-This is a very basic extension that uses the DiscordSRV plugin API to talk to a Discord server.
+This is CommandHelper extension that uses the JDA library to talk to your Discord server.
 
-If you wish to override DiscordSRV's automatic handling of chat integration, you must disable DiscordChatChannelDiscordToMinecraft and DiscordChatChannelMinecraftToDiscord in the DiscordSRV config.yml. You can also set things like MinecraftPlayerJoinMessageFormat to "" in messages.yml to create your own custom messages for events.
+You'll need a Discord Bot "Token" from an app you can create [here](https://discordapp.com/developers/applications/me) as well as your server id that you can get by right-clicking your server name and clicking "Copy ID". You have to run discord_connect(token, server_id) before you can use the other functionality of this extension.
+
+NOTE: This could conflict with other Discord plugins, including DiscordSRV. This is meant as a standalone solution for handling all Discord integration for your server.
 
 ## Functions
+
+### discord_connect(token, server_id)
+Connects to Discord server via token and server id.
 
 ### discord_broadcast([channel], string)
 Broadcasts text to the specified channel (or default).
