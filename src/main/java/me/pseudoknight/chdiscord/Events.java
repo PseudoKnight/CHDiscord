@@ -92,4 +92,130 @@ public class Events {
 			return false;
 		}
 	}
+
+	@api
+	public static class discord_voice_joined extends AbstractEvent {
+
+		@Override
+		public String getName() {
+			return "discord_voice_joined";
+		}
+
+		@Override
+		public String docs() {
+			return "{} "
+					+ "This event is called when a user joins a voice channel on the Discord server."
+					+ "{username: The Discord username | nickname: The display name on Discord"
+					+ " | channel: The channel the user joined} "
+					+ "{} "
+					+ "{}";
+		}
+
+		@Override
+		public CHVersion since() {
+			return CHVersion.V3_3_2;
+		}
+
+		@Override
+		public boolean matches(Map<String, Construct> prefilter, BindableEvent e) throws PrefilterNonMatchException {
+			if(e instanceof DiscordListener.DiscordVoiceJoinEvent) {
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public BindableEvent convert(CArray cArray, Target target) {
+			return null;
+		}
+
+		@Override
+		public Map<String, Construct> evaluate(BindableEvent e) throws EventException {
+			if(e instanceof DiscordListener.DiscordVoiceJoinEvent) {
+				DiscordListener.DiscordVoiceJoinEvent event = (DiscordListener.DiscordVoiceJoinEvent) e;
+				Target t = Target.UNKNOWN;
+				Map<String, Construct> map = new HashMap<>();
+
+				map.put("username", new CString(event.getMember().getUser().getName(), t));
+				map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
+				map.put("channel", new CString(event.getChannel().getName(), t));
+
+				return map;
+			}
+			throw new EventException("Cannot convert e to DiscordVoiceJoinEvent");
+		}
+
+		@Override
+		public Driver driver() {
+			return Driver.EXTENSION;
+		}
+
+		@Override
+		public boolean modifyEvent(String s, Construct construct, BindableEvent bindableEvent) {
+			return false;
+		}
+	}
+
+	@api
+	public static class discord_voice_left extends AbstractEvent {
+
+		@Override
+		public String getName() {
+			return "discord_voice_left";
+		}
+
+		@Override
+		public String docs() {
+			return "{} "
+					+ "This event is called when a user leaves a voice channel on the Discord server."
+					+ "{username: The Discord username | nickname: The display name on Discord"
+					+ " | channel: The channel the user left} "
+					+ "{} "
+					+ "{}";
+		}
+
+		@Override
+		public CHVersion since() {
+			return CHVersion.V3_3_2;
+		}
+
+		@Override
+		public boolean matches(Map<String, Construct> prefilter, BindableEvent e) throws PrefilterNonMatchException {
+			if(e instanceof DiscordListener.DiscordVoiceLeaveEvent) {
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public BindableEvent convert(CArray cArray, Target target) {
+			return null;
+		}
+
+		@Override
+		public Map<String, Construct> evaluate(BindableEvent e) throws EventException {
+			if(e instanceof DiscordListener.DiscordVoiceLeaveEvent) {
+				DiscordListener.DiscordVoiceLeaveEvent event = (DiscordListener.DiscordVoiceLeaveEvent) e;
+				Target t = Target.UNKNOWN;
+				Map<String, Construct> map = new HashMap<>();
+
+				map.put("username", new CString(event.getMember().getUser().getName(), t));
+				map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
+				map.put("channel", new CString(event.getChannel().getName(), t));
+
+				return map;
+			}
+			throw new EventException("Cannot convert e to DiscordVoiceLeaveEvent");
+		}
+
+		@Override
+		public Driver driver() {
+			return Driver.EXTENSION;
+		}
+
+		@Override
+		public boolean modifyEvent(String s, Construct construct, BindableEvent bindableEvent) {
+			return false;
+		}
+	}
 }
