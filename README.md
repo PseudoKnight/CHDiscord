@@ -17,9 +17,20 @@ Broadcasts text to the specified channel (or default).
 ### discord_private_message(user, string)
 Sends a private message to the specified Discord server member.
 
+### discord_set_channel_topic(channel, string)
+Sets a text channel's topic.
+
 ## Events
 
 ### discord_message_received
 This event is called when a user sends a message in the Discord server.
 Prefilters: username, channel
 Data: username, nickname, channel, message
+
+### discord_voice_joined
+This event is called when a user joined a voice channel.
+Data: username, nickname, channel
+
+### discord_voice_left
+This event is called when a user left a voice channel.
+Data: username, nickname, channel
