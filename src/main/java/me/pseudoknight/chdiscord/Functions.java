@@ -9,6 +9,7 @@ import com.laytonsmith.core.constructs.Construct;
 import com.laytonsmith.core.constructs.Target;
 import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.environments.GlobalEnv;
+import com.laytonsmith.core.exceptions.CRE.CREFormatException;
 import com.laytonsmith.core.exceptions.CRE.CRENotFoundException;
 import com.laytonsmith.core.exceptions.CRE.CREThrowable;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
@@ -18,6 +19,8 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.exceptions.PermissionException;
+import net.dv8tion.jda.core.managers.ChannelManager;
 
 import javax.security.auth.login.LoginException;
 import java.util.List;
@@ -160,6 +163,43 @@ public class Functions {
 
 		public Class<? extends CREThrowable>[] thrown() {
 			return new Class[]{CRENotFoundException.class};
+		}
+	}
+
+	@api
+	public static class discord_set_channel_topic extends DiscordFunction {
+
+		public String getName() {
+			return "discord_set_channel_topic";
+		}
+
+		public String docs() {
+			return "void {channel, string} Sets a text channel's topic.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{2};
+		}
+
+		public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
+			if(Extension.guild == null) {
+				throw new CRENotFoundException("Not connected to Discord server.", t);
+			}
+			TextChannel channel = Extension.channels.get(args[0].val());
+			if(channel == null) {
+				throw new CRENotFoundException("Channel by the name " + args[0].val() + " not found.", t);
+			}
+			String message = args[1].val();
+			try {
+				channel.getManager().setTopic(message).queue();
+			} catch(PermissionException | IllegalArgumentException ex) {
+				throw new CREFormatException(ex.getMessage(), t);
+			}
+			return CVoid.VOID;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class, CREFormatException.class};
 		}
 	}
 
