@@ -11,6 +11,7 @@ import com.laytonsmith.core.events.BindableEvent;
 import com.laytonsmith.core.events.Driver;
 import com.laytonsmith.core.exceptions.EventException;
 import com.laytonsmith.core.exceptions.PrefilterNonMatchException;
+import net.dv8tion.jda.core.entities.Message;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,13 +70,14 @@ public class Events {
 		public Map<String, Construct> evaluate(BindableEvent e) throws EventException {
 			if (e instanceof DiscordListener.DiscordMessageReceivedEvent) {
 				DiscordListener.DiscordMessageReceivedEvent event = (DiscordListener.DiscordMessageReceivedEvent) e;
+				Message msg = event.getMessage();
 				Target t = Target.UNKNOWN;
 				Map<String, Construct> map = new HashMap<>();
 
 				map.put("username", new CString(event.getMember().getUser().getName(), t));
 				map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
 				map.put("channel", new CString(event.getChannel().getName(), t));
-				map.put("message", new CString(event.getMessage().getContentRaw(), t));
+				map.put("message", new CString(msg.getContentDisplay(), t));
 
 				return map;
 			}
