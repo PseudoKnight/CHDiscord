@@ -29,7 +29,17 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>3.6.0_354</version>
+            <version>3.6.0_366</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.8.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.8.1</version>
         </dependency>
     </dependencies>
 
@@ -126,12 +136,14 @@
                 <version>3.1.0</version>
                 <executions>
                     <execution>
-                        <id>ShadedBundle</id>
+                        <id>bukkit</id>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>bukkit</shadedClassifierName>
                             <artifactSet>
                                 <includes>
                                     <include>net.dv8tion:JDA:jar:*</include>
@@ -165,10 +177,46 @@
                                     <shadedPattern>libs.org.json</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>org.apache.commons.commons-collections4</pattern>
-                                    <shadedPattern>libs.org.apache.commons.commons-collections4</shadedPattern>
+                                    <pattern>org.apache</pattern>
+                                    <shadedPattern>libs.org.apache</shadedPattern>
                                 </relocation>
                             </relocations>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>cmdline</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>cmdline</shadedClassifierName>
+                            <artifactSet>
+                                <includes>
+                                    <include>net.dv8tion:JDA:jar:*</include>
+                                    <include>com.neovisionaries:nv-websocket-client:jar:*</include>
+                                    <include>org.apache.commons:commons-collections4:jar:*</include>
+                                    <include>com.squareup.okhttp3:okhttp:jar:*</include>
+                                    <include>org.json:json:jar:*</include>
+                                    <include>com.squareup.okio:okio:jar:*</include>
+                                    <include>org.slf4j:slf4j-api:*</include>
+                                    <include>org.apache.logging.log4j:log4j-slf4j-impl:jar:*</include>
+                                    <include>org.apache.logging.log4j:log4j-api:jar:*</include>
+                                    <include>org.apache.logging.log4j:log4j-core:jar:*</include>
+                                    <include>net.sf.trove4j:trove4j:jar:*</include>
+                                </includes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>net.dv8tion:JDA:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>natives/**</exclude>
+                                        <exclude>tomp2p/opuswrapper/**</exclude>
+                                        <exclude>com/iwebpp/crypto/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>

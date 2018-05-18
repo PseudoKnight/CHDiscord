@@ -89,6 +89,11 @@
                   <include>com.squareup.okhttp3:okhttp:jar:*</include>
                   <include>org.json:json:jar:*</include>
                   <include>com.squareup.okio:okio:jar:*</include>
+                  <include>net.sf.trove4j:trove4j:jar:*</include>
+                  <include>org.slf4j:slf4j-api:jar:*</include>
+                  <include>org.apache.logging.log4j:log4j-slf4j-impl:jar:*</include>
+                  <include>org.apache.logging.log4j:log4j-api:jar:*</include>
+                  <include>org.apache.logging.log4j:log4j-core:jar:*</include>
                 </includes>
               </artifactSet>
               <filters>
@@ -97,6 +102,7 @@
                   <excludes>
                     <exclude>natives/**</exclude>
                     <exclude>tomp2p/opuswrapper/**</exclude>
+                    <exclude>com/iwebpp/crypto/**</exclude>
                   </excludes>
                 </filter>
               </filters>
@@ -114,8 +120,8 @@
                   <shadedPattern>libs.org.json</shadedPattern>
                 </relocation>
                 <relocation>
-                  <pattern>org.apache.commons.commons-collections4</pattern>
-                  <shadedPattern>libs.org.apache.commons.commons-collections4</shadedPattern>
+                  <pattern>gnu.trove</pattern>
+                  <shadedPattern>libs.gnu.trove</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>
