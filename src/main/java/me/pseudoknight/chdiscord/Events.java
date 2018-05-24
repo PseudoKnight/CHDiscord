@@ -11,6 +11,7 @@ import com.laytonsmith.core.events.BindableEvent;
 import com.laytonsmith.core.events.Driver;
 import com.laytonsmith.core.exceptions.EventException;
 import com.laytonsmith.core.exceptions.PrefilterNonMatchException;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 
 import java.util.HashMap;
@@ -74,8 +75,14 @@ public class Events {
 				Target t = Target.UNKNOWN;
 				Map<String, Construct> map = new HashMap<>();
 
-				map.put("username", new CString(event.getMember().getUser().getName(), t));
-				map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
+				Member mem = event.getMember();
+				if(mem != null) {
+					map.put("nickname", new CString(mem.getEffectiveName(), t));
+				} else {
+					map.put("nickname", new CString(event.getAuthor().getName(), t));
+				}
+
+				map.put("username", new CString(event.getAuthor().getName(), t));
 				map.put("channel", new CString(event.getChannel().getName(), t));
 				map.put("message", new CString(msg.getContentDisplay(), t));
 

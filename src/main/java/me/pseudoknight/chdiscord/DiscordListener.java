@@ -9,6 +9,7 @@ import com.laytonsmith.core.events.EventUtils;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
@@ -64,6 +65,7 @@ public class DiscordListener extends ListenerAdapter {
 
 	public interface DiscordMessageReceivedEvent extends BindableEvent {
 		MessageChannel getChannel();
+		User getAuthor();
 		Member getMember();
 		Message getMessage();
 	}
@@ -78,6 +80,10 @@ public class DiscordListener extends ListenerAdapter {
 
 		public MessageChannel getChannel() {
 			return e.getChannel();
+		}
+
+		public User getAuthor() {
+			return e.getAuthor();
 		}
 
 		public Member getMember() {
