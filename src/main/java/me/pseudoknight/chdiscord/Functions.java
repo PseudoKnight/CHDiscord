@@ -3,13 +3,16 @@ package me.pseudoknight.chdiscord;
 import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.abstraction.StaticLayer;
 import com.laytonsmith.annotations.api;
+import com.laytonsmith.core.CHLog;
 import com.laytonsmith.core.CHVersion;
+import com.laytonsmith.core.Static;
 import com.laytonsmith.core.constructs.CInt;
 import com.laytonsmith.core.constructs.CVoid;
 import com.laytonsmith.core.constructs.Construct;
 import com.laytonsmith.core.constructs.Target;
 import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.environments.GlobalEnv;
+import com.laytonsmith.core.exceptions.CRE.CREException;
 import com.laytonsmith.core.exceptions.CRE.CREFormatException;
 import com.laytonsmith.core.exceptions.CRE.CRENotFoundException;
 import com.laytonsmith.core.exceptions.CRE.CREThrowable;
@@ -21,6 +24,7 @@ import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.exceptions.PermissionException;
+import org.slf4j.event.Level;
 
 import javax.security.auth.login.LoginException;
 import java.util.List;
@@ -71,9 +75,13 @@ public class Functions {
 							.setAudioEnabled(false)
 							.setAutoReconnect(true)
 							.addEventListener(new DiscordListener())
-							.buildAsync();
+							.build();
 				} catch(LoginException ex) {
-					throw new CRENotFoundException("Could not connect to Discord server.", t);
+					CHLog.GetLogger().e(CHLog.Tags.RUNTIME, "Could not connect to Discord server.", t);
+					return;
+				} catch(NoClassDefFoundError ex) {
+					CHLog.GetLogger().e(CHLog.Tags.RUNTIME, "Failed to connect. Verify your token is accurate.", t);
+					return;
 				}
 
 				while(Extension.jda.getStatus() != JDA.Status.CONNECTED) {
