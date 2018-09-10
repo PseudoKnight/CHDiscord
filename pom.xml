@@ -6,7 +6,7 @@
 
     <groupId>me.pseudoknight</groupId>
     <artifactId>CHDiscord</artifactId>
-    <version>1.1.2</version>
+    <version>1.2.0</version>
 
     <repositories>
         <repository>
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>3.6.0_366</version>
+            <version>3.7.1_421</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

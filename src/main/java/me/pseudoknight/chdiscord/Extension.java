@@ -18,7 +18,7 @@ public class Extension extends AbstractExtension {
 	static HashMap<String, TextChannel> channels = new HashMap<>();
 
 	public Version getVersion() {
-		return new SimpleVersion(1,1,2);
+		return new SimpleVersion(1,2,0);
 	}
 
 	@Override
