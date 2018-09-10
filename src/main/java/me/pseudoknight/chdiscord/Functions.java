@@ -4,6 +4,7 @@ import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.abstraction.StaticLayer;
 import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.CHVersion;
+import com.laytonsmith.core.constructs.CInt;
 import com.laytonsmith.core.constructs.CVoid;
 import com.laytonsmith.core.constructs.Construct;
 import com.laytonsmith.core.constructs.Target;
@@ -140,7 +141,10 @@ public class Functions {
 		}
 
 		public String docs() {
-			return "void {member, string} Sends a private message to the specified Discord server member.";
+			return "void {member, string} Sends a private message to the specified Discord server member."
+					+ " The user numeric id or name can be used to specify which server member to send to."
+					+ " If there are multiple members with the same user name, only the first one is messaged."
+					+ " Therefore it is recommended to use the user id.";
 		}
 
 		public Integer[] numArgs() {
@@ -151,12 +155,18 @@ public class Functions {
 			if(Extension.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
-			List<Member> m = Extension.guild.getMembersByName(args[0].val(), false);
-			if(m.isEmpty()) {
-				throw new CRENotFoundException("A member with the name \"" + args[0].val() + "\" was not found on Discord server.", t);
+			Member mem;
+			if(args[0] instanceof CInt) {
+				mem = Extension.guild.getMemberById(((CInt) args[0]).getInt());
+			} else {
+				List<Member> m = Extension.guild.getMembersByName(args[0].val(), false);
+				if(m.isEmpty()) {
+					throw new CRENotFoundException("A member with the name \"" + args[0].val() + "\" was not found on Discord server.", t);
+				}
+				mem = m.get(0);
 			}
 			final String message = args[1].val();
-			m.get(0).getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(message).queue());
+			mem.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(message).queue());
 			return CVoid.VOID;
 		}
 

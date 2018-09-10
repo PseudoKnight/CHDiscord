@@ -3,6 +3,7 @@ package me.pseudoknight.chdiscord;
 import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.CHVersion;
 import com.laytonsmith.core.constructs.CArray;
+import com.laytonsmith.core.constructs.CInt;
 import com.laytonsmith.core.constructs.CString;
 import com.laytonsmith.core.constructs.Construct;
 import com.laytonsmith.core.constructs.Target;
@@ -83,6 +84,7 @@ public class Events {
 				}
 
 				map.put("username", new CString(event.getAuthor().getName(), t));
+				map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
 				map.put("channel", new CString(event.getChannel().getName(), t));
 				map.put("message", new CString(msg.getContentDisplay(), t));
 
@@ -146,6 +148,7 @@ public class Events {
 				Map<String, Construct> map = new HashMap<>();
 
 				map.put("username", new CString(event.getMember().getUser().getName(), t));
+				map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
 				map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
 				map.put("channel", new CString(event.getChannel().getName(), t));
 
@@ -209,6 +212,7 @@ public class Events {
 				Map<String, Construct> map = new HashMap<>();
 
 				map.put("username", new CString(event.getMember().getUser().getName(), t));
+				map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
 				map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
 				map.put("channel", new CString(event.getChannel().getName(), t));
 
