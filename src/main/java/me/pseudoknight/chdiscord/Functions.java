@@ -6,17 +6,18 @@ import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.CHLog;
 import com.laytonsmith.core.CHVersion;
 import com.laytonsmith.core.Static;
+import com.laytonsmith.core.constructs.CClosure;
 import com.laytonsmith.core.constructs.CInt;
 import com.laytonsmith.core.constructs.CVoid;
 import com.laytonsmith.core.constructs.Construct;
 import com.laytonsmith.core.constructs.Target;
 import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.environments.GlobalEnv;
-import com.laytonsmith.core.exceptions.CRE.CREException;
 import com.laytonsmith.core.exceptions.CRE.CREFormatException;
 import com.laytonsmith.core.exceptions.CRE.CRENotFoundException;
 import com.laytonsmith.core.exceptions.CRE.CREThrowable;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
+import com.laytonsmith.core.exceptions.ProgramFlowManipulationException;
 import com.laytonsmith.core.functions.AbstractFunction;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
@@ -24,17 +25,18 @@ import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.exceptions.PermissionException;
-import org.slf4j.event.Level;
 
 import javax.security.auth.login.LoginException;
 import java.util.List;
 
 public class Functions {
+
 	public static String docs() {
 		return "Functions for the DiscordSRV plugin.";
 	}
 
 	public static abstract class DiscordFunction extends AbstractFunction {
+
 		public boolean isRestricted() {
 			return true;
 		}
@@ -56,16 +58,18 @@ public class Functions {
 		}
 
 		public String docs() {
-			return "boolean {token, server_id} Connects to Discord server via token and server id. (The server id can"
-					+ " be retrieved by right-clicking the server name and clicking \"Copy ID\".)";
+			return "boolean {token, server_id, [callback]} Connects to Discord server via token and server id. (The server id can"
+					+ " be retrieved by right-clicking the server name and clicking \"Copy ID\".)\n\n"
+					+ "Connection happens in a separate thread. You can get a callback by providing a closure in the"
+					+ " third argument, which if provided, is called once the connection actually succeeds.";
 		}
 
 		public Integer[] numArgs() {
-			return new Integer[]{2};
+			return new Integer[]{2, 3};
 		}
 
 		public Construct exec(Target t, Environment env, Construct... args) throws ConfigRuntimeException {
-			if(Extension.jda != null) {
+			if (Extension.jda != null) {
 				Extension.jda.shutdownNow();
 			}
 			Thread connect = new Thread(() -> {
@@ -76,29 +80,40 @@ public class Functions {
 							.setAutoReconnect(true)
 							.addEventListener(new DiscordListener())
 							.build();
-				} catch(LoginException ex) {
+				} catch (LoginException ex) {
 					CHLog.GetLogger().e(CHLog.Tags.RUNTIME, "Could not connect to Discord server.", t);
 					return;
-				} catch(NoClassDefFoundError ex) {
+				} catch (NoClassDefFoundError ex) {
 					CHLog.GetLogger().e(CHLog.Tags.RUNTIME, "Failed to connect. Verify your token is accurate.", t);
 					return;
 				}
 
-				while(Extension.jda.getStatus() != JDA.Status.CONNECTED) {
+				while (Extension.jda.getStatus() != JDA.Status.CONNECTED) {
 					try {
 						Thread.sleep(10);
-					} catch(InterruptedException e) {
+					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 				}
 
 				StaticLayer.GetConvertor().runOnMainThreadLater(env.getEnv(GlobalEnv.class).GetDaemonManager(), () -> {
 					Extension.guild = Extension.jda.getGuildById(args[1].val());
-					for(TextChannel channel : Extension.guild.getTextChannels()) {
+					for (TextChannel channel : Extension.guild.getTextChannels()) {
 						Extension.channels.put(channel.getName(), channel);
+					}
+					if(args.length >= 3) {
+						CClosure c = Static.getObject(args[2], t, CClosure.class);
+						try {
+							c.execute();
+						} catch (ConfigRuntimeException ex) {
+							ConfigRuntimeException.HandleUncaughtException(ex, env);
+						} catch(ProgramFlowManipulationException ex) {
+							// ignored
+						}
 					}
 				});
 			}, "DiscordConnect");
+			env.getEnv(GlobalEnv.class).GetDaemonManager().activateThread(Extension.DAEMON_THREAD);
 			connect.start();
 			return CVoid.VOID;
 		}
@@ -124,11 +139,11 @@ public class Functions {
 		}
 
 		public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
-			if(Extension.guild == null) {
+			if (Extension.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
 			TextChannel channel = args.length == 2 ? Extension.channels.get(args[0].val()) : Extension.guild.getDefaultChannel();
-			if(channel == null) {
+			if (channel == null) {
 				throw new CRENotFoundException("Channel by the name " + args[0].val() + " not found.", t);
 			}
 			String message = args[args.length - 1].val();
@@ -160,15 +175,15 @@ public class Functions {
 		}
 
 		public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
-			if(Extension.guild == null) {
+			if (Extension.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
 			Member mem;
-			if(args[0] instanceof CInt) {
+			if (args[0] instanceof CInt) {
 				mem = Extension.guild.getMemberById(((CInt) args[0]).getInt());
 			} else {
 				List<Member> m = Extension.guild.getMembersByName(args[0].val(), false);
-				if(m.isEmpty()) {
+				if (m.isEmpty()) {
 					throw new CRENotFoundException("A member with the name \"" + args[0].val() + "\" was not found on Discord server.", t);
 				}
 				mem = m.get(0);
@@ -199,17 +214,17 @@ public class Functions {
 		}
 
 		public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
-			if(Extension.guild == null) {
+			if (Extension.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
 			TextChannel channel = Extension.channels.get(args[0].val());
-			if(channel == null) {
+			if (channel == null) {
 				throw new CRENotFoundException("Channel by the name " + args[0].val() + " not found.", t);
 			}
 			String message = args[1].val();
 			try {
 				channel.getManager().setTopic(message).queue();
-			} catch(PermissionException | IllegalArgumentException ex) {
+			} catch (PermissionException | IllegalArgumentException ex) {
 				throw new CREFormatException(ex.getMessage(), t);
 			}
 			return CVoid.VOID;
@@ -218,6 +233,38 @@ public class Functions {
 		public Class<? extends CREThrowable>[] thrown() {
 			return new Class[]{CRENotFoundException.class, CREFormatException.class};
 		}
+	}
+
+	@api
+	public static class discord_disconnect extends DiscordFunction {
+
+		@Override
+		public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
+			Extension.jda.shutdown();
+			environment.getEnv(GlobalEnv.class).GetDaemonManager().deactivateThread(Extension.DAEMON_THREAD);
+			return CVoid.VOID;
+		}
+
+		@Override
+		public Class<? extends CREThrowable>[] thrown() {
+			return null;
+		}
+
+		@Override
+		public String getName() {
+			return "discord_disconnect";
+		}
+
+		@Override
+		public Integer[] numArgs() {
+			return new Integer[]{0};
+		}
+
+		@Override
+		public String docs() {
+			return "void {} Disconnects the previously connected bots";
+		}
+
 	}
 
 }
