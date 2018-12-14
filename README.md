@@ -8,11 +8,16 @@ NOTE: This could conflict with other Discord plugins. This is meant as a standal
 
 ## Functions
 
-### discord_connect(token, server_id)
+### discord_connect(token, server_id, [callback])
 Connects to Discord server via token and server id.
+The optional callback closure will be executed when a connection is made.
+
+### discord_disconnect()
+Disconnects from the Discord server.
 
 ### discord_broadcast([channel], string)
-Broadcasts text to the specified channel (or default).
+Broadcasts text to the specified channel (or default). 
+Message must not be empty, else it will throw an IllegalArgumentException.
 
 ### discord_private_message(user, string)
 Sends a private message to the specified Discord server member.
@@ -29,6 +34,10 @@ Sets a text channel's topic.
 This event is called when a user sends a message in the Discord server.
 Prefilters: username, channel
 Data: userid, username, nickname, channel, message
+
+### discord_direct_message_received
+This event is called when a user sends a direct message to the bot.
+Data: userid, username, message
 
 ### discord_voice_joined
 This event is called when a user joined a voice channel.
