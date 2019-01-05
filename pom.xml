@@ -29,7 +29,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>3.8.1_448</version>
+            <version>3.8.1_454</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -144,6 +144,7 @@
                         <configuration>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>bukkit</shadedClassifierName>
+                            <minimizeJar>true</minimizeJar>
                             <artifactSet>
                                 <includes>
                                     <include>net.dv8tion:JDA:jar:*</include>
@@ -153,6 +154,7 @@
                                     <include>org.json:json:jar:*</include>
                                     <include>com.squareup.okio:okio:jar:*</include>
                                     <include>org.slf4j:slf4j-api:*</include>
+                                    <include>net.sf.trove4j:trove4j:jar:*</include>
                                 </includes>
                             </artifactSet>
                             <filters>
@@ -181,6 +183,18 @@
                                     <pattern>org.apache</pattern>
                                     <shadedPattern>libs.org.apache</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>gnu.trove</pattern>
+                                    <shadedPattern>libs.gnu.trove</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.iwebpp.crypto</pattern>
+                                    <shadedPattern>libs.com.iwebpp.crypto</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.neovisionaries.we.client</pattern>
+                                    <shadedPattern>libs.com.neovisionaries.we.client</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
@@ -193,6 +207,7 @@
                         <configuration>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>cmdline</shadedClassifierName>
+                            <minimizeJar>true</minimizeJar>
                             <artifactSet>
                                 <includes>
                                     <include>net.dv8tion:JDA:jar:*</include>
