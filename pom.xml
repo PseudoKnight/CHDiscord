@@ -192,8 +192,8 @@
                                     <shadedPattern>libs.com.iwebpp.crypto</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>com.neovisionaries.we.client</pattern>
-                                    <shadedPattern>libs.com.neovisionaries.we.client</shadedPattern>
+                                    <pattern>com.neovisionaries.ws.client</pattern>
+                                    <shadedPattern>libs.com.neovisionaries.ws.client</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
