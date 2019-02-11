@@ -16,9 +16,9 @@ with the keys token and serverId, or an array, with the same keys.
 
 The profile should be defined such as
     <profile id="discordCredentials">
-	<type>discord</type>
-	<token>abcdefg</token>
-	<serverId>12345</serverId>
+        <type>discord</type>
+        <token>abcdefg</token>
+        <serverId>12345</serverId>
     </profile>
 
 ### discord_disconnect()
