@@ -130,6 +130,8 @@ public class Functions {
 					}	break;
 				case 3:
 					// Individual options
+					token = args[0].val();
+					serverId = args[1].val();
 					callback = Static.getObject(args[2], t, CClosure.class);
 					break;
 				default:
