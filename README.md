@@ -15,6 +15,7 @@ The profile may be a string, which should refer to a profile defined in profiles
 with the keys token and serverId, or an array, with the same keys.
 
 The profile should be defined such as
+
     <profile id="discordCredentials">
         <type>discord</type>
         <token>abcdefg</token>
