@@ -8,9 +8,19 @@ NOTE: This could conflict with other Discord plugins. This is meant as a standal
 
 ## Functions
 
-### discord_connect(token, server_id, [callback])
+### discord_connect(token, server_id, [callback] | profile, [callback])
 Connects to Discord server via token and server id.
 The optional callback closure will be executed when a connection is made.
+The profile may be a string, which should refer to a profile defined in profiles.xml,
+with the keys token and serverId, or an array, with the same keys.
+
+The profile should be defined such as
+
+    <profile id="discordCredentials">
+        <type>discord</type>
+        <token>abcdefg</token>
+        <serverId>12345</serverId>
+    </profile>
 
 ### discord_disconnect()
 Disconnects from the Discord server.

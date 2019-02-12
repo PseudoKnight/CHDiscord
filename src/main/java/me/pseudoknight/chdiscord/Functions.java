@@ -2,13 +2,18 @@ package me.pseudoknight.chdiscord;
 
 import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.annotations.api;
+import com.laytonsmith.core.ArgumentValidation;
 import com.laytonsmith.core.MSVersion;
+import com.laytonsmith.core.Profiles;
 import com.laytonsmith.core.Static;
+import com.laytonsmith.core.constructs.CArray;
 import com.laytonsmith.core.constructs.CClosure;
 import com.laytonsmith.core.constructs.CInt;
 import com.laytonsmith.core.constructs.CVoid;
 import com.laytonsmith.core.constructs.Target;
 import com.laytonsmith.core.environments.Environment;
+import com.laytonsmith.core.environments.GlobalEnv;
+import com.laytonsmith.core.exceptions.CRE.CRECastException;
 import com.laytonsmith.core.exceptions.CRE.CREFormatException;
 import com.laytonsmith.core.exceptions.CRE.CREIllegalArgumentException;
 import com.laytonsmith.core.exceptions.CRE.CRENotFoundException;
@@ -21,6 +26,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.exceptions.PermissionException;
 
 import java.util.List;
+import java.util.Map;
 
 public class Functions {
 	public static String docs() {
@@ -41,6 +47,33 @@ public class Functions {
 		}
 	}
 
+	@Profiles.ProfileType(type = "discord")
+	public static class DiscordProfile extends Profiles.Profile {
+		private final String token;
+		private final String serverId;
+		public DiscordProfile(String id, Map<String, String> elements) throws Profiles.InvalidProfileException {
+			super(id);
+			if(elements.containsKey("token")) {
+				token = elements.get("token");
+			} else {
+				throw new Profiles.InvalidProfileException("token and serverId are required parameters in the profile");
+			}
+			if(elements.containsKey("serverId")) {
+				serverId = elements.get("serverId");
+			} else {
+				throw new Profiles.InvalidProfileException("token and serverId are required parameters in the profile");
+			}
+		}
+
+		public String getToken() {
+			return this.token;
+		}
+
+		public String getServerId() {
+			return this.serverId;
+		}
+	}
+
 	@api
 	public static class discord_connect extends DiscordFunction {
 
@@ -49,21 +82,73 @@ public class Functions {
 		}
 
 		public String docs() {
-			return "boolean {token, server_id, [callback]} Connects to Discord server via token and server id."
+			return "boolean {token, server_id, [callback] | profile, [callback]} Connects to Discord server via token and server id."
 					+ " The server id can be retrieved by right-clicking the server name and clicking \"Copy ID\"."
-					+ " The optional callback closure will be executed when a connection is made.";
+					+ " The optional callback closure will be executed when a connection is made. The profile may be"
+					+ " a string, which should refer to a profile defined in profiles.xml, with the keys token and"
+					+ " serverId, or an array, with the same keys.";
 		}
 
 		public Integer[] numArgs() {
-			return new Integer[]{2, 3};
+			return new Integer[]{1, 2, 3};
+		}
+
+		private DiscordProfile getProfile(Environment environment, String profileName, Target t) {
+			Profiles.Profile p;
+			try {
+				p = environment.getEnv(GlobalEnv.class).getProfiles().getProfileById(profileName);
+			} catch (Profiles.InvalidProfileException ex) {
+				throw new CREFormatException(ex.getMessage(), t, ex);
+			}
+			if(!(p instanceof DiscordProfile)) {
+				throw new CRECastException("Profile type is expected to be \"discord\", but \"" + p.getType()
+						+ "\"  was found.", t);
+			}
+			return (DiscordProfile) p;
 		}
 
 		public Mixed exec(Target t, Environment env, Mixed... args) throws ConfigRuntimeException {
 			CClosure callback = null;
-			if(args.length == 3) {
-				callback = Static.getObject(args[2], t, CClosure.class);
+			Mixed profile = null;
+			String token = null;
+			String serverId = null;
+			switch (args.length) {
+				case 1:
+					// Just a profile
+					profile = args[0];
+					break;
+				case 2:
+					// Not sure, could be (profile, callback) or (token, serverId)
+					if(args[1].isInstanceOf(CClosure.class)) {
+						// profile, callback
+						profile = args[0];
+						callback = ArgumentValidation.getObject(args[1], t, CClosure.class);
+					} else {
+						// token, serverId
+						token = args[0].val();
+						serverId = args[1].val();
+					}	break;
+				case 3:
+					// Individual options
+					token = args[0].val();
+					serverId = args[1].val();
+					callback = Static.getObject(args[2], t, CClosure.class);
+					break;
+				default:
+					throw new CREIllegalArgumentException("Not enough/too many parameters", t);
 			}
-			Extension.connectDiscord(args[0].val(), args[1].val(), callback, env, t);
+			if(profile != null) {
+				if(profile.isInstanceOf(CArray.class)) {
+					CArray prof = (CArray) profile;
+					token = prof.get("token", t).val();
+					serverId = prof.get("serverId", t).val();
+				} else {
+					DiscordProfile p = getProfile(env, profile.val(), t);
+					token = p.getToken();
+					serverId = p.getServerId();
+				}
+			}
+			Extension.connectDiscord(token, serverId, callback, env, t);
 			return CVoid.VOID;
 		}
 
