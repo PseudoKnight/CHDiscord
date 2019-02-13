@@ -110,17 +110,17 @@ public class Events {
 	}
 
 	@api
-	public static class discord_direct_message_received extends AbstractEvent {
+	public static class discord_private_message_received extends AbstractEvent {
 
 		@Override
 		public String getName() {
-			return "discord_direct_message_received";
+			return "discord_private_message_received";
 		}
 
 		@Override
 		public String docs() {
 			return "{} "
-					+ "This event is called when a user sends a direct message to the bot."
+					+ "This event is called when a user sends a private message to the bot."
 					+ "{username: The Discord username | userid: The Discord user's unique id"
 					+ " | message: The message the user sent.} "
 					+ "{} "

@@ -43,7 +43,7 @@ public class Listener extends ListenerAdapter {
 		final JDADiscordPrivateMessageReceivedEvent mre = new JDADiscordPrivateMessageReceivedEvent(event);
 		try {
 			StaticLayer.GetConvertor().runOnMainThreadAndWait(() -> {
-				EventUtils.TriggerListener(Driver.EXTENSION, "discord_direct_message_received", mre);
+				EventUtils.TriggerListener(Driver.EXTENSION, "discord_private_message_received", mre);
 				return null;
 			});
 		} catch(Exception ex) {
