@@ -45,8 +45,8 @@ This event is called when a user sends a message in the Discord server.
 Prefilters: username, channel
 Data: userid, username, nickname, channel, message
 
-### discord_direct_message_received
-This event is called when a user sends a direct message to the bot.
+### discord_private_message_received
+This event is called when a user sends a private message to the bot.
 Data: userid, username, message
 
 ### discord_voice_joined
