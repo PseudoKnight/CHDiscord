@@ -5,7 +5,7 @@ import com.laytonsmith.PureUtilities.SimpleVersion;
 import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.abstraction.Implementation;
 import com.laytonsmith.abstraction.StaticLayer;
-import com.laytonsmith.core.CHLog;
+import com.laytonsmith.core.MSLog;
 import com.laytonsmith.core.constructs.CClosure;
 import com.laytonsmith.core.constructs.Target;
 import com.laytonsmith.core.environments.Environment;
@@ -74,7 +74,7 @@ public class Extension extends AbstractExtension {
 				}
 
 			} catch(LoginException | IllegalStateException | InterruptedException ex) {
-				CHLog.GetLogger().e(CHLog.Tags.RUNTIME, "Could not connect to Discord server.", t);
+				MSLog.GetLogger().e(MSLog.Tags.RUNTIME, "Could not connect to Discord server.", t);
 				dm.deactivateThread(null);
 				return;
 			}
