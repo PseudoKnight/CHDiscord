@@ -6,11 +6,7 @@ import com.laytonsmith.core.ArgumentValidation;
 import com.laytonsmith.core.MSVersion;
 import com.laytonsmith.core.Profiles;
 import com.laytonsmith.core.Static;
-import com.laytonsmith.core.constructs.CArray;
-import com.laytonsmith.core.constructs.CClosure;
-import com.laytonsmith.core.constructs.CInt;
-import com.laytonsmith.core.constructs.CVoid;
-import com.laytonsmith.core.constructs.Target;
+import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.environments.GlobalEnv;
 import com.laytonsmith.core.exceptions.CRE.CRECastException;
@@ -22,11 +18,9 @@ import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.functions.AbstractFunction;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.exceptions.PermissionException;
-
-import java.util.List;
-import java.util.Map;
 
 public class Functions {
 	public static String docs() {
@@ -44,33 +38,6 @@ public class Functions {
 
 		public Version since() {
 			return MSVersion.V3_3_2;
-		}
-	}
-
-	@Profiles.ProfileType(type = "discord")
-	public static class DiscordProfile extends Profiles.Profile {
-		private final String token;
-		private final String serverId;
-		public DiscordProfile(String id, Map<String, String> elements) throws Profiles.InvalidProfileException {
-			super(id);
-			if(elements.containsKey("token")) {
-				token = elements.get("token");
-			} else {
-				throw new Profiles.InvalidProfileException("token and serverId are required parameters in the profile");
-			}
-			if(elements.containsKey("serverId")) {
-				serverId = elements.get("serverId");
-			} else {
-				throw new Profiles.InvalidProfileException("token and serverId are required parameters in the profile");
-			}
-		}
-
-		public String getToken() {
-			return this.token;
-		}
-
-		public String getServerId() {
-			return this.serverId;
 		}
 	}
 
@@ -93,18 +60,18 @@ public class Functions {
 			return new Integer[]{1, 2, 3};
 		}
 
-		private DiscordProfile getProfile(Environment environment, String profileName, Target t) {
+		private Extension.DiscordProfile getProfile(Environment environment, String profileName, Target t) {
 			Profiles.Profile p;
 			try {
 				p = environment.getEnv(GlobalEnv.class).getProfiles().getProfileById(profileName);
 			} catch (Profiles.InvalidProfileException ex) {
 				throw new CREFormatException(ex.getMessage(), t, ex);
 			}
-			if(!(p instanceof DiscordProfile)) {
+			if(!(p instanceof Extension.DiscordProfile)) {
 				throw new CRECastException("Profile type is expected to be \"discord\", but \"" + p.getType()
 						+ "\"  was found.", t);
 			}
-			return (DiscordProfile) p;
+			return (Extension.DiscordProfile) p;
 		}
 
 		public Mixed exec(Target t, Environment env, Mixed... args) throws ConfigRuntimeException {
@@ -143,12 +110,12 @@ public class Functions {
 					token = prof.get("token", t).val();
 					serverId = prof.get("serverId", t).val();
 				} else {
-					DiscordProfile p = getProfile(env, profile.val(), t);
+					Extension.DiscordProfile p = getProfile(env, profile.val(), t);
 					token = p.getToken();
 					serverId = p.getServerId();
 				}
 			}
-			Extension.connectDiscord(token, serverId, callback, env, t);
+			Discord.Connect(token, serverId, callback, env, t);
 			return CVoid.VOID;
 		}
 
@@ -173,7 +140,7 @@ public class Functions {
 		}
 
 		public Mixed exec(Target t, final Environment env, Mixed... args) throws ConfigRuntimeException {
-			Extension.disconnectDiscord();
+			Discord.Disconnect();
 			return CVoid.VOID;
 		}
 
@@ -199,10 +166,10 @@ public class Functions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Extension.guild == null) {
+			if(Discord.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
-			TextChannel channel = args.length == 2 ? Extension.channels.get(args[0].val()) : Extension.guild.getDefaultChannel();
+			TextChannel channel = args.length == 2 ? Discord.channels.get(args[0].val()) : Discord.guild.getDefaultChannel();
 			if(channel == null) {
 				throw new CRENotFoundException("Channel by the name " + args[0].val() + " not found.", t);
 			}
@@ -239,19 +206,10 @@ public class Functions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Extension.guild == null) {
+			if(Discord.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
-			Member mem;
-			if(args[0] instanceof CInt) {
-				mem = Extension.guild.getMemberById(((CInt) args[0]).getInt());
-			} else {
-				List<Member> m = Extension.guild.getMembersByName(args[0].val(), false);
-				if(m.isEmpty()) {
-					throw new CRENotFoundException("A member with the name \"" + args[0].val() + "\" was not found on Discord server.", t);
-				}
-				mem = m.get(0);
-			}
+			Member mem = Discord.GetMember(args[0], t);
 			final String message = args[1].val();
 			mem.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(message).queue());
 			return CVoid.VOID;
@@ -278,10 +236,10 @@ public class Functions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Extension.guild == null) {
+			if(Discord.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
-			TextChannel channel = Extension.channels.get(args[0].val());
+			TextChannel channel = Discord.channels.get(args[0].val());
 			if(channel == null) {
 				throw new CRENotFoundException("Channel by the name " + args[0].val() + " not found.", t);
 			}
@@ -296,6 +254,95 @@ public class Functions {
 
 		public Class<? extends CREThrowable>[] thrown() {
 			return new Class[]{CRENotFoundException.class, CREFormatException.class};
+		}
+	}
+
+	@api
+	public static class discord_member_get_roles extends DiscordFunction {
+
+		public String getName() {
+			return "discord_member_get_roles";
+		}
+
+		public String docs() {
+			return "array {member} Gets an associative array of all server roles for a member."
+					+ " The key is the role name, and the value is the role numeric id."
+					+ " Throws NotFoundException if a member by that name doesn't exist.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{1};
+		}
+
+		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			Member mem = Discord.GetMember(args[0], t);
+			CArray roles = CArray.GetAssociativeArray(t);
+			for(Role role : mem.getRoles()) {
+				roles.set(role.getName(), new CInt(role.getIdLong(), t), t);
+			}
+			return roles;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class};
+		}
+	}
+
+	@api
+	public static class discord_member_add_role extends DiscordFunction {
+
+		public String getName() {
+			return "discord_member_add_role";
+		}
+
+		public String docs() {
+			return "void {member, role} Adds a role to a server member."
+					+ " The role parameter, like members, can be given the name or the numeric id."
+					+ " Throws NotFoundException if a member or role by that name doesn't exist.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{2};
+		}
+
+		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			Member mem = Discord.GetMember(args[0], t);
+			Role role = Discord.GetRole(args[1], t);
+			Discord.guild.getController().addRolesToMember(mem, role).queue();
+			return CVoid.VOID;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class};
+		}
+	}
+
+	@api
+	public static class discord_member_remove_role extends DiscordFunction {
+
+		public String getName() {
+			return "discord_member_remove_role";
+		}
+
+		public String docs() {
+			return "void {member, role} Remove a role from a server member."
+					+ " The role parameter, like members, can be given the name or the numeric id."
+					+ " Throws NotFoundException if a member or role by that name doesn't exist.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{2};
+		}
+
+		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			Member mem = Discord.GetMember(args[0], t);
+			Role role = Discord.GetRole(args[1], t);
+			Discord.guild.getController().removeRolesFromMember(mem, role).queue();
+			return CVoid.VOID;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class};
 		}
 	}
 

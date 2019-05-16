@@ -38,6 +38,21 @@ Therefore it is recommended to use the user id.
 ### discord_set_channel_topic(channel, string)
 Sets a text channel's topic.
 
+### discord_member_get_roles(member)
+Gets an associative array of all server roles for a member.
+The key is the role name, and the value is the role numeric id.
+Throws NotFoundException if a member by that name doesn't exist.
+
+### discord_member_add_role(member, role)
+Adds a role to a server member.
+The role parameter, like members, can be given the name or the numeric id.
+Throws NotFoundException if a member or role by that name doesn't exist.
+
+### discord_member_remove_role(member, role)
+Remove a role from a server member.
+The role parameter, like members, can be given the name or the numeric id.
+Throws NotFoundException if a member or role by that name doesn't exist."
+
 ## Events
 
 ### discord_message_received

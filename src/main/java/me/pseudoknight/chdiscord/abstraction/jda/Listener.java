@@ -3,7 +3,7 @@ package me.pseudoknight.chdiscord.abstraction.jda;
 import com.laytonsmith.abstraction.StaticLayer;
 import com.laytonsmith.core.events.Driver;
 import com.laytonsmith.core.events.EventUtils;
-import me.pseudoknight.chdiscord.Extension;
+import me.pseudoknight.chdiscord.Discord;
 import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordGuildMessageReceivedEvent;
 import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordPrivateMessageReceivedEvent;
 import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordVoiceJoinEvent;
@@ -21,7 +21,7 @@ public class Listener extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-		if(event.getAuthor().equals(Extension.jda.getSelfUser())) {
+		if(event.getAuthor().equals(Discord.jda.getSelfUser())) {
 			return;
 		}
 		final JDADiscordGuildMessageReceivedEvent mre = new JDADiscordGuildMessageReceivedEvent(event);
@@ -37,7 +37,7 @@ public class Listener extends ListenerAdapter {
 
 	@Override
 	public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
-		if(event.getAuthor().equals(Extension.jda.getSelfUser())) {
+		if(event.getAuthor().equals(Discord.jda.getSelfUser())) {
 			return;
 		}
 		final JDADiscordPrivateMessageReceivedEvent mre = new JDADiscordPrivateMessageReceivedEvent(event);
