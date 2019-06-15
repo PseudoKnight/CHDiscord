@@ -9,11 +9,7 @@ import com.laytonsmith.core.Static;
 import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.environments.GlobalEnv;
-import com.laytonsmith.core.exceptions.CRE.CRECastException;
-import com.laytonsmith.core.exceptions.CRE.CREFormatException;
-import com.laytonsmith.core.exceptions.CRE.CREIllegalArgumentException;
-import com.laytonsmith.core.exceptions.CRE.CRENotFoundException;
-import com.laytonsmith.core.exceptions.CRE.CREThrowable;
+import com.laytonsmith.core.exceptions.CRE.*;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.functions.AbstractFunction;
 import com.laytonsmith.core.natives.interfaces.Mixed;
@@ -298,7 +294,8 @@ public class Functions {
 		public String docs() {
 			return "void {member, role} Adds a role to a server member."
 					+ " The role parameter, like members, can be given the name or the numeric id."
-					+ " Throws NotFoundException if a member or role by that name doesn't exist.";
+					+ " Throws NotFoundException if a member or role by that name doesn't exist."
+					+ " Throws InsufficientPermissionException when the bot is not allowed by the discord server.";
 		}
 
 		public Integer[] numArgs() {
@@ -308,12 +305,16 @@ public class Functions {
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
 			Member mem = Discord.GetMember(args[0], t);
 			Role role = Discord.GetRole(args[1], t);
-			Discord.guild.getController().addRolesToMember(mem, role).queue();
+			try {
+				Discord.guild.getController().addRolesToMember(mem, role).queue();
+			} catch (PermissionException ex) {
+				throw new CREInsufficientPermissionException(ex.getMessage(), t);
+			}
 			return CVoid.VOID;
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{CRENotFoundException.class};
+			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class};
 		}
 	}
 
@@ -327,7 +328,8 @@ public class Functions {
 		public String docs() {
 			return "void {member, role} Remove a role from a server member."
 					+ " The role parameter, like members, can be given the name or the numeric id."
-					+ " Throws NotFoundException if a member or role by that name doesn't exist.";
+					+ " Throws NotFoundException if a member or role by that name doesn't exist."
+					+ " Throws InsufficientPermissionException when the bot is not allowed by the discord server.";
 		}
 
 		public Integer[] numArgs() {
@@ -337,12 +339,16 @@ public class Functions {
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
 			Member mem = Discord.GetMember(args[0], t);
 			Role role = Discord.GetRole(args[1], t);
-			Discord.guild.getController().removeRolesFromMember(mem, role).queue();
+			try {
+				Discord.guild.getController().removeRolesFromMember(mem, role).queue();
+			} catch (PermissionException ex) {
+				throw new CREInsufficientPermissionException(ex.getMessage(), t);
+			}
 			return CVoid.VOID;
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{CRENotFoundException.class};
+			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class};
 		}
 	}
 
