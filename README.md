@@ -47,11 +47,13 @@ Throws NotFoundException if a member by that name doesn't exist.
 Adds a role to a server member.
 The role parameter, like members, can be given the name or the numeric id.
 Throws NotFoundException if a member or role by that name doesn't exist.
+Throws InsufficientPermissionException when the bot is not allowed by the discord server.
 
 ### discord_member_remove_role(member, role)
 Remove a role from a server member.
 The role parameter, like members, can be given the name or the numeric id.
-Throws NotFoundException if a member or role by that name doesn't exist."
+Throws NotFoundException if a member or role by that name doesn't exist.
+Throws InsufficientPermissionException when the bot is not allowed by the discord server.
 
 ## Events
 
