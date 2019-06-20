@@ -73,3 +73,7 @@ Data: userid, username, nickname, channel
 ### discord_voice_left
 This event is called when a user left a voice channel.
 Data: userid, username, nickname, channel
+
+### discord_member_joined
+This event is called when a user joined the Discord server.
+Data: userid, username, nickname

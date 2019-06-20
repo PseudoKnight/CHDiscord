@@ -12,10 +12,7 @@ import com.laytonsmith.core.events.Driver;
 import com.laytonsmith.core.exceptions.EventException;
 import com.laytonsmith.core.exceptions.PrefilterNonMatchException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
-import me.pseudoknight.chdiscord.abstraction.events.DiscordGuildMessageReceivedEvent;
-import me.pseudoknight.chdiscord.abstraction.events.DiscordPrivateMessageReceivedEvent;
-import me.pseudoknight.chdiscord.abstraction.events.DiscordVoiceJoinEvent;
-import me.pseudoknight.chdiscord.abstraction.events.DiscordVoiceLeaveEvent;
+import me.pseudoknight.chdiscord.abstraction.events.*;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 
@@ -287,6 +284,69 @@ public class Events {
 				return map;
 			}
 			throw new EventException("Cannot convert e to DiscordVoiceLeaveEvent");
+		}
+
+		@Override
+		public Driver driver() {
+			return Driver.EXTENSION;
+		}
+
+		@Override
+		public boolean modifyEvent(String s, Mixed construct, BindableEvent bindableEvent) {
+			return false;
+		}
+	}
+
+	@api
+	public static class discord_member_joined extends AbstractEvent {
+
+		@Override
+		public String getName() {
+			return "discord_member_joined";
+		}
+
+		@Override
+		public String docs() {
+			return "{} "
+					+ "This event is called when a user joined the Discord server."
+					+ "{username: The Discord username | nickname: The display name on Discord"
+					+ " | userid: The Discord user's unique id} "
+					+ "{} "
+					+ "{}";
+		}
+
+		@Override
+		public MSVersion since() {
+			return MSVersion.V3_3_4;
+		}
+
+		@Override
+		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
+			if(e instanceof DiscordMemberJoinEvent) {
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public BindableEvent convert(CArray cArray, Target target) {
+			return null;
+		}
+
+		@Override
+		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
+			if(e instanceof DiscordMemberJoinEvent) {
+				DiscordMemberJoinEvent event = (DiscordMemberJoinEvent) e;
+				Target t = Target.UNKNOWN;
+				Map<String, Mixed> map = new HashMap<>();
+
+				map.put("username", new CString(event.getMember().getUser().getName(), t));
+				map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
+				map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
+
+				return map;
+			}
+			throw new EventException("Cannot convert e to DiscordMemberJoinEvent");
 		}
 
 		@Override

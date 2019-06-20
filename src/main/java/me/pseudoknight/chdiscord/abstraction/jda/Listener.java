@@ -8,6 +8,7 @@ import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordGuildMessageRe
 import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordPrivateMessageReceivedEvent;
 import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordVoiceJoinEvent;
 import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordVoiceLeaveEvent;
+import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -70,6 +71,19 @@ public class Listener extends ListenerAdapter {
 		try {
 			StaticLayer.GetConvertor().runOnMainThreadAndWait(() -> {
 				EventUtils.TriggerListener(Driver.EXTENSION, "discord_voice_left", vle);
+				return null;
+			});
+		} catch(Exception ex) {
+			Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
+
+	@Override
+	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+		final Events.JDADiscordMemberJoinEvent mje = new Events.JDADiscordMemberJoinEvent(event);
+		try {
+			StaticLayer.GetConvertor().runOnMainThreadAndWait(() -> {
+				EventUtils.TriggerListener(Driver.EXTENSION, "discord_member_joined", mje);
 				return null;
 			});
 		} catch(Exception ex) {
