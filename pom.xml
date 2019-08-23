@@ -163,6 +163,9 @@
                                     <include>com.squareup.okio:okio:jar:*</include>
                                     <include>org.slf4j:slf4j-api:*</include>
                                     <include>net.sf.trove4j:trove4j:jar:*</include>
+                                    <include>com.fasterxml.jackson.core:jackson-databind:jar:*</include>
+                                    <include>com.fasterxml.jackson.core:jackson-annotations:jar:*</include>
+                                    <include>com.fasterxml.jackson.core:jackson-core:jar:*</include>
                                 </includes>
                             </artifactSet>
                             <filters>
@@ -184,10 +187,6 @@
                                     <shadedPattern>libs.okhttp3</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>org.json</pattern>
-                                    <shadedPattern>libs.org.json</shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>org.apache</pattern>
                                     <shadedPattern>libs.org.apache</shadedPattern>
                                 </relocation>
@@ -202,6 +201,10 @@
                                 <relocation>
                                     <pattern>com.neovisionaries.ws.client</pattern>
                                     <shadedPattern>libs.com.neovisionaries.ws.client</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.fasterxml.jackson</pattern>
+                                    <shadedPattern>libs.com.fasterxml.jackson</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
@@ -229,6 +232,9 @@
                                     <include>org.apache.logging.log4j:log4j-api:jar:*</include>
                                     <include>org.apache.logging.log4j:log4j-core:jar:*</include>
                                     <include>net.sf.trove4j:trove4j:jar:*</include>
+                                    <include>com.fasterxml.jackson.core:jackson-databind:jar:*</include>
+                                    <include>com.fasterxml.jackson.core:jackson-annotations:jar:*</include>
+                                    <include>com.fasterxml.jackson.core:jackson-core:jar:*</include>
                                 </includes>
                             </artifactSet>
                             <filters>
