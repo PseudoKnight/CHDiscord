@@ -2,21 +2,22 @@ package me.pseudoknight.chdiscord;
 
 import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.annotations.api;
-import com.laytonsmith.core.ArgumentValidation;
-import com.laytonsmith.core.MSVersion;
-import com.laytonsmith.core.Profiles;
-import com.laytonsmith.core.Static;
+import com.laytonsmith.core.*;
+import com.laytonsmith.core.compiler.FileOptions;
 import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.environments.GlobalEnv;
 import com.laytonsmith.core.exceptions.CRE.*;
+import com.laytonsmith.core.exceptions.ConfigCompileException;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.functions.AbstractFunction;
 import com.laytonsmith.core.natives.interfaces.Mixed;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.exceptions.PermissionException;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.exceptions.PermissionException;
+
+import java.util.*;
 
 public class Functions {
 	public static String docs() {
@@ -165,9 +166,18 @@ public class Functions {
 			if(Discord.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
-			TextChannel channel = args.length == 2 ? Discord.channels.get(args[0].val()) : Discord.guild.getDefaultChannel();
-			if(channel == null) {
-				throw new CRENotFoundException("Channel by the name " + args[0].val() + " not found.", t);
+			TextChannel channel = null;
+			if(args.length == 2) {
+				List<TextChannel> channels =  Discord.guild.getTextChannelsByName(args[0].val(), false);
+				if(channels.isEmpty()) {
+					throw new CRENotFoundException("Channel by the name " + args[0].val() + " not found.", t);
+				}
+				channel = channels.get(0);
+			} else {
+				channel = Discord.guild.getDefaultChannel();
+				if(channel == null) {
+					throw new CRENotFoundException("Default channel for bot not found.", t);
+				}
 			}
 			String message = args[args.length - 1].val();
 			try {
@@ -179,7 +189,7 @@ public class Functions {
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{CRENotFoundException.class};
+			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class};
 		}
 	}
 
@@ -235,10 +245,11 @@ public class Functions {
 			if(Discord.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
-			TextChannel channel = Discord.channels.get(args[0].val());
-			if(channel == null) {
+			List<TextChannel> channels =  Discord.guild.getTextChannelsByName(args[0].val(), false);
+			if(channels.isEmpty()) {
 				throw new CRENotFoundException("Channel by the name " + args[0].val() + " not found.", t);
 			}
+			TextChannel channel = channels.get(0);
 			String message = args[1].val();
 			try {
 				channel.getManager().setTopic(message).queue();
@@ -285,7 +296,47 @@ public class Functions {
 	}
 
 	@api
-	public static class discord_member_add_role extends DiscordFunction {
+	public static class discord_member_set_roles extends DiscordFunction {
+
+		public String getName() {
+			return "discord_member_set_roles";
+		}
+
+		public String docs() {
+			return "void {member, role(s)} Sets the roles for a server member."
+					+ " The role argument can be an array or a single role."
+					+ " Like members, a role can be the name or the numeric id."
+					+ " Throws NotFoundException if a member or role by that name doesn't exist."
+					+ " Throws InsufficientPermissionException when the bot is not allowed by the discord server.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{1};
+		}
+
+		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			Member mem = Discord.GetMember(args[0], t);
+			List<Role> roles = new ArrayList<>();
+			if(args[1].isInstanceOf(CArray.TYPE)) {
+				for(Mixed value : ((CArray) args[1]).asList()) {
+					roles.add(Discord.GetRole(value, t));
+				}
+			}
+			try {
+				Discord.guild.modifyMemberRoles(mem, roles).queue();
+			} catch (PermissionException ex) {
+				throw new CREInsufficientPermissionException(ex.getMessage(), t);
+			}
+			return CVoid.VOID;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class};
+		}
+	}
+
+	@api
+	public static class discord_member_add_role extends DiscordFunction implements Optimizable {
 
 		public String getName() {
 			return "discord_member_add_role";
@@ -306,7 +357,7 @@ public class Functions {
 			Member mem = Discord.GetMember(args[0], t);
 			Role role = Discord.GetRole(args[1], t);
 			try {
-				Discord.guild.getController().addRolesToMember(mem, role).queue();
+				Discord.guild.modifyMemberRoles(mem, Collections.singletonList(role), new ArrayList<>()).queue();
 			} catch (PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);
 			}
@@ -316,10 +367,22 @@ public class Functions {
 		public Class<? extends CREThrowable>[] thrown() {
 			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class};
 		}
+
+		@Override
+		public Set<OptimizationOption> optimizationOptions() {
+			return EnumSet.of(OptimizationOption.OPTIMIZE_DYNAMIC);
+		}
+
+		@Override
+		public ParseTree optimizeDynamic(Target t, Environment env, Set<Class<? extends Environment.EnvironmentImpl>> envs,
+				List<ParseTree> children, FileOptions fileOptions) throws ConfigCompileException, ConfigRuntimeException {
+			MSLog.GetLogger().w(MSLog.Tags.DEPRECATION, getName() + " is deprecated for discord_member_set_roles", t);
+			return null;
+		}
 	}
 
 	@api
-	public static class discord_member_remove_role extends DiscordFunction {
+	public static class discord_member_remove_role extends DiscordFunction implements Optimizable {
 
 		public String getName() {
 			return "discord_member_remove_role";
@@ -340,7 +403,7 @@ public class Functions {
 			Member mem = Discord.GetMember(args[0], t);
 			Role role = Discord.GetRole(args[1], t);
 			try {
-				Discord.guild.getController().removeRolesFromMember(mem, role).queue();
+				Discord.guild.modifyMemberRoles(mem, new ArrayList<>(), Collections.singletonList(role)).queue();
 			} catch (PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);
 			}
@@ -349,6 +412,19 @@ public class Functions {
 
 		public Class<? extends CREThrowable>[] thrown() {
 			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class};
+		}
+
+
+		@Override
+		public Set<Optimizable.OptimizationOption> optimizationOptions() {
+			return EnumSet.of(Optimizable.OptimizationOption.OPTIMIZE_DYNAMIC);
+		}
+
+		@Override
+		public ParseTree optimizeDynamic(Target t, Environment env, Set<Class<? extends Environment.EnvironmentImpl>> envs,
+				List<ParseTree> children, FileOptions fileOptions) throws ConfigCompileException, ConfigRuntimeException {
+			MSLog.GetLogger().w(MSLog.Tags.DEPRECATION, getName() + " is deprecated for discord_member_set_roles", t);
+			return null;
 		}
 	}
 

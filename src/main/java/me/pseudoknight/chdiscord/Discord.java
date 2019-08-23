@@ -13,16 +13,16 @@ import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.exceptions.ProgramFlowManipulationException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import me.pseudoknight.chdiscord.abstraction.jda.Listener;
-import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.api.AccountType;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 import javax.security.auth.login.LoginException;
-import java.util.HashMap;
+import java.util.EnumSet;
 import java.util.List;
 
 public class Discord {
@@ -30,7 +30,6 @@ public class Discord {
 	public static JDA jda = null;
 
 	static Guild guild = null;
-	static HashMap<String, TextChannel> channels = new HashMap<>();
 
 	private static Thread connection;
 	private static DaemonManager dm;
@@ -44,20 +43,22 @@ public class Discord {
 			try {
 				jda = new JDABuilder(AccountType.BOT)
 						.setToken(token)
-						.setAudioEnabled(false)
+						.setDisabledCacheFlags(EnumSet.of(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.CLIENT_STATUS, CacheFlag.EMOTE))
 						.setAutoReconnect(true)
-						.addEventListener(new Listener())
+						.addEventListeners(new Listener())
 						.build()
 						.awaitReady();
 
 				guild = jda.getGuildById(guildID);
-				for(TextChannel channel : guild.getTextChannels()) {
-					channels.put(channel.getName(), channel);
+				if(guild == null) {
+					MSLog.GetLogger().e(MSLog.Tags.RUNTIME, "The specified Discord server does not exist: " + guildID, t);
+					Disconnect();
+					return;
 				}
 
 			} catch(LoginException | IllegalStateException | InterruptedException ex) {
 				MSLog.GetLogger().e(MSLog.Tags.RUNTIME, "Could not connect to Discord server.", t);
-				dm.deactivateThread(null);
+				Disconnect();
 				return;
 			}
 
@@ -86,7 +87,6 @@ public class Discord {
 
 		jda = null;
 		guild = null;
-		channels.clear();
 		dm = null;
 		connection = null;
 	}

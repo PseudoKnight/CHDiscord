@@ -43,15 +43,10 @@ Gets an associative array of all server roles for a member.
 The key is the role name, and the value is the role numeric id.
 Throws NotFoundException if a member by that name doesn't exist.
 
-### discord_member_add_role(member, role)
-Adds a role to a server member.
-The role parameter, like members, can be given the name or the numeric id.
-Throws NotFoundException if a member or role by that name doesn't exist.
-Throws InsufficientPermissionException when the bot is not allowed by the discord server.
-
-### discord_member_remove_role(member, role)
-Remove a role from a server member.
-The role parameter, like members, can be given the name or the numeric id.
+### discord_member_set_roles(member, role(s))
+Sets the roles for a server member.
+The role argument can be an array or a single role.
+Like members, a role can be the name or the numeric id.
 Throws NotFoundException if a member or role by that name doesn't exist.
 Throws InsufficientPermissionException when the bot is not allowed by the discord server.
 
