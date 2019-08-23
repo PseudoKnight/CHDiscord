@@ -65,7 +65,7 @@ public class Discord {
 			if(callback != null) {
 				StaticLayer.GetConvertor().runOnMainThreadLater(dm, () -> {
 					try {
-						callback.execute();
+						callback.executeCallable();
 					} catch (ConfigRuntimeException ex) {
 						ConfigRuntimeException.HandleUncaughtException(ex, env);
 					} catch (ProgramFlowManipulationException ex) {
