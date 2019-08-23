@@ -43,7 +43,7 @@ public class Discord {
 			try {
 				jda = new JDABuilder(AccountType.BOT)
 						.setToken(token)
-						.setDisabledCacheFlags(EnumSet.of(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.CLIENT_STATUS, CacheFlag.EMOTE))
+						.setDisabledCacheFlags(EnumSet.of(CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS, CacheFlag.EMOTE))
 						.setAutoReconnect(true)
 						.addEventListeners(new Listener())
 						.build()

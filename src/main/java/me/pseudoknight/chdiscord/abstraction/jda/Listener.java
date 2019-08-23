@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import javax.annotation.Nonnull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,7 +54,7 @@ public class Listener extends ListenerAdapter {
 	}
 
 	@Override
-	public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
+	public void onGuildVoiceJoin(@Nonnull GuildVoiceJoinEvent event) {
 		final JDADiscordVoiceJoinEvent vje = new JDADiscordVoiceJoinEvent(event);
 		try {
 			StaticLayer.GetConvertor().runOnMainThreadAndWait(() -> {
@@ -66,7 +67,7 @@ public class Listener extends ListenerAdapter {
 	}
 
 	@Override
-	public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
+	public void onGuildVoiceLeave(@Nonnull GuildVoiceLeaveEvent event) {
 		final JDADiscordVoiceLeaveEvent vle = new JDADiscordVoiceLeaveEvent(event);
 		try {
 			StaticLayer.GetConvertor().runOnMainThreadAndWait(() -> {
@@ -79,7 +80,7 @@ public class Listener extends ListenerAdapter {
 	}
 
 	@Override
-	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+	public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
 		final Events.JDADiscordMemberJoinEvent mje = new Events.JDADiscordMemberJoinEvent(event);
 		try {
 			StaticLayer.GetConvertor().runOnMainThreadAndWait(() -> {
