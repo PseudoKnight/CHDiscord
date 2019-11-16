@@ -382,8 +382,9 @@ public class Functions {
 			Member mem = Discord.GetMember(args[0], t);
 			List<Role> roles = new ArrayList<>();
 			if(args[1].isInstanceOf(CArray.TYPE)) {
-				for(Mixed value : ((CArray) args[1]).asList()) {
-					roles.add(Discord.GetRole(value, t));
+				CArray ca = (CArray) args[1];
+				for(Mixed key : ((CArray) args[1]).keySet()) {
+					roles.add(Discord.GetRole(ca.get(key, t), t));
 				}
 			}
 			try {
