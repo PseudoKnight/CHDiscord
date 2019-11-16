@@ -35,6 +35,13 @@ The user numeric id or name can be used to specify which server member to send t
 If there are multiple members with the same user name, only the first one is messaged.
 Therefore it is recommended to use the user id.
 
+### discord_set_activity(type, string, [url])
+Sets the activity tag for the bot.
+Activity type can be one of DEFAULT, STREAMING, or LISTENING
+Activity string can be anything but an empty string.
+If streaming, a valid Twitch URL must also be provided.
+If not, or it's invalid, type will revert to DEFAULT (ie. playing).
+
 ### discord_set_channel_topic(channel, string)
 Sets a text channel's topic.
 

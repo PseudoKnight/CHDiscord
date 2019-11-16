@@ -1,5 +1,6 @@
 package me.pseudoknight.chdiscord;
 
+import com.laytonsmith.PureUtilities.Common.StringUtils;
 import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.ArgumentValidation;
@@ -27,6 +28,7 @@ import com.laytonsmith.core.exceptions.ConfigCompileException;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.functions.AbstractFunction;
 import com.laytonsmith.core.natives.interfaces.Mixed;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -280,6 +282,49 @@ public class Functions {
 
 		public Class<? extends CREThrowable>[] thrown() {
 			return new Class[]{CRENotFoundException.class, CREFormatException.class};
+		}
+	}
+
+	@api
+	public static class discord_set_activity extends DiscordFunction {
+
+		public String getName() {
+			return "discord_set_activity";
+		}
+
+		public String docs() {
+			return "void {type, string, [url]} Sets the activity tag for the bot."
+					+ " Activity type can be one of " + StringUtils.Join(Activity.ActivityType.values(), ", ", ", or ") + "."
+					+ " Activity string can be anything but an empty string."
+					+ " If streaming, a valid Twitch URL must also be provided."
+					+ " If not, or it's invalid, type will revert to DEFAULT (ie. playing).";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{2, 3};
+		}
+
+		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			if(Discord.guild == null) {
+				throw new CRENotFoundException("Not connected to Discord server.", t);
+			}
+			try {
+				Activity.ActivityType type = Activity.ActivityType.valueOf(args[0].val().toUpperCase());
+				Activity activity;
+				if (type == Activity.ActivityType.STREAMING && args.length == 3) {
+					activity = Activity.of(type, args[1].val(), args[2].val());
+				} else {
+					activity = Activity.of(type, args[1].val());
+				}
+				Discord.jda.getPresence().setActivity(activity);
+			} catch (IllegalArgumentException ex) {
+				throw new CREIllegalArgumentException(ex.getMessage(), t);
+			}
+			return CVoid.VOID;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class};
 		}
 	}
 
