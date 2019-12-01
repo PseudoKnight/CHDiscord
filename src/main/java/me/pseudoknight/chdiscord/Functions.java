@@ -11,11 +11,7 @@ import com.laytonsmith.core.ParseTree;
 import com.laytonsmith.core.Profiles;
 import com.laytonsmith.core.Static;
 import com.laytonsmith.core.compiler.FileOptions;
-import com.laytonsmith.core.constructs.CArray;
-import com.laytonsmith.core.constructs.CClosure;
-import com.laytonsmith.core.constructs.CInt;
-import com.laytonsmith.core.constructs.CVoid;
-import com.laytonsmith.core.constructs.Target;
+import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.environments.GlobalEnv;
 import com.laytonsmith.core.exceptions.CRE.CRECastException;
@@ -290,7 +286,7 @@ public class Functions {
 		}
 
 		public String docs() {
-			return "void {type, string, [url]} Sets the activity tag for the bot."
+			return "void {[type], string, [url]} Sets the activity tag for the bot."
 					+ " Activity type can be one of " + StringUtils.Join(Activity.ActivityType.values(), ", ", ", or ") + "."
 					+ " Activity string can be anything but an empty string."
 					+ " If streaming, a valid Twitch URL must also be provided."
@@ -298,7 +294,7 @@ public class Functions {
 		}
 
 		public Integer[] numArgs() {
-			return new Integer[]{2, 3};
+			return new Integer[]{1, 2, 3};
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
@@ -307,8 +303,12 @@ public class Functions {
 			}
 			try {
 				Activity.ActivityType type = Activity.ActivityType.valueOf(args[0].val().toUpperCase());
-				Activity activity;
-				if (type == Activity.ActivityType.STREAMING && args.length == 3) {
+				Activity activity = null;
+				if (args.length == 1) {
+					if(!(args[0] instanceof CNull)) {
+						activity = Activity.playing(args[0].val());
+					}
+				} else if (type == Activity.ActivityType.STREAMING && args.length == 3) {
 					activity = Activity.of(type, args[1].val(), args[2].val());
 				} else {
 					activity = Activity.of(type, args[1].val());
