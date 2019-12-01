@@ -28,10 +28,7 @@ import com.laytonsmith.core.exceptions.ConfigCompileException;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.functions.AbstractFunction;
 import com.laytonsmith.core.natives.interfaces.Mixed;
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.util.ArrayList;
@@ -397,99 +394,6 @@ public class Functions {
 
 		public Class<? extends CREThrowable>[] thrown() {
 			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class};
-		}
-	}
-
-	@api
-	public static class discord_member_add_role extends DiscordFunction implements Optimizable {
-
-		public String getName() {
-			return "discord_member_add_role";
-		}
-
-		public String docs() {
-			return "void {member, role} Adds a role to a server member."
-					+ " The role parameter, like members, can be given the name or the numeric id."
-					+ " Throws NotFoundException if a member or role by that name doesn't exist."
-					+ " Throws InsufficientPermissionException when the bot is not allowed by the discord server.";
-		}
-
-		public Integer[] numArgs() {
-			return new Integer[]{2};
-		}
-
-		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			Member mem = Discord.GetMember(args[0], t);
-			Role role = Discord.GetRole(args[1], t);
-			try {
-				Discord.guild.modifyMemberRoles(mem, Collections.singletonList(role), new ArrayList<>()).queue();
-			} catch (PermissionException ex) {
-				throw new CREInsufficientPermissionException(ex.getMessage(), t);
-			}
-			return CVoid.VOID;
-		}
-
-		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class};
-		}
-
-		@Override
-		public Set<OptimizationOption> optimizationOptions() {
-			return EnumSet.of(OptimizationOption.OPTIMIZE_DYNAMIC);
-		}
-
-		@Override
-		public ParseTree optimizeDynamic(Target t, Environment env, Set<Class<? extends Environment.EnvironmentImpl>> envs,
-				List<ParseTree> children, FileOptions fileOptions) throws ConfigCompileException, ConfigRuntimeException {
-			MSLog.GetLogger().w(MSLog.Tags.DEPRECATION, getName() + " is deprecated for discord_member_set_roles", t);
-			return null;
-		}
-	}
-
-	@api
-	public static class discord_member_remove_role extends DiscordFunction implements Optimizable {
-
-		public String getName() {
-			return "discord_member_remove_role";
-		}
-
-		public String docs() {
-			return "void {member, role} Remove a role from a server member."
-					+ " The role parameter, like members, can be given the name or the numeric id."
-					+ " Throws NotFoundException if a member or role by that name doesn't exist."
-					+ " Throws InsufficientPermissionException when the bot is not allowed by the discord server.";
-		}
-
-		public Integer[] numArgs() {
-			return new Integer[]{2};
-		}
-
-		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			Member mem = Discord.GetMember(args[0], t);
-			Role role = Discord.GetRole(args[1], t);
-			try {
-				Discord.guild.modifyMemberRoles(mem, new ArrayList<>(), Collections.singletonList(role)).queue();
-			} catch (PermissionException ex) {
-				throw new CREInsufficientPermissionException(ex.getMessage(), t);
-			}
-			return CVoid.VOID;
-		}
-
-		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class};
-		}
-
-
-		@Override
-		public Set<Optimizable.OptimizationOption> optimizationOptions() {
-			return EnumSet.of(Optimizable.OptimizationOption.OPTIMIZE_DYNAMIC);
-		}
-
-		@Override
-		public ParseTree optimizeDynamic(Target t, Environment env, Set<Class<? extends Environment.EnvironmentImpl>> envs,
-				List<ParseTree> children, FileOptions fileOptions) throws ConfigCompileException, ConfigRuntimeException {
-			MSLog.GetLogger().w(MSLog.Tags.DEPRECATION, getName() + " is deprecated for discord_member_set_roles", t);
-			return null;
 		}
 	}
 
