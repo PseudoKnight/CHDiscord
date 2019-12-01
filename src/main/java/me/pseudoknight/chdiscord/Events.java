@@ -38,7 +38,8 @@ public class Events {
 					+ "This event is called when a user sends a message in the Discord server."
 					+ "{username: The Discord username | nickname: The display name on Discord"
 					+ " | userid: The Discord user's unique id"
-					+ " | channel: The channel the message was sent | message: The message the user sent.} "
+					+ " | channel: The channel the message was sent | message: The message the user sent."
+					+ " | id: The message id.} "
 					+ "{} "
 					+ "{}";
 		}
@@ -89,6 +90,7 @@ public class Events {
 				map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
 				map.put("channel", new CString(event.getChannel().getName(), t));
 				map.put("message", new CString(msg.getContentDisplay(), t));
+				map.put("id", new CInt(msg.getIdLong(), t));
 
 				return map;
 			}
@@ -119,7 +121,7 @@ public class Events {
 			return "{} "
 					+ "This event is called when a user sends a private message to the bot."
 					+ "{username: The Discord username | userid: The Discord user's unique id"
-					+ " | message: The message the user sent.} "
+					+ " | message: The message the user sent. | id: The message id.} "
 					+ "{} "
 					+ "{}";
 		}
@@ -150,6 +152,7 @@ public class Events {
 				map.put("username", new CString(event.getAuthor().getName(), t));
 				map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
 				map.put("message", new CString(msg.getContentDisplay(), t));
+				map.put("id", new CInt(msg.getIdLong(), t));
 
 				return map;
 			}
