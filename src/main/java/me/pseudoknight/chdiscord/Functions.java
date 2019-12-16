@@ -4,13 +4,9 @@ import com.laytonsmith.PureUtilities.Common.StringUtils;
 import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.ArgumentValidation;
-import com.laytonsmith.core.MSLog;
 import com.laytonsmith.core.MSVersion;
-import com.laytonsmith.core.Optimizable;
-import com.laytonsmith.core.ParseTree;
 import com.laytonsmith.core.Profiles;
 import com.laytonsmith.core.Static;
-import com.laytonsmith.core.compiler.FileOptions;
 import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.environments.GlobalEnv;
@@ -20,7 +16,6 @@ import com.laytonsmith.core.exceptions.CRE.CREIllegalArgumentException;
 import com.laytonsmith.core.exceptions.CRE.CREInsufficientPermissionException;
 import com.laytonsmith.core.exceptions.CRE.CRENotFoundException;
 import com.laytonsmith.core.exceptions.CRE.CREThrowable;
-import com.laytonsmith.core.exceptions.ConfigCompileException;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.functions.AbstractFunction;
 import com.laytonsmith.core.natives.interfaces.Mixed;
@@ -28,10 +23,7 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
 public class Functions {
 	public static String docs() {
@@ -196,6 +188,44 @@ public class Functions {
 			String message = args[args.length - 1].val();
 			try {
 				channel.sendMessage(message).queue();
+			} catch(IllegalArgumentException ex) {
+				throw new CREIllegalArgumentException(ex.getMessage(), t);
+			}
+			return CVoid.VOID;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class};
+		}
+	}
+
+	@api
+	public static class discord_delete_message extends DiscordFunction {
+
+		public String getName() {
+			return "discord_delete_message";
+		}
+
+		public String docs() {
+			return "void {channel, id} Deletes a message on a channel with the given id.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{2};
+		}
+
+		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			if(Discord.guild == null) {
+				throw new CRENotFoundException("Not connected to Discord server.", t);
+			}
+			List<TextChannel> channels =  Discord.guild.getTextChannelsByName(args[0].val(), false);
+			if(channels.isEmpty()) {
+				throw new CRENotFoundException("Channel by the name " + args[0].val() + " not found.", t);
+			}
+			TextChannel channel = channels.get(0);
+			long id = Static.getInt(args[1], t);
+			try {
+				channel.deleteMessageById(id).queue();
 			} catch(IllegalArgumentException ex) {
 				throw new CREIllegalArgumentException(ex.getMessage(), t);
 			}

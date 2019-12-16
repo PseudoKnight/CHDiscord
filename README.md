@@ -29,6 +29,9 @@ Disconnects from the Discord server.
 Broadcasts text to the specified channel (or default). 
 Message must not be empty, else it will throw an IllegalArgumentException.
 
+### discord_delete_message(channel, id)
+Deletes a message on a channel with the given id.
+
 ### discord_private_message(user, string)
 Sends a private message to the specified Discord server member.
 The user numeric id or name can be used to specify which server member to send to.
