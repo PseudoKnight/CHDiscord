@@ -2,9 +2,9 @@
 
 This is CommandHelper extension that uses the JDA library to talk to your Discord server.
 
-You'll need a Discord Bot "Token" from an app you can create [here](https://discordapp.com/developers/applications/me) as well as your server id that you can get by right-clicking your server name and clicking "Copy ID". You have to run discord_connect(token, server_id) before you can use the other functionality of this extension.
+You'll need to have created a Discord application [here](https://discordapp.com/developers/applications/me). Then add a Bot to it. Grab the "TOKEN" for the Bot that you'll use to connect this extension to Discord. Finally, you'll need your server id that you can get by right-clicking your server name and clicking "Copy ID". 
 
-NOTE: This could conflict with other Discord plugins. This is meant as a standalone solution for handling all Discord integration for your server. If you want to use DiscordSRV, I recommend forking the 0.0.1 version of this extension.
+You have to run discord_connect(token, server_id) before you can use the other functionality of this extension.
 
 ## Functions
 
