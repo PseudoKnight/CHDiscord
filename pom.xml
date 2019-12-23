@@ -176,6 +176,12 @@
                                         <exclude>tomp2p/opuswrapper/**</exclude>
                                     </excludes>
                                 </filter>
+                                <filter>
+                                    <artifact>com.fasterxml.jackson.core:jackson-databind:jar:*</artifact>
+                                    <includes>
+                                        <include>**</include> <!-- This avoids an issue with minimizeJar. -->
+                                    </includes>
+                                </filter>
                             </filters>
                             <relocations>
                                 <relocation>
@@ -244,6 +250,12 @@
                                         <exclude>tomp2p/opuswrapper/**</exclude>
                                         <exclude>com/iwebpp/crypto/**</exclude>
                                     </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.fasterxml.jackson.core:jackson-databind:jar:*</artifact>
+                                    <includes>
+                                        <include>**</include> <!-- This avoids an issue with minimizeJar. -->
+                                    </includes>
                                 </filter>
                             </filters>
                         </configuration>
