@@ -18,10 +18,6 @@
             <name>jcenter-bintray</name>
             <url>http://jcenter.bintray.com</url>
         </repository>
-        <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
-        </repository>
     </repositories>
 
     <dependencies>
@@ -204,46 +200,7 @@
                             </relocations>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>cmdline</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <shadedArtifactAttached>true</shadedArtifactAttached>
-                            <shadedClassifierName>cmdline</shadedClassifierName>
-                            <minimizeJar>true</minimizeJar>
-                            <artifactSet>
-                                <includes>
-                                    <include>net.dv8tion:JDA:jar:*</include>
-                                    <include>com.neovisionaries:nv-websocket-client:jar:*</include>
-                                    <include>org.apache.commons:commons-collections4:jar:*</include>
-                                    <include>com.squareup.okhttp3:okhttp:jar:*</include>
-                                    <include>com.squareup.okio:okio:jar:*</include>
-                                    <include>org.slf4j:slf4j-api:*</include>
-                                    <include>org.apache.logging.log4j:log4j-slf4j-impl:jar:*</include>
-                                    <include>org.apache.logging.log4j:log4j-api:jar:*</include>
-                                    <include>org.apache.logging.log4j:log4j-core:jar:*</include>
-                                    <include>net.sf.trove4j:trove4j:jar:*</include>
-                                    <include>com.fasterxml.jackson.core:jackson-databind:jar:*</include>
-                                    <include>com.fasterxml.jackson.core:jackson-annotations:jar:*</include>
-                                    <include>com.fasterxml.jackson.core:jackson-core:jar:*</include>
-                                </includes>
-                            </artifactSet>
-                            <filters>
-                                <filter>
-                                    <artifact>net.dv8tion:JDA:jar:*</artifact>
-                                    <excludes>
-                                        <exclude>natives/**</exclude>
-                                        <exclude>tomp2p/opuswrapper/**</exclude>
-                                        <exclude>com/iwebpp/crypto/**</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                        </configuration>
-                    </execution>
-                </executions>
+                 </executions>
             </plugin>
         </plugins>
     </build>
