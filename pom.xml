@@ -26,14 +26,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.14.4-R0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>commandhelper</artifactId>
-            <version>3.3.4-SNAPSHOT</version>
+            <version>3.3.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>net.dv8tion</groupId>

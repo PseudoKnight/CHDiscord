@@ -1,9 +1,10 @@
 package me.pseudoknight.chdiscord;
 
 import com.laytonsmith.annotations.api;
-import com.laytonsmith.core.MSVersion;
+import com.laytonsmith.core.CHVersion;
 import com.laytonsmith.core.constructs.CArray;
 import com.laytonsmith.core.constructs.CInt;
+import com.laytonsmith.core.constructs.Construct;
 import com.laytonsmith.core.constructs.CString;
 import com.laytonsmith.core.constructs.Target;
 import com.laytonsmith.core.events.AbstractEvent;
@@ -11,7 +12,6 @@ import com.laytonsmith.core.events.BindableEvent;
 import com.laytonsmith.core.events.Driver;
 import com.laytonsmith.core.exceptions.EventException;
 import com.laytonsmith.core.exceptions.PrefilterNonMatchException;
-import com.laytonsmith.core.natives.interfaces.Mixed;
 import me.pseudoknight.chdiscord.abstraction.events.*;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -45,12 +45,12 @@ public class Events {
 		}
 
 		@Override
-		public MSVersion since() {
-			return MSVersion.V3_3_2;
+		public CHVersion since() {
+			return CHVersion.V3_3_2;
 		}
 
 		@Override
-		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
+		public boolean matches(Map<String, Construct> prefilter, BindableEvent e) throws PrefilterNonMatchException {
 			if (e instanceof DiscordGuildMessageReceivedEvent) {
 				DiscordGuildMessageReceivedEvent event = (DiscordGuildMessageReceivedEvent)e;
 
@@ -72,12 +72,12 @@ public class Events {
 		}
 
 		@Override
-		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
+		public Map<String, Construct> evaluate(BindableEvent e) throws EventException {
 			if (e instanceof DiscordGuildMessageReceivedEvent) {
 				DiscordGuildMessageReceivedEvent event = (DiscordGuildMessageReceivedEvent) e;
 				Message msg = event.getMessage();
 				Target t = Target.UNKNOWN;
-				Map<String, Mixed> map = new HashMap<>();
+				Map<String, Construct> map = new HashMap<>();
 
 				Member mem = event.getMember();
 				if(mem != null) {
@@ -103,7 +103,7 @@ public class Events {
 		}
 
 		@Override
-		public boolean modifyEvent(String s, Mixed construct, BindableEvent bindableEvent) {
+		public boolean modifyEvent(String s, Construct construct, BindableEvent bindableEvent) {
 			return false;
 		}
 	}
@@ -127,12 +127,12 @@ public class Events {
 		}
 
 		@Override
-		public MSVersion since() {
-			return MSVersion.V3_3_2;
+		public CHVersion since() {
+			return CHVersion.V3_3_2;
 		}
 
 		@Override
-		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
+		public boolean matches(Map<String, Construct> prefilter, BindableEvent e) throws PrefilterNonMatchException {
 			return e instanceof DiscordPrivateMessageReceivedEvent;
 		}
 
@@ -142,12 +142,12 @@ public class Events {
 		}
 
 		@Override
-		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
+		public Map<String, Construct> evaluate(BindableEvent e) throws EventException {
 			if (e instanceof DiscordPrivateMessageReceivedEvent) {
 				DiscordPrivateMessageReceivedEvent event = (DiscordPrivateMessageReceivedEvent) e;
 				Message msg = event.getMessage();
 				Target t = Target.UNKNOWN;
-				Map<String, Mixed> map = new HashMap<>();
+				Map<String, Construct> map = new HashMap<>();
 
 				map.put("username", new CString(event.getAuthor().getName(), t));
 				map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
@@ -165,7 +165,7 @@ public class Events {
 		}
 
 		@Override
-		public boolean modifyEvent(String s, Mixed construct, BindableEvent bindableEvent) {
+		public boolean modifyEvent(String s, Construct construct, BindableEvent bindableEvent) {
 			return false;
 		}
 	}
@@ -190,12 +190,12 @@ public class Events {
 		}
 
 		@Override
-		public MSVersion since() {
-			return MSVersion.V3_3_2;
+		public CHVersion since() {
+			return CHVersion.V3_3_2;
 		}
 
 		@Override
-		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
+		public boolean matches(Map<String, Construct> prefilter, BindableEvent e) throws PrefilterNonMatchException {
 			if(e instanceof DiscordVoiceJoinEvent) {
 				return true;
 			}
@@ -208,11 +208,11 @@ public class Events {
 		}
 
 		@Override
-		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
+		public Map<String, Construct> evaluate(BindableEvent e) throws EventException {
 			if(e instanceof DiscordVoiceJoinEvent) {
 				DiscordVoiceJoinEvent event = (DiscordVoiceJoinEvent) e;
 				Target t = Target.UNKNOWN;
-				Map<String, Mixed> map = new HashMap<>();
+				Map<String, Construct> map = new HashMap<>();
 
 				map.put("username", new CString(event.getMember().getUser().getName(), t));
 				map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
@@ -230,7 +230,7 @@ public class Events {
 		}
 
 		@Override
-		public boolean modifyEvent(String s, Mixed construct, BindableEvent bindableEvent) {
+		public boolean modifyEvent(String s, Construct construct, BindableEvent bindableEvent) {
 			return false;
 		}
 	}
@@ -255,12 +255,12 @@ public class Events {
 		}
 
 		@Override
-		public MSVersion since() {
-			return MSVersion.V3_3_2;
+		public CHVersion since() {
+			return CHVersion.V3_3_2;
 		}
 
 		@Override
-		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
+		public boolean matches(Map<String, Construct> prefilter, BindableEvent e) throws PrefilterNonMatchException {
 			if(e instanceof DiscordVoiceLeaveEvent) {
 				return true;
 			}
@@ -273,11 +273,11 @@ public class Events {
 		}
 
 		@Override
-		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
+		public Map<String, Construct> evaluate(BindableEvent e) throws EventException {
 			if(e instanceof DiscordVoiceLeaveEvent) {
 				DiscordVoiceLeaveEvent event = (DiscordVoiceLeaveEvent) e;
 				Target t = Target.UNKNOWN;
-				Map<String, Mixed> map = new HashMap<>();
+				Map<String, Construct> map = new HashMap<>();
 
 				map.put("username", new CString(event.getMember().getUser().getName(), t));
 				map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
@@ -295,7 +295,7 @@ public class Events {
 		}
 
 		@Override
-		public boolean modifyEvent(String s, Mixed construct, BindableEvent bindableEvent) {
+		public boolean modifyEvent(String s, Construct construct, BindableEvent bindableEvent) {
 			return false;
 		}
 	}
@@ -319,12 +319,12 @@ public class Events {
 		}
 
 		@Override
-		public MSVersion since() {
-			return MSVersion.V3_3_4;
+		public CHVersion since() {
+			return CHVersion.V3_3_2;
 		}
 
 		@Override
-		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
+		public boolean matches(Map<String, Construct> prefilter, BindableEvent e) throws PrefilterNonMatchException {
 			if(e instanceof DiscordMemberJoinEvent) {
 				return true;
 			}
@@ -337,11 +337,11 @@ public class Events {
 		}
 
 		@Override
-		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
+		public Map<String, Construct> evaluate(BindableEvent e) throws EventException {
 			if(e instanceof DiscordMemberJoinEvent) {
 				DiscordMemberJoinEvent event = (DiscordMemberJoinEvent) e;
 				Target t = Target.UNKNOWN;
-				Map<String, Mixed> map = new HashMap<>();
+				Map<String, Construct> map = new HashMap<>();
 
 				map.put("username", new CString(event.getMember().getUser().getName(), t));
 				map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
@@ -358,7 +358,7 @@ public class Events {
 		}
 
 		@Override
-		public boolean modifyEvent(String s, Mixed construct, BindableEvent bindableEvent) {
+		public boolean modifyEvent(String s, Construct construct, BindableEvent bindableEvent) {
 			return false;
 		}
 	}

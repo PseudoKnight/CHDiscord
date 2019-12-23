@@ -4,7 +4,7 @@ import com.laytonsmith.PureUtilities.Common.StringUtils;
 import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.ArgumentValidation;
-import com.laytonsmith.core.MSVersion;
+import com.laytonsmith.core.CHVersion;
 import com.laytonsmith.core.Profiles;
 import com.laytonsmith.core.Static;
 import com.laytonsmith.core.constructs.*;
@@ -18,7 +18,6 @@ import com.laytonsmith.core.exceptions.CRE.CRENotFoundException;
 import com.laytonsmith.core.exceptions.CRE.CREThrowable;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.functions.AbstractFunction;
-import com.laytonsmith.core.natives.interfaces.Mixed;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
@@ -40,7 +39,7 @@ public class Functions {
 		}
 
 		public Version since() {
-			return MSVersion.V3_3_2;
+			return CHVersion.V3_3_2;
 		}
 	}
 
@@ -77,9 +76,9 @@ public class Functions {
 			return (Extension.DiscordProfile) p;
 		}
 
-		public Mixed exec(Target t, Environment env, Mixed... args) throws ConfigRuntimeException {
+		public Construct exec(Target t, Environment env, Construct... args) throws ConfigRuntimeException {
 			CClosure callback = null;
-			Mixed profile = null;
+			Construct profile = null;
 			String token = null;
 			String serverId = null;
 			switch (args.length) {
@@ -89,7 +88,7 @@ public class Functions {
 					break;
 				case 2:
 					// Not sure, could be (profile, callback) or (token, serverId)
-					if(args[1].isInstanceOf(CClosure.class)) {
+					if(args[1] instanceof CClosure) {
 						// profile, callback
 						profile = args[0];
 						callback = ArgumentValidation.getObject(args[1], t, CClosure.class);
@@ -108,7 +107,7 @@ public class Functions {
 					throw new CREIllegalArgumentException("Not enough/too many parameters", t);
 			}
 			if(profile != null) {
-				if(profile.isInstanceOf(CArray.class)) {
+				if(profile instanceof CArray) {
 					CArray prof = (CArray) profile;
 					token = prof.get("token", t).val();
 					serverId = prof.get("serverId", t).val();
@@ -142,7 +141,7 @@ public class Functions {
 			return new Integer[]{0};
 		}
 
-		public Mixed exec(Target t, final Environment env, Mixed... args) throws ConfigRuntimeException {
+		public Construct exec(Target t, final Environment env, Construct... args) throws ConfigRuntimeException {
 			Discord.Disconnect();
 			return CVoid.VOID;
 		}
@@ -168,7 +167,7 @@ public class Functions {
 			return new Integer[]{1, 2};
 		}
 
-		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+		public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
 			if(Discord.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
@@ -214,7 +213,7 @@ public class Functions {
 			return new Integer[]{2};
 		}
 
-		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+		public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
 			if(Discord.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
@@ -255,7 +254,7 @@ public class Functions {
 			return new Integer[]{2};
 		}
 
-		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+		public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
 			if(Discord.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
@@ -285,7 +284,7 @@ public class Functions {
 			return new Integer[]{2};
 		}
 
-		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+		public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
 			if(Discord.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
@@ -327,7 +326,7 @@ public class Functions {
 			return new Integer[]{1, 2, 3};
 		}
 
-		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+		public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
 			if(Discord.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
@@ -372,7 +371,7 @@ public class Functions {
 			return new Integer[]{1};
 		}
 
-		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+		public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
 			Member mem = Discord.GetMember(args[0], t);
 			CArray roles = CArray.GetAssociativeArray(t);
 			for(Role role : mem.getRoles()) {
@@ -405,12 +404,12 @@ public class Functions {
 			return new Integer[]{2};
 		}
 
-		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+		public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
 			Member mem = Discord.GetMember(args[0], t);
 			List<Role> roles = new ArrayList<>();
-			if(args[1].isInstanceOf(CArray.TYPE)) {
+			if(args[1] instanceof CArray) {
 				CArray ca = (CArray) args[1];
-				for(Mixed key : ((CArray) args[1]).keySet()) {
+				for(Construct key : ((CArray) args[1]).keySet()) {
 					roles.add(Discord.GetRole(ca.get(key, t), t));
 				}
 			}

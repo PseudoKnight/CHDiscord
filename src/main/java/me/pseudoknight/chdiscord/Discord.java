@@ -2,7 +2,7 @@ package me.pseudoknight.chdiscord;
 
 import com.laytonsmith.PureUtilities.DaemonManager;
 import com.laytonsmith.abstraction.StaticLayer;
-import com.laytonsmith.core.MSLog;
+import com.laytonsmith.core.CHLog;
 import com.laytonsmith.core.constructs.CClosure;
 import com.laytonsmith.core.constructs.CInt;
 import com.laytonsmith.core.constructs.Target;
@@ -51,13 +51,13 @@ public class Discord {
 
 				guild = jda.getGuildById(guildID);
 				if(guild == null) {
-					MSLog.GetLogger().e(MSLog.Tags.RUNTIME, "The specified Discord server does not exist: " + guildID, t);
+					CHLog.GetLogger().e(CHLog.Tags.RUNTIME, "The specified Discord server does not exist: " + guildID, t);
 					Disconnect();
 					return;
 				}
 
 			} catch(LoginException | IllegalStateException | InterruptedException ex) {
-				MSLog.GetLogger().e(MSLog.Tags.RUNTIME, "Could not connect to Discord server.", t);
+				CHLog.GetLogger().e(CHLog.Tags.RUNTIME, "Could not connect to Discord server.", t);
 				Disconnect();
 				return;
 			}
@@ -65,7 +65,7 @@ public class Discord {
 			if(callback != null) {
 				StaticLayer.GetConvertor().runOnMainThreadLater(dm, () -> {
 					try {
-						callback.executeCallable();
+						callback.execute();
 					} catch (ConfigRuntimeException ex) {
 						ConfigRuntimeException.HandleUncaughtException(ex, env);
 					} catch (ProgramFlowManipulationException ex) {
