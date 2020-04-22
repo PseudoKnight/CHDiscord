@@ -13,12 +13,12 @@ import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.exceptions.ProgramFlowManipulationException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import me.pseudoknight.chdiscord.abstraction.jda.Listener;
-import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 import javax.security.auth.login.LoginException;
@@ -41,9 +41,8 @@ public class Discord {
 		dm = env.getEnv(GlobalEnv.class).GetDaemonManager();
 		connection = new Thread(() -> {
 			try {
-				jda = new JDABuilder(AccountType.BOT)
-						.setToken(token)
-						.setDisabledCacheFlags(EnumSet.of(CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS, CacheFlag.EMOTE))
+				jda = JDABuilder.create(token, GatewayIntent.getIntents(GatewayIntent.ALL_INTENTS))
+						.disableCache(EnumSet.of(CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS, CacheFlag.EMOTE))
 						.setAutoReconnect(true)
 						.addEventListeners(new Listener())
 						.build()
