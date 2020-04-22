@@ -27,7 +27,7 @@ import java.util.List;
 
 public class Functions {
 	public static String docs() {
-		return "Functions for the DiscordSRV plugin.";
+		return "Functions for Discord.";
 	}
 
 	public static abstract class DiscordFunction extends AbstractFunction {

@@ -21,11 +21,34 @@ import java.util.Map;
 
 public class Events {
 	public static String docs() {
-		return "This provides hooks for DiscordSRV events.";
+		return "This provides hooks for Discord events.";
+	}
+
+	public static abstract class DiscordEvent extends AbstractEvent {
+
+		@Override
+		public MSVersion since() {
+			return MSVersion.V3_3_2;
+		}
+
+		@Override
+		public Driver driver() {
+			return Driver.EXTENSION;
+		}
+
+		@Override
+		public BindableEvent convert(CArray cArray, Target target) {
+			return null;
+		}
+
+		@Override
+		public boolean modifyEvent(String s, Mixed construct, BindableEvent bindableEvent) {
+			return false;
+		}
 	}
 
 	@api
-	public static class discord_message_received extends AbstractEvent {
+	public static class discord_message_received extends DiscordEvent {
 
 		@Override
 		public String getName() {
@@ -45,11 +68,6 @@ public class Events {
 		}
 
 		@Override
-		public MSVersion since() {
-			return MSVersion.V3_3_2;
-		}
-
-		@Override
 		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
 			if (e instanceof DiscordGuildMessageReceivedEvent) {
 				DiscordGuildMessageReceivedEvent event = (DiscordGuildMessageReceivedEvent)e;
@@ -64,11 +82,6 @@ public class Events {
 				return true;
 			}
 			return false;
-		}
-
-		@Override
-		public BindableEvent convert(CArray cArray, Target target) {
-			return null;
 		}
 
 		@Override
@@ -96,20 +109,10 @@ public class Events {
 			}
 			throw new EventException("Cannot convert e to DiscordMessageReceivedEvent");
 		}
-
-		@Override
-		public Driver driver() {
-			return Driver.EXTENSION;
-		}
-
-		@Override
-		public boolean modifyEvent(String s, Mixed construct, BindableEvent bindableEvent) {
-			return false;
-		}
 	}
 
 	@api
-	public static class discord_private_message_received extends AbstractEvent {
+	public static class discord_private_message_received extends DiscordEvent {
 
 		@Override
 		public String getName() {
@@ -127,18 +130,8 @@ public class Events {
 		}
 
 		@Override
-		public MSVersion since() {
-			return MSVersion.V3_3_2;
-		}
-
-		@Override
 		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
 			return e instanceof DiscordPrivateMessageReceivedEvent;
-		}
-
-		@Override
-		public BindableEvent convert(CArray cArray, Target target) {
-			return null;
 		}
 
 		@Override
@@ -158,20 +151,10 @@ public class Events {
 			}
 			throw new EventException("Cannot convert e to DiscordPrivateMessageReceivedEvent");
 		}
-
-		@Override
-		public Driver driver() {
-			return Driver.EXTENSION;
-		}
-
-		@Override
-		public boolean modifyEvent(String s, Mixed construct, BindableEvent bindableEvent) {
-			return false;
-		}
 	}
 
 	@api
-	public static class discord_voice_joined extends AbstractEvent {
+	public static class discord_voice_joined extends DiscordEvent {
 
 		@Override
 		public String getName() {
@@ -190,21 +173,8 @@ public class Events {
 		}
 
 		@Override
-		public MSVersion since() {
-			return MSVersion.V3_3_2;
-		}
-
-		@Override
 		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-			if(e instanceof DiscordVoiceJoinEvent) {
-				return true;
-			}
-			return false;
-		}
-
-		@Override
-		public BindableEvent convert(CArray cArray, Target target) {
-			return null;
+			return e instanceof DiscordVoiceJoinEvent;
 		}
 
 		@Override
@@ -223,20 +193,10 @@ public class Events {
 			}
 			throw new EventException("Cannot convert e to DiscordVoiceJoinEvent");
 		}
-
-		@Override
-		public Driver driver() {
-			return Driver.EXTENSION;
-		}
-
-		@Override
-		public boolean modifyEvent(String s, Mixed construct, BindableEvent bindableEvent) {
-			return false;
-		}
 	}
 
 	@api
-	public static class discord_voice_left extends AbstractEvent {
+	public static class discord_voice_left extends DiscordEvent {
 
 		@Override
 		public String getName() {
@@ -255,21 +215,11 @@ public class Events {
 		}
 
 		@Override
-		public MSVersion since() {
-			return MSVersion.V3_3_2;
-		}
-
-		@Override
 		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
 			if(e instanceof DiscordVoiceLeaveEvent) {
 				return true;
 			}
 			return false;
-		}
-
-		@Override
-		public BindableEvent convert(CArray cArray, Target target) {
-			return null;
 		}
 
 		@Override
@@ -288,20 +238,10 @@ public class Events {
 			}
 			throw new EventException("Cannot convert e to DiscordVoiceLeaveEvent");
 		}
-
-		@Override
-		public Driver driver() {
-			return Driver.EXTENSION;
-		}
-
-		@Override
-		public boolean modifyEvent(String s, Mixed construct, BindableEvent bindableEvent) {
-			return false;
-		}
 	}
 
 	@api
-	public static class discord_member_joined extends AbstractEvent {
+	public static class discord_member_joined extends DiscordEvent {
 
 		@Override
 		public String getName() {
@@ -319,21 +259,8 @@ public class Events {
 		}
 
 		@Override
-		public MSVersion since() {
-			return MSVersion.V3_3_4;
-		}
-
-		@Override
 		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-			if(e instanceof DiscordMemberJoinEvent) {
-				return true;
-			}
-			return false;
-		}
-
-		@Override
-		public BindableEvent convert(CArray cArray, Target target) {
-			return null;
+			return e instanceof DiscordMemberJoinEvent;
 		}
 
 		@Override
@@ -350,16 +277,6 @@ public class Events {
 				return map;
 			}
 			throw new EventException("Cannot convert e to DiscordMemberJoinEvent");
-		}
-
-		@Override
-		public Driver driver() {
-			return Driver.EXTENSION;
-		}
-
-		@Override
-		public boolean modifyEvent(String s, Mixed construct, BindableEvent bindableEvent) {
-			return false;
 		}
 	}
 }
