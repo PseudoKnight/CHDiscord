@@ -373,6 +373,9 @@ public class Functions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			if(Discord.guild == null) {
+				throw new CRENotFoundException("Not connected to Discord server.", t);
+			}
 			Member mem = Discord.GetMember(args[0], t);
 			CArray roles = CArray.GetAssociativeArray(t);
 			for(Role role : mem.getRoles()) {
@@ -406,6 +409,9 @@ public class Functions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			if(Discord.guild == null) {
+				throw new CRENotFoundException("Not connected to Discord server.", t);
+			}
 			Member mem = Discord.GetMember(args[0], t);
 			List<Role> roles = new ArrayList<>();
 			if(args[1].isInstanceOf(CArray.TYPE)) {
@@ -413,17 +419,22 @@ public class Functions {
 				for(Mixed key : ((CArray) args[1]).keySet()) {
 					roles.add(Discord.GetRole(ca.get(key, t), t));
 				}
+			} else {
+				roles.add(Discord.GetRole(args[1], t));
 			}
 			try {
 				Discord.guild.modifyMemberRoles(mem, roles).queue();
 			} catch (PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);
+			} catch (IllegalArgumentException ex) {
+				throw new CREIllegalArgumentException(ex.getMessage(), t);
 			}
 			return CVoid.VOID;
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class};
+			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class,
+					CREIllegalArgumentException.class};
 		}
 	}
 
