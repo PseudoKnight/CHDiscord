@@ -1,8 +1,10 @@
 package me.pseudoknight.chdiscord;
 
 import com.laytonsmith.PureUtilities.DaemonManager;
+import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.abstraction.StaticLayer;
 import com.laytonsmith.core.MSLog;
+import com.laytonsmith.core.MSVersion;
 import com.laytonsmith.core.constructs.CClosure;
 import com.laytonsmith.core.constructs.CInt;
 import com.laytonsmith.core.constructs.Target;
@@ -11,6 +13,7 @@ import com.laytonsmith.core.environments.GlobalEnv;
 import com.laytonsmith.core.exceptions.CRE.CRENotFoundException;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.exceptions.ProgramFlowManipulationException;
+import com.laytonsmith.core.functions.AbstractFunction;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import me.pseudoknight.chdiscord.abstraction.jda.Listener;
 import net.dv8tion.jda.api.JDA;
@@ -88,6 +91,20 @@ public class Discord {
 		guild = null;
 		dm = null;
 		connection = null;
+	}
+
+	public static abstract class Function extends AbstractFunction {
+		public boolean isRestricted() {
+			return true;
+		}
+
+		public Boolean runAsync() {
+			return false;
+		}
+
+		public Version since() {
+			return MSVersion.V3_3_2;
+		}
 	}
 
 	static Member GetMember(Mixed m, Target t) {
