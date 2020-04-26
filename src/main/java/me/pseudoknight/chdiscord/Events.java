@@ -86,28 +86,25 @@ public class Events {
 
 		@Override
 		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
-			if (e instanceof DiscordGuildMessageReceivedEvent) {
-				DiscordGuildMessageReceivedEvent event = (DiscordGuildMessageReceivedEvent) e;
-				Message msg = event.getMessage();
-				Target t = Target.UNKNOWN;
-				Map<String, Mixed> map = new HashMap<>();
+			DiscordGuildMessageReceivedEvent event = (DiscordGuildMessageReceivedEvent) e;
+			Message msg = event.getMessage();
+			Target t = Target.UNKNOWN;
+			Map<String, Mixed> map = new HashMap<>();
 
-				Member mem = event.getMember();
-				if(mem != null) {
-					map.put("nickname", new CString(mem.getEffectiveName(), t));
-				} else {
-					map.put("nickname", new CString(event.getAuthor().getName(), t));
-				}
-
-				map.put("username", new CString(event.getAuthor().getName(), t));
-				map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
-				map.put("channel", new CString(event.getChannel().getName(), t));
-				map.put("message", new CString(msg.getContentDisplay(), t));
-				map.put("id", new CInt(msg.getIdLong(), t));
-
-				return map;
+			Member mem = event.getMember();
+			if(mem != null) {
+				map.put("nickname", new CString(mem.getEffectiveName(), t));
+			} else {
+				map.put("nickname", new CString(event.getAuthor().getName(), t));
 			}
-			throw new EventException("Cannot convert e to DiscordMessageReceivedEvent");
+
+			map.put("username", new CString(event.getAuthor().getName(), t));
+			map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
+			map.put("channel", new CString(event.getChannel().getName(), t));
+			map.put("message", new CString(msg.getContentDisplay(), t));
+			map.put("id", new CInt(msg.getIdLong(), t));
+
+			return map;
 		}
 	}
 
@@ -136,20 +133,17 @@ public class Events {
 
 		@Override
 		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
-			if (e instanceof DiscordPrivateMessageReceivedEvent) {
-				DiscordPrivateMessageReceivedEvent event = (DiscordPrivateMessageReceivedEvent) e;
-				Message msg = event.getMessage();
-				Target t = Target.UNKNOWN;
-				Map<String, Mixed> map = new HashMap<>();
+			DiscordPrivateMessageReceivedEvent event = (DiscordPrivateMessageReceivedEvent) e;
+			Message msg = event.getMessage();
+			Target t = Target.UNKNOWN;
+			Map<String, Mixed> map = new HashMap<>();
 
-				map.put("username", new CString(event.getAuthor().getName(), t));
-				map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
-				map.put("message", new CString(msg.getContentDisplay(), t));
-				map.put("id", new CInt(msg.getIdLong(), t));
+			map.put("username", new CString(event.getAuthor().getName(), t));
+			map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
+			map.put("message", new CString(msg.getContentDisplay(), t));
+			map.put("id", new CInt(msg.getIdLong(), t));
 
-				return map;
-			}
-			throw new EventException("Cannot convert e to DiscordPrivateMessageReceivedEvent");
+			return map;
 		}
 	}
 
@@ -179,19 +173,16 @@ public class Events {
 
 		@Override
 		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
-			if(e instanceof DiscordVoiceJoinEvent) {
-				DiscordVoiceJoinEvent event = (DiscordVoiceJoinEvent) e;
-				Target t = Target.UNKNOWN;
-				Map<String, Mixed> map = new HashMap<>();
+			DiscordVoiceJoinEvent event = (DiscordVoiceJoinEvent) e;
+			Target t = Target.UNKNOWN;
+			Map<String, Mixed> map = new HashMap<>();
 
-				map.put("username", new CString(event.getMember().getUser().getName(), t));
-				map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
-				map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
-				map.put("channel", new CString(event.getChannel().getName(), t));
+			map.put("username", new CString(event.getMember().getUser().getName(), t));
+			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
+			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
+			map.put("channel", new CString(event.getChannel().getName(), t));
 
-				return map;
-			}
-			throw new EventException("Cannot convert e to DiscordVoiceJoinEvent");
+			return map;
 		}
 	}
 
@@ -224,19 +215,16 @@ public class Events {
 
 		@Override
 		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
-			if(e instanceof DiscordVoiceLeaveEvent) {
-				DiscordVoiceLeaveEvent event = (DiscordVoiceLeaveEvent) e;
-				Target t = Target.UNKNOWN;
-				Map<String, Mixed> map = new HashMap<>();
+			DiscordVoiceLeaveEvent event = (DiscordVoiceLeaveEvent) e;
+			Target t = Target.UNKNOWN;
+			Map<String, Mixed> map = new HashMap<>();
 
-				map.put("username", new CString(event.getMember().getUser().getName(), t));
-				map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
-				map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
-				map.put("channel", new CString(event.getChannel().getName(), t));
+			map.put("username", new CString(event.getMember().getUser().getName(), t));
+			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
+			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
+			map.put("channel", new CString(event.getChannel().getName(), t));
 
-				return map;
-			}
-			throw new EventException("Cannot convert e to DiscordVoiceLeaveEvent");
+			return map;
 		}
 	}
 
@@ -265,18 +253,15 @@ public class Events {
 
 		@Override
 		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
-			if(e instanceof DiscordMemberJoinEvent) {
-				DiscordMemberJoinEvent event = (DiscordMemberJoinEvent) e;
-				Target t = Target.UNKNOWN;
-				Map<String, Mixed> map = new HashMap<>();
+			DiscordMemberJoinEvent event = (DiscordMemberJoinEvent) e;
+			Target t = Target.UNKNOWN;
+			Map<String, Mixed> map = new HashMap<>();
 
-				map.put("username", new CString(event.getMember().getUser().getName(), t));
-				map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
-				map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
+			map.put("username", new CString(event.getMember().getUser().getName(), t));
+			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
+			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
 
-				return map;
-			}
-			throw new EventException("Cannot convert e to DiscordMemberJoinEvent");
+			return map;
 		}
 	}
 }
