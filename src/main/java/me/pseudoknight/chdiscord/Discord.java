@@ -44,8 +44,10 @@ public class Discord {
 		dm = env.getEnv(GlobalEnv.class).GetDaemonManager();
 		connection = new Thread(() -> {
 			try {
-				jda = JDABuilder.create(token, GatewayIntent.getIntents(GatewayIntent.ALL_INTENTS))
-						.disableCache(EnumSet.of(CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS, CacheFlag.EMOTE))
+				jda = JDABuilder.create(token, EnumSet.of(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES,
+								GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES))
+						.disableCache(EnumSet.of(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.CLIENT_STATUS,
+								CacheFlag.EMOTE, CacheFlag.MEMBER_OVERRIDES))
 						.setAutoReconnect(true)
 						.addEventListeners(new Listener())
 						.build()
