@@ -2,9 +2,9 @@
 
 This is CommandHelper extension that uses the JDA library to talk to your Discord server.
 
-You'll need to have created a Discord application [here](https://discordapp.com/developers/applications/me). Then add a Bot to it. Grab the "TOKEN" for the Bot that you'll use to connect this extension to Discord. Finally, you'll need your server id that you can get by right-clicking your server name and clicking "Copy ID". 
+You'll need to have created a Discord application [here](https://discordapp.com/developers/applications/me). Then add a Bot to it. Grab the "TOKEN" for the Bot that you'll use to connect this extension to Discord. Finally, you'll need your server id, which you can get by right-clicking your server name and clicking "Copy ID". 
 
-You have to run discord_connect(token, server_id) before you can use the other functionality of this extension.
+You have to run discord_connect() before you can use the other functionality of this extension, otherwise a NotFoundException will be thrown.
 
 ## Functions
 
@@ -65,11 +65,11 @@ Throws InsufficientPermissionException when the bot is not allowed by the discor
 ### discord_message_received
 This event is called when a user sends a message in the Discord server.
 Prefilters: username, channel
-Data: userid, username, nickname, channel, message
+Data: userid, username, nickname, channel, message, id
 
 ### discord_private_message_received
 This event is called when a user sends a private message to the bot.
-Data: userid, username, message
+Data: userid, username, message, id
 
 ### discord_voice_joined
 This event is called when a user joined a voice channel.
