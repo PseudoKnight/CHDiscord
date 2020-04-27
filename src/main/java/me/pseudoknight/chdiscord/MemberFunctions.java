@@ -8,7 +8,7 @@ import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import net.dv8tion.jda.api.entities.Member;
 
-public class UserFunctions {
+public class MemberFunctions {
 	public static String docs() {
 		return "Functions for managing Discord users/members.";
 	}
