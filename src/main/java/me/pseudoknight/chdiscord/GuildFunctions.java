@@ -66,7 +66,7 @@ public class GuildFunctions {
 					+ " The role argument can be an array or a single role."
 					+ " Like members, a role can be the name or the numeric id."
 					+ " Throws NotFoundException if a member or role by that name doesn't exist."
-					+ " Throws InsufficientPermissionException when the bot is not allowed by the discord server.";
+					+ " Requires the 'Manage Roles' permission.";
 		}
 
 		public Integer[] numArgs() {

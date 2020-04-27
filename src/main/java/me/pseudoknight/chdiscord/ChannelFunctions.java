@@ -26,7 +26,8 @@ public class ChannelFunctions {
 
 		public String docs() {
 			return "void {[channel], string} Broadcasts text to the specified channel (or server default)."
-					+ " Message must not be empty, else it will throw a IllegalArgumentException.";
+					+ " Message must not be empty, else it will throw a IllegalArgumentException."
+					+ " Requires the 'Send Messages' permission.";
 		}
 
 		public Integer[] numArgs() {
@@ -53,6 +54,8 @@ public class ChannelFunctions {
 			String message = args[args.length - 1].val();
 			try {
 				channel.sendMessage(message).queue();
+			} catch(PermissionException ex) {
+				throw new CREInsufficientPermissionException(ex.getMessage(), t);
 			} catch(IllegalArgumentException ex) {
 				throw new CREIllegalArgumentException(ex.getMessage(), t);
 			}
@@ -60,7 +63,8 @@ public class ChannelFunctions {
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class};
+			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class,
+					CREInsufficientPermissionException.class};
 		}
 	}
 
@@ -72,7 +76,8 @@ public class ChannelFunctions {
 		}
 
 		public String docs() {
-			return "void {channel, id} Deletes a message on a channel with the given id.";
+			return "void {channel, id} Deletes a message on a channel with the given id."
+					+ " Requires 'Manage Messages' permission.";
 		}
 
 		public Integer[] numArgs() {
@@ -91,6 +96,8 @@ public class ChannelFunctions {
 			long id = Static.getInt(args[1], t);
 			try {
 				channel.deleteMessageById(id).queue();
+			} catch(PermissionException ex) {
+				throw new CREInsufficientPermissionException(ex.getMessage(), t);
 			} catch(IllegalArgumentException ex) {
 				throw new CREIllegalArgumentException(ex.getMessage(), t);
 			}
@@ -98,7 +105,8 @@ public class ChannelFunctions {
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class};
+			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class,
+					CREInsufficientPermissionException.class};
 		}
 	}
 
@@ -110,7 +118,8 @@ public class ChannelFunctions {
 		}
 
 		public String docs() {
-			return "void {channel, string} Sets a text channel's topic.";
+			return "void {channel, string} Sets a text channel's topic."
+					+ " Requires the 'Manage Channels' permission.";
 		}
 
 		public Integer[] numArgs() {
@@ -129,14 +138,17 @@ public class ChannelFunctions {
 			String message = args[1].val();
 			try {
 				channel.getManager().setTopic(message).queue();
-			} catch(PermissionException | IllegalArgumentException ex) {
+			} catch(PermissionException ex) {
+				throw new CREInsufficientPermissionException(ex.getMessage(), t);
+			} catch(IllegalArgumentException ex) {
 				throw new CREFormatException(ex.getMessage(), t);
 			}
 			return CVoid.VOID;
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{CRENotFoundException.class, CREFormatException.class};
+			return new Class[]{CRENotFoundException.class, CREFormatException.class,
+					CREInsufficientPermissionException.class};
 		}
 	}
 }
