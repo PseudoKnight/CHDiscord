@@ -26,9 +26,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.14.4-R0.1-SNAPSHOT</version>
+            <groupId>net.dv8tion</groupId>
+            <artifactId>JDA</artifactId>
+            <version>4.1.1_145</version>
         </dependency>
         <dependency>
             <groupId>com.sk89q</groupId>
@@ -36,19 +36,9 @@
             <version>3.3.4-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>net.dv8tion</groupId>
-            <artifactId>JDA</artifactId>
-            <version>4.1.1_137</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.12.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>2.12.1</version>
+            <version>2.13.2</version>
         </dependency>
     </dependencies>
 
@@ -61,7 +51,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
+                <version>3.8.1</version>
                 <configuration>
                     <showDeprecation>true</showDeprecation>
                     <source>1.8</source>
@@ -86,7 +76,7 @@
                     </archive>
                 </configuration>
 
-                <version>2.4</version>
+                <version>3.2.0</version>
             </plugin>
 
             <plugin>
@@ -117,7 +107,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
+                <version>1.6.0</version>
 
                 <executions>
                     <execution>
@@ -142,7 +132,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.3</version>
                 <executions>
                     <execution>
                         <id>bukkit</id>
@@ -172,8 +162,12 @@
                                 <filter>
                                     <artifact>net.dv8tion:JDA:jar:*</artifact>
                                     <excludes>
-                                        <exclude>natives/**</exclude>
-                                        <exclude>tomp2p/opuswrapper/**</exclude>
+                                        <exclude>natives/**</exclude> <!-- voice -->
+                                        <exclude>tomp2p/opuswrapper/*</exclude> <!-- voice -->
+                                        <exclude>club/minnced/opus/util/*</exclude> <!-- voice -->
+                                        <exclude>com/sun/jna/**</exclude> <!-- voice / opus depend -->
+                                        <exclude>com/iwebpp/crypto/**</exclude> <!-- voice crypto -->
+                                        <exclude>META-INF/**</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>
@@ -181,6 +175,60 @@
                                     <includes>
                                         <include>**</include> <!-- This avoids an issue with minimizeJar. -->
                                     </includes>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                        <exclude>module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.apache.commons:commons-collections4:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.fasterxml.jackson.core:jackson-annotations:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                        <exclude>module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.fasterxml.jackson.core:jackson-core:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                        <exclude>module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.squareup.okhttp3:okhttp:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.squareup.okio:okio:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>net.sf.trove4j:trove4j:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.slf4j:slf4j-api:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.neovisionaries:nv-websocket-client:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
                                 </filter>
                             </filters>
                             <relocations>
@@ -246,9 +294,12 @@
                                 <filter>
                                     <artifact>net.dv8tion:JDA:jar:*</artifact>
                                     <excludes>
-                                        <exclude>natives/**</exclude>
-                                        <exclude>tomp2p/opuswrapper/**</exclude>
-                                        <exclude>com/iwebpp/crypto/**</exclude>
+                                        <exclude>natives/**</exclude> <!-- voice -->
+                                        <exclude>tomp2p/opuswrapper/*</exclude> <!-- voice -->
+                                        <exclude>club/minnced/opus/util/*</exclude> <!-- voice -->
+                                        <exclude>com/sun/jna/**</exclude> <!-- voice / opus depend -->
+                                        <exclude>com/iwebpp/crypto/**</exclude> <!-- voice crypto -->
+                                        <exclude>META-INF/**</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>
@@ -256,6 +307,78 @@
                                     <includes>
                                         <include>**</include> <!-- This avoids an issue with minimizeJar. -->
                                     </includes>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                        <exclude>module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.apache.commons:commons-collections4:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.fasterxml.jackson.core:jackson-annotations:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                        <exclude>module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.fasterxml.jackson.core:jackson-core:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                        <exclude>module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.squareup.okhttp3:okhttp:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.squareup.okio:okio:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>net.sf.trove4j:trove4j:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.slf4j:slf4j-api:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.neovisionaries:nv-websocket-client:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.apache.logging.log4j:log4j-api:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.apache.logging.log4j:log4j-core:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.apache.logging.log4j:log4j-slf4j-impl:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
                                 </filter>
                             </filters>
                         </configuration>
