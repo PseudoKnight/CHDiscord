@@ -40,11 +40,7 @@ public class ChannelFunctions {
 			}
 			TextChannel channel = null;
 			if(args.length == 2) {
-				List<TextChannel> channels =  Discord.guild.getTextChannelsByName(args[0].val(), false);
-				if(channels.isEmpty()) {
-					throw new CRENotFoundException("Channel by the name " + args[0].val() + " not found.", t);
-				}
-				channel = channels.get(0);
+				channel = Discord.GetTextChannel(args[0], t);
 			} else {
 				channel = Discord.guild.getDefaultChannel();
 				if(channel == null) {
@@ -88,11 +84,7 @@ public class ChannelFunctions {
 			if(Discord.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
-			List<TextChannel> channels =  Discord.guild.getTextChannelsByName(args[0].val(), false);
-			if(channels.isEmpty()) {
-				throw new CRENotFoundException("Channel by the name " + args[0].val() + " not found.", t);
-			}
-			TextChannel channel = channels.get(0);
+			TextChannel channel = Discord.GetTextChannel(args[0], t);
 			long id = Static.getInt(args[1], t);
 			try {
 				channel.deleteMessageById(id).queue();
@@ -130,11 +122,7 @@ public class ChannelFunctions {
 			if(Discord.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
-			List<TextChannel> channels =  Discord.guild.getTextChannelsByName(args[0].val(), false);
-			if(channels.isEmpty()) {
-				throw new CRENotFoundException("Channel by the name " + args[0].val() + " not found.", t);
-			}
-			TextChannel channel = channels.get(0);
+			TextChannel channel = Discord.GetTextChannel(args[0], t);
 			String message = args[1].val();
 			try {
 				channel.getManager().setTopic(message).queue();
@@ -147,7 +135,7 @@ public class ChannelFunctions {
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{CRENotFoundException.class, CREFormatException.class,
+			return new Class[]{CRENotFoundException.class, CREFormatException.class, CREIllegalArgumentException.class,
 					CREInsufficientPermissionException.class};
 		}
 	}

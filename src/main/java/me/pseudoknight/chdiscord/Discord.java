@@ -117,6 +117,9 @@ public class Discord {
 				throw new CRENotFoundException("A member with the id \"" + m.val() + "\" was not found on Discord server.", t);
 			}
 		} else {
+			if(m.val().isEmpty()) {
+				throw new CREIllegalArgumentException("A member name was expected but was given an empty string.", t);
+			}
 			List<Member> mems = guild.getMembersByName(m.val(), false);
 			if(mems.isEmpty()) {
 				throw new CRENotFoundException("A member with the name \"" + m.val() + "\" was not found on Discord server.", t);
@@ -134,6 +137,9 @@ public class Discord {
 				throw new CRENotFoundException("A role with the id \"" + m.val() + "\" was not found on Discord server.", t);
 			}
 		} else {
+			if(m.val().isEmpty()) {
+				throw new CREIllegalArgumentException("A role name was expected but was given an empty string.", t);
+			}
 			List<Role> r = guild.getRolesByName(m.val(), false);
 			if(r.isEmpty()) {
 				throw new CRENotFoundException("A role with the name \"" + m.val() + "\" was not found on Discord server.", t);
@@ -141,5 +147,16 @@ public class Discord {
 			role = r.get(0);
 		}
 		return role;
+	}
+
+	static TextChannel GetTextChannel(Mixed m, Target t) {
+		if(m.val().isEmpty()) {
+			throw new CREIllegalArgumentException("A channel name was expected but was given an empty string.", t);
+		}
+		List<TextChannel> channels =  guild.getTextChannelsByName(m.val(), false);
+		if(channels.isEmpty()) {
+			throw new CRENotFoundException("Channel by the name " + m.val() + " not found.", t);
+		}
+		return channels.get(0);
 	}
 }
