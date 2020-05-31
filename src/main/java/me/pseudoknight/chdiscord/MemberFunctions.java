@@ -54,7 +54,7 @@ public class MemberFunctions {
 		}
 
 		public String docs() {
-			return"void {member, string} Get the server nickname for a member."
+			return"void {member} Get the server nickname for a member."
 				+ " Member can be a user's numeric id or name."
 				+ " Throws NotFoundException if a member by that name or id doesn't exist.";
 		}
@@ -68,7 +68,7 @@ public class MemberFunctions {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
 			Member member = Discord.GetMember(args[0], t);
-			return member.getNickname();
+			return new CString(member.getNickname(), t);
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
