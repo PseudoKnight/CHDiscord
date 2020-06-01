@@ -28,7 +28,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.1.1_145</version>
+            <version>4.1.1_156</version>
         </dependency>
         <dependency>
             <groupId>com.sk89q</groupId>

@@ -2,9 +2,14 @@
 
 This is CommandHelper extension that uses the JDA library to talk to your Discord server.
 
-You'll need to have created a Discord application [here](https://discordapp.com/developers/applications/me). Then add a Bot to it. Grab the "TOKEN" for the Bot that you'll use to connect this extension to Discord. Finally, you'll need your server id, which you can get by right-clicking your server name and clicking "Copy ID". 
+You'll need to have created a Discord application [here](https://discordapp.com/developers/applications/me).
+Then add a Bot to it. Grab the "TOKEN" for the Bot that you'll use to connect this extension to Discord.
+Finally, you'll need your server id, which you can get by right-clicking your server name and clicking "Copy ID".
 
-You have to run discord_connect() before you can use the other functionality of this extension, otherwise a NotFoundException will be thrown.
+For version 2.4.0 and later, the Server Members Intent on the Bot page is required for member caching!
+
+You have to run discord_connect() before you can use the other functionality of this extension, otherwise a
+NotFoundException will be thrown.
 
 ## Functions
 

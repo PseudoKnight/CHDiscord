@@ -10,6 +10,7 @@ import com.laytonsmith.core.constructs.CInt;
 import com.laytonsmith.core.constructs.Target;
 import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.environments.GlobalEnv;
+import com.laytonsmith.core.exceptions.CRE.CREIllegalArgumentException;
 import com.laytonsmith.core.exceptions.CRE.CRENotFoundException;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.exceptions.ProgramFlowManipulationException;
@@ -21,6 +22,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
@@ -53,15 +55,15 @@ public class Discord {
 						.build()
 						.awaitReady();
 
-				guild = jda.getGuildById(guildID);
-				if(guild == null) {
-					MSLog.GetLogger().e(MSLog.Tags.RUNTIME, "The specified Discord server does not exist: " + guildID, t);
-					Disconnect();
-					return;
-				}
-
 			} catch(LoginException | IllegalStateException | InterruptedException ex) {
-				MSLog.GetLogger().e(MSLog.Tags.RUNTIME, "Could not connect to Discord server.", t);
+				MSLog.GetLogger().e(MSLog.Tags.RUNTIME, "Could not connect to Discord.", t);
+				Disconnect();
+				return;
+			}
+
+			guild = jda.getGuildById(guildID);
+			if(guild == null) {
+				MSLog.GetLogger().e(MSLog.Tags.RUNTIME, "The specified Discord server does not exist: " + guildID, t);
 				Disconnect();
 				return;
 			}

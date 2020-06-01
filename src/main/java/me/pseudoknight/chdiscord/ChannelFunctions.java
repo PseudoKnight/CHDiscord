@@ -10,8 +10,6 @@ import com.laytonsmith.core.natives.interfaces.Mixed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
-import java.util.List;
-
 public class ChannelFunctions {
 	public static String docs() {
 		return "Functions for managing a Discord channel.";
