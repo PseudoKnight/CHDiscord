@@ -63,6 +63,17 @@ Like members, a role can be the name or the numeric id.
 Throws NotFoundException if a member or role by that name doesn't exist.
 Requires the 'Manage Roles' permission.
 
+### discord_member_get_nickname(member)
+Get the server nickname for a member.
+Member can be a user's numeric id or name.
+Throws NotFoundException if a member by that name or id doesn't exist.
+
+### discord_member_set_nickname(member, string)
+Set the server nickname for a member.
+Member can be a user's numeric id or name.
+Throws NotFoundException if a member by that name or id doesn't exist.
+Requires the 'Manage Nicknames' permission.
+
 ## Events
 
 ### discord_message_received

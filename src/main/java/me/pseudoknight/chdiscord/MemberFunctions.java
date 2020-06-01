@@ -46,4 +46,74 @@ public class MemberFunctions {
 		}
 	}
 
+	@api
+	public static class discord_member_get_nickname extends Discord.Function {
+
+		public String getName() {
+			return "discord_member_get_nickname";
+		}
+
+		public String docs() {
+			return "string {member} Get the server nickname for a member."
+					+ " Member can be a user's numeric id or name."
+					+ " Throws NotFoundException if a member by that name or id doesn't exist.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{1};
+		}
+
+		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			if(Discord.guild == null) {
+				throw new CRENotFoundException("Not connected to Discord server.", t);
+			}
+			Member member = Discord.GetMember(args[0], t);
+			return new CString(member.getNickname(), t);
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class};
+		}
+	}
+
+	@api
+	public static class discord_member_set_nickname extends Discord.Function {
+
+		public String getName() {
+			return "discord_member_set_nickname";
+		}
+
+		public String docs() {
+			return "void {member, string} Set the server nickname for a member."
+					+ " Member can be a user's numeric id or name."
+					+ " Throws NotFoundException if a member by that name or id doesn't exist."
+					+ " Requires the 'Manage Nicknames' permission.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{2};
+		}
+
+		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			if(Discord.guild == null) {
+				throw new CRENotFoundException("Not connected to Discord server.", t);
+			}
+			Member member = Discord.GetMember(args[0], t);
+			String newNickname = args[1].val();
+			try {
+				member.modifyNickname(newNickname).queue();
+			} catch (PermissionException ex) {
+				throw new CREInsufficientPermissionException(ex.getMessage(), t);
+			} catch (IllegalArgumentException ex) {
+				throw new CREIllegalArgumentException(ex.getMessage(), t);
+			}
+			return CVoid.VOID;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class,
+				CREInsufficientPermissionException.class};
+		}
+	}
+
 }
