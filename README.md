@@ -53,7 +53,7 @@ If streaming, a valid Twitch URL must also be provided.
 If not, or it's invalid, type will revert to DEFAULT (ie. playing).
 
 ### discord_set_channel_topic(channel, string)
-Sets a text channel's topic.
+Sets a text channel's topic. (Currently rate-limited to twice every 10 minutes)
 Requires the 'Manage Channels' permission.
 
 ### discord_member_get_roles(member)
