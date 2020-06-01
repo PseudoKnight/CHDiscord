@@ -54,9 +54,9 @@ public class MemberFunctions {
 		}
 
 		public String docs() {
-			return"void {member} Get the server nickname for a member."
-				+ " Member can be a user's numeric id or name."
-				+ " Throws NotFoundException if a member by that name or id doesn't exist.";
+			return "string {member} Get the server nickname for a member."
+					+ " Member can be a user's numeric id or name."
+					+ " Throws NotFoundException if a member by that name or id doesn't exist.";
 		}
 
 		public Integer[] numArgs() {
