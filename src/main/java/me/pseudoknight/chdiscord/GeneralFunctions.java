@@ -4,7 +4,6 @@ import com.laytonsmith.PureUtilities.Common.StringUtils;
 import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.ArgumentValidation;
 import com.laytonsmith.core.Profiles;
-import com.laytonsmith.core.Static;
 import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.environments.GlobalEnv;
@@ -76,7 +75,7 @@ public class GeneralFunctions {
 					// Individual options
 					token = args[0].val();
 					serverId = args[1].val();
-					callback = Static.getObject(args[2], t, CClosure.class);
+					callback = ArgumentValidation.getObject(args[2], t, CClosure.class);
 					break;
 				default:
 					throw new CREIllegalArgumentException("Not enough/too many parameters", t);

@@ -1,7 +1,7 @@
 package me.pseudoknight.chdiscord;
 
 import com.laytonsmith.annotations.api;
-import com.laytonsmith.core.Static;
+import com.laytonsmith.core.ArgumentValidation;
 import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.exceptions.CRE.*;
@@ -83,7 +83,7 @@ public class ChannelFunctions {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
 			TextChannel channel = Discord.GetTextChannel(args[0], t);
-			long id = Static.getInt(args[1], t);
+			long id = ArgumentValidation.getInt(args[1], t);
 			try {
 				channel.deleteMessageById(id).queue();
 			} catch(PermissionException ex) {
