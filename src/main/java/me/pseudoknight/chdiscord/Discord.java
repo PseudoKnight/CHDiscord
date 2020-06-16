@@ -9,7 +9,7 @@ import com.laytonsmith.core.constructs.CClosure;
 import com.laytonsmith.core.constructs.CInt;
 import com.laytonsmith.core.constructs.Target;
 import com.laytonsmith.core.environments.Environment;
-import com.laytonsmith.core.environments.GlobalEnv;
+import com.laytonsmith.core.environments.StaticRuntimeEnv;
 import com.laytonsmith.core.exceptions.CRE.CREIllegalArgumentException;
 import com.laytonsmith.core.exceptions.CRE.CRENotFoundException;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
@@ -43,7 +43,7 @@ public class Discord {
 		if(jda != null) {
 			Disconnect();
 		}
-		dm = env.getEnv(GlobalEnv.class).GetDaemonManager();
+		dm = env.getEnv(StaticRuntimeEnv.class).GetDaemonManager();
 		connection = new Thread(() -> {
 			try {
 				jda = JDABuilder.create(token, EnumSet.of(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES,

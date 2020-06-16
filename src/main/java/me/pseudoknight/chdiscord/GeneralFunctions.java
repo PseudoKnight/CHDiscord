@@ -6,7 +6,7 @@ import com.laytonsmith.core.ArgumentValidation;
 import com.laytonsmith.core.Profiles;
 import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.environments.Environment;
-import com.laytonsmith.core.environments.GlobalEnv;
+import com.laytonsmith.core.environments.StaticRuntimeEnv;
 import com.laytonsmith.core.exceptions.CRE.*;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
@@ -39,7 +39,7 @@ public class GeneralFunctions {
 		private Extension.DiscordProfile getProfile(Environment environment, String profileName, Target t) {
 			Profiles.Profile p;
 			try {
-				p = environment.getEnv(GlobalEnv.class).getProfiles().getProfileById(profileName);
+				p = environment.getEnv(StaticRuntimeEnv.class).getProfiles().getProfileById(profileName);
 			} catch (Profiles.InvalidProfileException ex) {
 				throw new CREFormatException(ex.getMessage(), t, ex);
 			}
