@@ -119,14 +119,21 @@ public class Discord {
 				throw new CRENotFoundException("A member with the id \"" + m.val() + "\" was not found on Discord server.", t);
 			}
 		} else {
-			if(m.val().isEmpty()) {
-				throw new CREIllegalArgumentException("A member name was expected but was given an empty string.", t);
+			try {
+				mem = guild.getMemberById(m.val());
+				if(mem == null) {
+					throw new CRENotFoundException("A member with the id \"" + m.val() + "\" was not found on Discord server.", t);
+				}
+			} catch (NumberFormatException ex) {
+				if(m.val().isEmpty()) {
+					throw new CREIllegalArgumentException("A member id was expected but was given an empty string.", t);
+				}
+				List<Member> mems = guild.getMembersByName(m.val(), false);
+				if(mems.isEmpty()) {
+					throw new CRENotFoundException("A member with the name \"" + m.val() + "\" was not found on Discord server.", t);
+				}
+				mem = mems.get(0);
 			}
-			List<Member> mems = guild.getMembersByName(m.val(), false);
-			if(mems.isEmpty()) {
-				throw new CRENotFoundException("A member with the name \"" + m.val() + "\" was not found on Discord server.", t);
-			}
-			mem = mems.get(0);
 		}
 		return mem;
 	}
@@ -139,14 +146,21 @@ public class Discord {
 				throw new CRENotFoundException("A role with the id \"" + m.val() + "\" was not found on Discord server.", t);
 			}
 		} else {
-			if(m.val().isEmpty()) {
-				throw new CREIllegalArgumentException("A role name was expected but was given an empty string.", t);
+			try {
+				role = guild.getRoleById(m.val());
+				if(role == null) {
+					throw new CRENotFoundException("A role with the id \"" + m.val() + "\" was not found on Discord server.", t);
+				}
+			} catch (NumberFormatException ex) {
+				if(m.val().isEmpty()) {
+					throw new CREIllegalArgumentException("A role id was expected but was given an empty string.", t);
+				}
+				List<Role> r = guild.getRolesByName(m.val(), false);
+				if(r.isEmpty()) {
+					throw new CRENotFoundException("A role with the name \"" + m.val() + "\" was not found on Discord server.", t);
+				}
+				role = r.get(0);
 			}
-			List<Role> r = guild.getRolesByName(m.val(), false);
-			if(r.isEmpty()) {
-				throw new CRENotFoundException("A role with the name \"" + m.val() + "\" was not found on Discord server.", t);
-			}
-			role = r.get(0);
 		}
 		return role;
 	}
