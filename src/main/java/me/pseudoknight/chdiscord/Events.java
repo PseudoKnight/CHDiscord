@@ -2,11 +2,7 @@ package me.pseudoknight.chdiscord;
 
 import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.CHVersion;
-import com.laytonsmith.core.constructs.CArray;
-import com.laytonsmith.core.constructs.CInt;
-import com.laytonsmith.core.constructs.Construct;
-import com.laytonsmith.core.constructs.CString;
-import com.laytonsmith.core.constructs.Target;
+import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.events.AbstractEvent;
 import com.laytonsmith.core.events.BindableEvent;
 import com.laytonsmith.core.events.Driver;
@@ -21,11 +17,34 @@ import java.util.Map;
 
 public class Events {
 	public static String docs() {
-		return "This provides hooks for DiscordSRV events.";
+		return "This provides hooks for Discord events.";
+	}
+
+	public static abstract class DiscordEvent extends AbstractEvent {
+
+		@Override
+		public CHVersion since() {
+			return CHVersion.V3_3_2;
+		}
+
+		@Override
+		public Driver driver() {
+			return Driver.EXTENSION;
+		}
+
+		@Override
+		public BindableEvent convert(CArray cArray, Target target) {
+			return null;
+		}
+
+		@Override
+		public boolean modifyEvent(String s, Construct construct, BindableEvent bindableEvent) {
+			return false;
+		}
 	}
 
 	@api
-	public static class discord_message_received extends AbstractEvent {
+	public static class discord_message_received extends DiscordEvent {
 
 		@Override
 		public String getName() {
@@ -42,11 +61,6 @@ public class Events {
 					+ " | id: The message id.} "
 					+ "{} "
 					+ "{}";
-		}
-
-		@Override
-		public CHVersion since() {
-			return CHVersion.V3_3_2;
 		}
 
 		@Override
@@ -67,49 +81,31 @@ public class Events {
 		}
 
 		@Override
-		public BindableEvent convert(CArray cArray, Target target) {
-			return null;
-		}
-
-		@Override
 		public Map<String, Construct> evaluate(BindableEvent e) throws EventException {
-			if (e instanceof DiscordGuildMessageReceivedEvent) {
-				DiscordGuildMessageReceivedEvent event = (DiscordGuildMessageReceivedEvent) e;
-				Message msg = event.getMessage();
-				Target t = Target.UNKNOWN;
-				Map<String, Construct> map = new HashMap<>();
+			DiscordGuildMessageReceivedEvent event = (DiscordGuildMessageReceivedEvent) e;
+			Message msg = event.getMessage();
+			Target t = Target.UNKNOWN;
+			Map<String, Construct> map = new HashMap<>();
 
-				Member mem = event.getMember();
-				if(mem != null) {
-					map.put("nickname", new CString(mem.getEffectiveName(), t));
-				} else {
-					map.put("nickname", new CString(event.getAuthor().getName(), t));
-				}
-
-				map.put("username", new CString(event.getAuthor().getName(), t));
-				map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
-				map.put("channel", new CString(event.getChannel().getName(), t));
-				map.put("message", new CString(msg.getContentDisplay(), t));
-				map.put("id", new CInt(msg.getIdLong(), t));
-
-				return map;
+			Member mem = event.getMember();
+			if(mem != null) {
+				map.put("nickname", new CString(mem.getEffectiveName(), t));
+			} else {
+				map.put("nickname", new CString(event.getAuthor().getName(), t));
 			}
-			throw new EventException("Cannot convert e to DiscordMessageReceivedEvent");
-		}
 
-		@Override
-		public Driver driver() {
-			return Driver.EXTENSION;
-		}
+			map.put("username", new CString(event.getAuthor().getName(), t));
+			map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
+			map.put("channel", new CString(event.getChannel().getName(), t));
+			map.put("message", new CString(msg.getContentDisplay(), t));
+			map.put("id", new CInt(msg.getIdLong(), t));
 
-		@Override
-		public boolean modifyEvent(String s, Construct construct, BindableEvent bindableEvent) {
-			return false;
+			return map;
 		}
 	}
 
 	@api
-	public static class discord_private_message_received extends AbstractEvent {
+	public static class discord_private_message_received extends DiscordEvent {
 
 		@Override
 		public String getName() {
@@ -127,51 +123,28 @@ public class Events {
 		}
 
 		@Override
-		public CHVersion since() {
-			return CHVersion.V3_3_2;
-		}
-
-		@Override
 		public boolean matches(Map<String, Construct> prefilter, BindableEvent e) throws PrefilterNonMatchException {
 			return e instanceof DiscordPrivateMessageReceivedEvent;
 		}
 
 		@Override
-		public BindableEvent convert(CArray cArray, Target target) {
-			return null;
-		}
-
-		@Override
 		public Map<String, Construct> evaluate(BindableEvent e) throws EventException {
-			if (e instanceof DiscordPrivateMessageReceivedEvent) {
-				DiscordPrivateMessageReceivedEvent event = (DiscordPrivateMessageReceivedEvent) e;
-				Message msg = event.getMessage();
-				Target t = Target.UNKNOWN;
-				Map<String, Construct> map = new HashMap<>();
+			DiscordPrivateMessageReceivedEvent event = (DiscordPrivateMessageReceivedEvent) e;
+			Message msg = event.getMessage();
+			Target t = Target.UNKNOWN;
+			Map<String, Construct> map = new HashMap<>();
 
-				map.put("username", new CString(event.getAuthor().getName(), t));
-				map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
-				map.put("message", new CString(msg.getContentDisplay(), t));
-				map.put("id", new CInt(msg.getIdLong(), t));
+			map.put("username", new CString(event.getAuthor().getName(), t));
+			map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
+			map.put("message", new CString(msg.getContentDisplay(), t));
+			map.put("id", new CInt(msg.getIdLong(), t));
 
-				return map;
-			}
-			throw new EventException("Cannot convert e to DiscordPrivateMessageReceivedEvent");
-		}
-
-		@Override
-		public Driver driver() {
-			return Driver.EXTENSION;
-		}
-
-		@Override
-		public boolean modifyEvent(String s, Construct construct, BindableEvent bindableEvent) {
-			return false;
+			return map;
 		}
 	}
 
 	@api
-	public static class discord_voice_joined extends AbstractEvent {
+	public static class discord_voice_joined extends DiscordEvent {
 
 		@Override
 		public String getName() {
@@ -190,53 +163,27 @@ public class Events {
 		}
 
 		@Override
-		public CHVersion since() {
-			return CHVersion.V3_3_2;
-		}
-
-		@Override
 		public boolean matches(Map<String, Construct> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-			if(e instanceof DiscordVoiceJoinEvent) {
-				return true;
-			}
-			return false;
-		}
-
-		@Override
-		public BindableEvent convert(CArray cArray, Target target) {
-			return null;
+			return e instanceof DiscordVoiceJoinEvent;
 		}
 
 		@Override
 		public Map<String, Construct> evaluate(BindableEvent e) throws EventException {
-			if(e instanceof DiscordVoiceJoinEvent) {
-				DiscordVoiceJoinEvent event = (DiscordVoiceJoinEvent) e;
-				Target t = Target.UNKNOWN;
-				Map<String, Construct> map = new HashMap<>();
+			DiscordVoiceJoinEvent event = (DiscordVoiceJoinEvent) e;
+			Target t = Target.UNKNOWN;
+			Map<String, Construct> map = new HashMap<>();
 
-				map.put("username", new CString(event.getMember().getUser().getName(), t));
-				map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
-				map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
-				map.put("channel", new CString(event.getChannel().getName(), t));
+			map.put("username", new CString(event.getMember().getUser().getName(), t));
+			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
+			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
+			map.put("channel", new CString(event.getChannel().getName(), t));
 
-				return map;
-			}
-			throw new EventException("Cannot convert e to DiscordVoiceJoinEvent");
-		}
-
-		@Override
-		public Driver driver() {
-			return Driver.EXTENSION;
-		}
-
-		@Override
-		public boolean modifyEvent(String s, Construct construct, BindableEvent bindableEvent) {
-			return false;
+			return map;
 		}
 	}
 
 	@api
-	public static class discord_voice_left extends AbstractEvent {
+	public static class discord_voice_left extends DiscordEvent {
 
 		@Override
 		public String getName() {
@@ -255,11 +202,6 @@ public class Events {
 		}
 
 		@Override
-		public CHVersion since() {
-			return CHVersion.V3_3_2;
-		}
-
-		@Override
 		public boolean matches(Map<String, Construct> prefilter, BindableEvent e) throws PrefilterNonMatchException {
 			if(e instanceof DiscordVoiceLeaveEvent) {
 				return true;
@@ -268,40 +210,22 @@ public class Events {
 		}
 
 		@Override
-		public BindableEvent convert(CArray cArray, Target target) {
-			return null;
-		}
-
-		@Override
 		public Map<String, Construct> evaluate(BindableEvent e) throws EventException {
-			if(e instanceof DiscordVoiceLeaveEvent) {
-				DiscordVoiceLeaveEvent event = (DiscordVoiceLeaveEvent) e;
-				Target t = Target.UNKNOWN;
-				Map<String, Construct> map = new HashMap<>();
+			DiscordVoiceLeaveEvent event = (DiscordVoiceLeaveEvent) e;
+			Target t = Target.UNKNOWN;
+			Map<String, Construct> map = new HashMap<>();
 
-				map.put("username", new CString(event.getMember().getUser().getName(), t));
-				map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
-				map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
-				map.put("channel", new CString(event.getChannel().getName(), t));
+			map.put("username", new CString(event.getMember().getUser().getName(), t));
+			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
+			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
+			map.put("channel", new CString(event.getChannel().getName(), t));
 
-				return map;
-			}
-			throw new EventException("Cannot convert e to DiscordVoiceLeaveEvent");
-		}
-
-		@Override
-		public Driver driver() {
-			return Driver.EXTENSION;
-		}
-
-		@Override
-		public boolean modifyEvent(String s, Construct construct, BindableEvent bindableEvent) {
-			return false;
+			return map;
 		}
 	}
 
 	@api
-	public static class discord_member_joined extends AbstractEvent {
+	public static class discord_member_joined extends DiscordEvent {
 
 		@Override
 		public String getName() {
@@ -319,47 +243,21 @@ public class Events {
 		}
 
 		@Override
-		public CHVersion since() {
-			return CHVersion.V3_3_2;
-		}
-
-		@Override
 		public boolean matches(Map<String, Construct> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-			if(e instanceof DiscordMemberJoinEvent) {
-				return true;
-			}
-			return false;
-		}
-
-		@Override
-		public BindableEvent convert(CArray cArray, Target target) {
-			return null;
+			return e instanceof DiscordMemberJoinEvent;
 		}
 
 		@Override
 		public Map<String, Construct> evaluate(BindableEvent e) throws EventException {
-			if(e instanceof DiscordMemberJoinEvent) {
-				DiscordMemberJoinEvent event = (DiscordMemberJoinEvent) e;
-				Target t = Target.UNKNOWN;
-				Map<String, Construct> map = new HashMap<>();
+			DiscordMemberJoinEvent event = (DiscordMemberJoinEvent) e;
+			Target t = Target.UNKNOWN;
+			Map<String, Construct> map = new HashMap<>();
 
-				map.put("username", new CString(event.getMember().getUser().getName(), t));
-				map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
-				map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
+			map.put("username", new CString(event.getMember().getUser().getName(), t));
+			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
+			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
 
-				return map;
-			}
-			throw new EventException("Cannot convert e to DiscordMemberJoinEvent");
-		}
-
-		@Override
-		public Driver driver() {
-			return Driver.EXTENSION;
-		}
-
-		@Override
-		public boolean modifyEvent(String s, Construct construct, BindableEvent bindableEvent) {
-			return false;
+			return map;
 		}
 	}
 }
