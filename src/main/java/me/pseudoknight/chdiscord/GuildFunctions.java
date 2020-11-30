@@ -16,90 +16,129 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GuildFunctions {
-	public static String docs() {
-		return "Functions for managing a Discord server (guild).";
-	}
+    public static String docs() {
+        return "Functions for managing a Discord server (guild).";
+    }
 
-	@api
-	public static class discord_member_get_roles extends Discord.Function {
+    @api
+    public static class discord_member_get_roles extends Discord.Function {
 
-		public String getName() {
-			return "discord_member_get_roles";
-		}
+        public String getName() {
+            return "discord_member_get_roles";
+        }
 
-		public String docs() {
-			return "array {member} Gets an associative array of all server roles for a member."
-					+ " The key is the role name, and the value is the role numeric id."
-					+ " Throws NotFoundException if a member by that name doesn't exist.";
-		}
+        public String docs() {
+            return "array {member} Gets an associative array of all server roles for a member."
+                    + " The key is the role name, and the value is the role numeric id."
+                    + " Throws NotFoundException if a member by that name doesn't exist.";
+        }
 
-		public Integer[] numArgs() {
-			return new Integer[]{1};
-		}
+        public Integer[] numArgs() {
+            return new Integer[]{1};
+        }
 
-		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Discord.guild == null) {
-				throw new CRENotFoundException("Not connected to Discord server.", t);
-			}
-			Member mem = Discord.GetMember(args[0], t);
-			CArray roles = CArray.GetAssociativeArray(t);
-			for(Role role : mem.getRoles()) {
-				roles.set(role.getName(), new CInt(role.getIdLong(), t), t);
-			}
-			return roles;
-		}
+        public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+            if (Discord.guild == null) {
+                throw new CRENotFoundException("Not connected to Discord server.", t);
+            }
+            Member mem = Discord.GetMember(args[0], t);
+            CArray roles = CArray.GetAssociativeArray(t);
+            for (Role role : mem.getRoles()) {
+                roles.set(role.getName(), new CInt(role.getIdLong(), t), t);
+            }
+            return roles;
+        }
 
-		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{CRENotFoundException.class};
-		}
-	}
+        public Class<? extends CREThrowable>[] thrown() {
+            return new Class[]{CRENotFoundException.class};
+        }
+    }
 
-	@api
-	public static class discord_member_set_roles extends Discord.Function {
+    @api
+    public static class discord_member_set_roles extends Discord.Function {
 
-		public String getName() {
-			return "discord_member_set_roles";
-		}
+        public String getName() {
+            return "discord_member_set_roles";
+        }
 
-		public String docs() {
-			return "void {member, role(s)} Sets the roles for a server member."
-					+ " The role argument can be an array or a single role."
-					+ " Like members, a role can be the name or the numeric id."
-					+ " Throws NotFoundException if a member or role by that name doesn't exist."
-					+ " Requires the 'Manage Roles' permission.";
-		}
+        public String docs() {
+            return "void {member, role(s)} Sets the roles for a server member."
+                    + " The role argument can be an array or a single role."
+                    + " Like members, a role can be the name or the numeric id."
+                    + " Throws NotFoundException if a member or role by that name doesn't exist."
+                    + " Requires the 'Manage Roles' permission.";
+        }
 
-		public Integer[] numArgs() {
-			return new Integer[]{2};
-		}
+        public Integer[] numArgs() {
+            return new Integer[]{2};
+        }
 
-		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Discord.guild == null) {
-				throw new CRENotFoundException("Not connected to Discord server.", t);
-			}
-			Member mem = Discord.GetMember(args[0], t);
-			List<Role> roles = new ArrayList<>();
-			if(args[1].isInstanceOf(CArray.TYPE)) {
-				CArray ca = (CArray) args[1];
-				for(Mixed key : ((CArray) args[1]).keySet()) {
-					roles.add(Discord.GetRole(ca.get(key, t), t));
-				}
-			} else {
-				roles.add(Discord.GetRole(args[1], t));
-			}
-			try {
-				Discord.guild.modifyMemberRoles(mem, roles).queue();
-			} catch (PermissionException ex) {
-				throw new CREInsufficientPermissionException(ex.getMessage(), t);
-			} catch (IllegalArgumentException ex) {
-				throw new CREIllegalArgumentException(ex.getMessage(), t);
-			}
-			return CVoid.VOID;
-		}
+        public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+            if (Discord.guild == null) {
+                throw new CRENotFoundException("Not connected to Discord server.", t);
+            }
+            Member mem = Discord.GetMember(args[0], t);
+            List<Role> roles = new ArrayList<>();
+            if (args[1].isInstanceOf(CArray.TYPE)) {
+                CArray ca = (CArray) args[1];
+                for (Mixed key : ((CArray) args[1]).keySet()) {
+                    roles.add(Discord.GetRole(ca.get(key, t), t));
+                }
+            } else {
+                roles.add(Discord.GetRole(args[1], t));
+            }
+            try {
+                Discord.guild.modifyMemberRoles(mem, roles).queue();
+            } catch (PermissionException ex) {
+                throw new CREInsufficientPermissionException(ex.getMessage(), t);
+            } catch (IllegalArgumentException ex) {
+                throw new CREIllegalArgumentException(ex.getMessage(), t);
+            }
+            return CVoid.VOID;
+        }
 
-		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class,
-					CREIllegalArgumentException.class};
-		}
-	}
+        public Class<? extends CREThrowable>[] thrown() {
+            return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class,
+                    CREIllegalArgumentException.class};
+        }
+    }
+
+    @api
+    public static class discord_get_all_members extends Discord.Function {
+        public String getName() {
+            return "discord_get_members";
+        }
+
+        public String docs() {
+            return "array {} Gets member list from the Discord server.";
+        }
+
+        public Integer[] numArgs() {
+            return new Integer[]{0};
+        }
+
+        public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+            if (Discord.guild == null) {
+                throw new CRENotFoundException("Not connected to Discord server.", t);
+            }
+
+            CArray members = CArray.GetAssociativeArray(t);
+
+            try {
+                for (Member mem : Discord.GetAllMembers()) {
+                    members.set(mem.getId(), (Mixed) new CInt(mem.getIdLong(), t), t);
+                }
+                return (Mixed) members;
+            } catch (PermissionException ex) {
+                throw new CREInsufficientPermissionException(ex.getMessage(), t);
+            } catch (IllegalArgumentException ex) {
+                throw new CREFormatException(ex.getMessage(), t);
+            }
+        }
+
+        @Override
+        public Class<? extends CREThrowable>[] thrown() {
+            return (Class<? extends CREThrowable>[]) new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class, CREInsufficientPermissionException.class};
+        }
+    }
 }

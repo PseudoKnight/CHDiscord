@@ -175,4 +175,9 @@ public class Discord {
 		}
 		return channels.get(0);
 	}
+
+	public static Object GetAllMembers() {
+		List<Member> members = guild.getMembers();
+		return members;
+	}
 }

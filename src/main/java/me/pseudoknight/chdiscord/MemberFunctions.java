@@ -115,6 +115,37 @@ public class MemberFunctions {
 			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class,
 				CREInsufficientPermissionException.class};
 		}
+
+		public static class discord_member_get_username extends Discord.Function{
+			public String getName() {
+				return "discord_member_get_username";
+			}
+
+			public String docs(){
+				return "mixed {id} Get the users discord username and tag. Member can be a user's numeric id or name. Throws NotFoundException if a member by that name or id doesn't exist."
+			}
+
+			public Integer[] numArgs() {
+				return new Integer[] {1};
+			}
+
+			public CString exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+				if (Discord.guild == null) {
+					throw new CRENotFoundException("Not connected to Discord server.", t);
+				}
+				Member member = Discord.GetMember(args[0], t);  
+				return new CString(member.getUser().getAsTag(), t);
+			}
+
+			@Override
+			public Class<? extends CREThrowable>[] thrown() {
+				return (Class<? extends CREThrowable>[])new Class[] { 
+					CRENotFoundException.class, 
+					CREIllegalArgumentException.class, 
+					CREInsufficientPermissionException.class 
+				};
+			}
+		}
 	}
 
 }
