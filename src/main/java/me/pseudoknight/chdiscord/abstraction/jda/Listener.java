@@ -9,6 +9,7 @@ import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordPrivateMessage
 import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordVoiceJoinEvent;
 import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -28,9 +29,8 @@ public class Listener extends ListenerAdapter {
 		}
 		final JDADiscordGuildMessageReceivedEvent mre = new JDADiscordGuildMessageReceivedEvent(event);
 		try {
-			StaticLayer.GetConvertor().runOnMainThreadAndWait(() -> {
+			StaticLayer.GetConvertor().runOnMainThreadLater(null, () -> {
 				EventUtils.TriggerListener(Driver.EXTENSION, "discord_message_received", mre);
-				return null;
 			});
 		} catch(Exception ex) {
 			Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
@@ -44,9 +44,8 @@ public class Listener extends ListenerAdapter {
 		}
 		final JDADiscordPrivateMessageReceivedEvent mre = new JDADiscordPrivateMessageReceivedEvent(event);
 		try {
-			StaticLayer.GetConvertor().runOnMainThreadAndWait(() -> {
+			StaticLayer.GetConvertor().runOnMainThreadLater(null, () -> {
 				EventUtils.TriggerListener(Driver.EXTENSION, "discord_private_message_received", mre);
-				return null;
 			});
 		} catch(Exception ex) {
 			Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
@@ -57,9 +56,8 @@ public class Listener extends ListenerAdapter {
 	public void onGuildVoiceJoin(@Nonnull GuildVoiceJoinEvent event) {
 		final JDADiscordVoiceJoinEvent vje = new JDADiscordVoiceJoinEvent(event);
 		try {
-			StaticLayer.GetConvertor().runOnMainThreadAndWait(() -> {
+			StaticLayer.GetConvertor().runOnMainThreadLater(null, () -> {
 				EventUtils.TriggerListener(Driver.EXTENSION, "discord_voice_joined", vje);
-				return null;
 			});
 		} catch(Exception ex) {
 			Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
@@ -70,9 +68,8 @@ public class Listener extends ListenerAdapter {
 	public void onGuildVoiceLeave(@Nonnull GuildVoiceLeaveEvent event) {
 		final JDADiscordVoiceLeaveEvent vle = new JDADiscordVoiceLeaveEvent(event);
 		try {
-			StaticLayer.GetConvertor().runOnMainThreadAndWait(() -> {
+			StaticLayer.GetConvertor().runOnMainThreadLater(null, () -> {
 				EventUtils.TriggerListener(Driver.EXTENSION, "discord_voice_left", vle);
-				return null;
 			});
 		} catch(Exception ex) {
 			Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
@@ -83,9 +80,20 @@ public class Listener extends ListenerAdapter {
 	public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
 		final Events.JDADiscordMemberJoinEvent mje = new Events.JDADiscordMemberJoinEvent(event);
 		try {
-			StaticLayer.GetConvertor().runOnMainThreadAndWait(() -> {
+			StaticLayer.GetConvertor().runOnMainThreadLater(null, () -> {
 				EventUtils.TriggerListener(Driver.EXTENSION, "discord_member_joined", mje);
-				return null;
+			});
+		} catch(Exception ex) {
+			Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
+
+	@Override
+	public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
+		final Events.JDADiscordMemberLeaveEvent mle = new Events.JDADiscordMemberLeaveEvent(event);
+		try {
+			StaticLayer.GetConvertor().runOnMainThreadLater(null, () -> {
+				EventUtils.TriggerListener(Driver.EXTENSION, "discord_member_left", mle);
 			});
 		} catch(Exception ex) {
 			Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);

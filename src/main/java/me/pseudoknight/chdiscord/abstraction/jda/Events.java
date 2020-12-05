@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -117,6 +118,28 @@ public class Events {
 
 		JDADiscordMemberJoinEvent(GuildMemberJoinEvent e) {
 			this.e = e;
+		}
+
+		public Member getMember() {
+			return e.getMember();
+		}
+
+		@Override
+		public Object _GetObject() {
+			return e;
+		}
+	}
+
+	@abstraction(type = Implementation.Type.BUKKIT)
+	public static class JDADiscordMemberLeaveEvent implements DiscordMemberLeaveEvent {
+		GuildMemberRemoveEvent e;
+
+		JDADiscordMemberLeaveEvent(GuildMemberRemoveEvent e) {
+			this.e = e;
+		}
+
+		public User getUser() {
+			return e.getUser();
 		}
 
 		public Member getMember() {
