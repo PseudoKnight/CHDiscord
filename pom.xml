@@ -14,9 +14,9 @@
             <url>https://maven.enginehub.org/repo</url>
         </repository>
         <repository>
-            <id>jcenter</id>
-            <name>jcenter-bintray</name>
-            <url>https://jcenter.bintray.com</url>
+            <id>dv8tion</id>
+            <name>m2-dv8tion</name>
+            <url>https://m2.dv8tion.net/releases</url>
         </repository>
         <repository>
             <id>spigot-repo</id>
@@ -28,7 +28,13 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.2.0_222</version>
+            <version>4.2.1_253</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>club.minnced</groupId>
+                    <artifactId>opus-java</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.sk89q</groupId>
@@ -59,56 +65,24 @@
                     <compilerArgument>-XDignore.symbol.file</compilerArgument>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-
                 <configuration>
                     <archive>
                         <addMavenDescriptor>false</addMavenDescriptor>
-
                         <manifest>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
-
                     </archive>
                 </configuration>
-
                 <version>3.2.0</version>
             </plugin>
-
-            <plugin>
-                <groupId>org.bsc.maven</groupId>
-                <artifactId>maven-processor-plugin</artifactId>
-                <version>2.2.4</version>
-
-                <executions>
-                    <execution>
-                        <id>process</id>
-                        <phase>process-classes</phase>
-
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                    </execution>
-                </executions>
-
-                <configuration>
-                    <outputDirectory>src/main/generated</outputDirectory>
-
-                    <processors>
-                        <processor>com.laytonsmith.core.extensions.ExtensionAnnotationProcessor</processor>
-                    </processors>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
-
                 <executions>
                     <execution>
                         <id>cache-annotations</id>
@@ -118,21 +92,38 @@
                         </goals>
                     </execution>
                 </executions>
-
                 <configuration>
                     <mainClass>com.laytonsmith.PureUtilities.ClassLoading.Annotations.CacheAnnotations</mainClass>
-
                     <arguments>
                         <argument>${basedir}/target/classes</argument>
                         <argument>${basedir}/target/classes</argument>
                     </arguments>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>org.bsc.maven</groupId>
+                <artifactId>maven-processor-plugin</artifactId>
+                <version>2.2.4</version>
+                <executions>
+                    <execution>
+                        <id>process</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <outputDirectory>src/main/generated</outputDirectory>
+                    <processors>
+                        <processor>com.laytonsmith.core.extensions.ExtensionAnnotationProcessor</processor>
+                    </processors>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.3</version>
+                <version>3.2.4</version>
                 <executions>
                     <execution>
                         <id>bukkit</id>
@@ -163,11 +154,6 @@
                                 <filter>
                                     <artifact>net.dv8tion:JDA:jar:*</artifact>
                                     <excludes>
-                                        <exclude>natives/**</exclude> <!-- voice -->
-                                        <exclude>tomp2p/opuswrapper/*</exclude> <!-- voice -->
-                                        <exclude>club/minnced/opus/util/*</exclude> <!-- voice -->
-                                        <exclude>com/sun/jna/**</exclude> <!-- voice / opus depend -->
-                                        <exclude>com/iwebpp/crypto/**</exclude> <!-- voice crypto -->
                                         <exclude>META-INF/**</exclude>
                                     </excludes>
                                 </filter>
@@ -296,11 +282,6 @@
                                 <filter>
                                     <artifact>net.dv8tion:JDA:jar:*</artifact>
                                     <excludes>
-                                        <exclude>natives/**</exclude> <!-- voice -->
-                                        <exclude>tomp2p/opuswrapper/*</exclude> <!-- voice -->
-                                        <exclude>club/minnced/opus/util/*</exclude> <!-- voice -->
-                                        <exclude>com/sun/jna/**</exclude> <!-- voice / opus depend -->
-                                        <exclude>com/iwebpp/crypto/**</exclude> <!-- voice crypto -->
                                         <exclude>META-INF/**</exclude>
                                     </excludes>
                                 </filter>
