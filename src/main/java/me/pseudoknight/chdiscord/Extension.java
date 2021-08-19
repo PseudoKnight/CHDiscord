@@ -4,10 +4,12 @@ import com.laytonsmith.PureUtilities.SimpleVersion;
 import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.abstraction.Implementation;
 import com.laytonsmith.core.Profiles;
+import com.laytonsmith.core.Static;
 import com.laytonsmith.core.extensions.AbstractExtension;
 import com.laytonsmith.core.extensions.MSExtension;
 
 import java.util.Map;
+import java.util.logging.Level;
 
 @MSExtension("CHDiscord")
 public class Extension extends AbstractExtension {
@@ -19,14 +21,14 @@ public class Extension extends AbstractExtension {
 	@Override
 	public void onStartup() {
 		if(!Implementation.GetServerType().equals(Implementation.Type.SHELL)) {
-			System.out.println("CHDiscord " + getVersion() + " loaded.");
+			Static.getLogger().log(Level.INFO, "CHDiscord " + getVersion() + " loaded.");
 		}
 	}
 
 	@Override
 	public void onShutdown() {
 		if(!Implementation.GetServerType().equals(Implementation.Type.SHELL)) {
-			System.out.println("CHDiscord " + getVersion() + " unloaded.");
+			Static.getLogger().log(Level.INFO, "CHDiscord " + getVersion() + " unloaded.");
 		}
 	}
 
