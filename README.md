@@ -32,10 +32,15 @@ The profile should be defined such as
 ### discord_disconnect()
 Disconnects from the Discord server.
 
-### discord_broadcast([channel], string)
-Broadcasts text to the specified channel (or default). 
-Message must not be empty, else it will throw an IllegalArgumentException.
-Requires the 'Send Messages' permission.
+### discord_broadcast([channel], message)
+Broadcasts text and embeds to the specified channel (or server default).
+Message can be a string or a message array object.
+Message array must contain at least one of the following keys: 'content' or 'embed'.
+Embed array can include any of the following keys: 'title', 'url' (requires title), 'description',
+'image' (URL), 'thumbnail' (URL), 'color' (rgb array), 'footer' (contains 'text' and optionally 'icon_url'),
+'author' (contains 'name' and optionally 'url' and/or 'icon_url'), and 'fields'
+(an array of field arrays, each with 'name', 'value', and optionally an 'inline' boolean).
+Requires the 'Send Messages' permission (and 'Embed Links' permission if only sending an embed)
 
 ### discord_delete_message(channel, id)
 Deletes a message on a channel with the given id.

@@ -7,6 +7,7 @@ import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.exceptions.CRE.*;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
@@ -23,9 +24,14 @@ public class ChannelFunctions {
 		}
 
 		public String docs() {
-			return "void {[channel], string} Broadcasts text to the specified channel (or server default)."
-					+ " Message must not be empty, else it will throw a IllegalArgumentException."
-					+ " Requires the 'Send Messages' permission.";
+			return "void {[channel], message} Broadcasts text and embeds to the specified channel (or server default)."
+					+ " Message can be a string or a message array object."
+					+ " Message array must contain at least one of the following keys: 'content' or 'embed'."
+					+ " Embed array can include any of the following keys: 'title', 'url' (requires title), 'description',"
+					+ " 'image', 'thumbnail', 'color' (rgb array), 'footer' (contains 'text' and optionally 'icon_url'),"
+					+ " 'author' (contains 'name' and optionally 'url' and/or 'icon_url'), and 'fields'"
+					+ " (an array of field arrays, each with 'name', 'value', and optionally an 'inline' boolean)."
+					+ " Requires the 'Send Messages' permission (and 'Embed Links' permission if only sending an embed)";
 		}
 
 		public Integer[] numArgs() {
@@ -36,7 +42,7 @@ public class ChannelFunctions {
 			if(Discord.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
-			TextChannel channel = null;
+			TextChannel channel;
 			if(args.length == 2) {
 				channel = Discord.GetTextChannel(args[0], t);
 			} else {
@@ -45,8 +51,8 @@ public class ChannelFunctions {
 					throw new CRENotFoundException("Default channel for bot not found.", t);
 				}
 			}
-			String message = args[args.length - 1].val();
 			try {
+				Message message = Discord.GetMessage(args[args.length - 1], t);
 				channel.sendMessage(message).queue();
 			} catch(PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);

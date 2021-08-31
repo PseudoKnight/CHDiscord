@@ -2,10 +2,14 @@ package me.pseudoknight.chdiscord;
 
 import com.laytonsmith.PureUtilities.DaemonManager;
 import com.laytonsmith.PureUtilities.Version;
+import com.laytonsmith.abstraction.MCColor;
 import com.laytonsmith.abstraction.StaticLayer;
+import com.laytonsmith.core.ArgumentValidation;
 import com.laytonsmith.core.MSLog;
 import com.laytonsmith.core.MSVersion;
+import com.laytonsmith.core.ObjectGenerator;
 import com.laytonsmith.core.constructs.CClosure;
+import com.laytonsmith.core.constructs.CArray;
 import com.laytonsmith.core.constructs.CInt;
 import com.laytonsmith.core.constructs.Target;
 import com.laytonsmith.core.environments.Environment;
@@ -17,16 +21,21 @@ import com.laytonsmith.core.exceptions.ProgramFlowManipulationException;
 import com.laytonsmith.core.functions.AbstractFunction;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import me.pseudoknight.chdiscord.abstraction.jda.Listener;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 import javax.security.auth.login.LoginException;
+import java.awt.Color;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -174,5 +183,111 @@ public class Discord {
 			throw new CRENotFoundException("Channel by the name " + m.val() + " not found.", t);
 		}
 		return channels.get(0);
+	}
+
+	static Message GetMessage(Mixed m, Target t) {
+		MessageBuilder builder = new MessageBuilder();
+		if(m instanceof CArray) {
+			CArray array = ArgumentValidation.getArray(m, t);
+			if(!array.isAssociative()) {
+				throw new CREIllegalArgumentException("Message array must be associative.", t);
+			}
+			if(array.containsKey("embed")) {
+				builder.setEmbed(GetEmbed(array.get("embed", t), t));
+			}
+			if(array.containsKey("content")) {
+				builder.setContent(array.get("content", t).val());
+			}
+		} else {
+			builder.setContent(m.val());
+		}
+		return builder.build();
+	}
+
+	static MessageEmbed GetEmbed(Mixed m, Target t) {
+		CArray embed = ArgumentValidation.getArray(m, t);
+		if(!embed.isAssociative()) {
+			throw new CREIllegalArgumentException("Embed array must be associative.", t);
+		}
+		EmbedBuilder builder = new EmbedBuilder();
+		if(embed.containsKey("title")) {
+			if(embed.containsKey("url")) {
+				builder.setTitle(embed.get("title", t).val(), embed.get("url", t).val());
+			} else {
+				builder.setTitle(embed.get("title", t).val());
+			}
+		}
+		if(embed.containsKey("description")) {
+			builder.setDescription(embed.get("description", t).val());
+		}
+		if(embed.containsKey("image")) {
+			builder.setImage(embed.get("image", t).val());
+		}
+		if(embed.containsKey("thumbnail")) {
+			builder.setThumbnail(embed.get("thumbnail", t).val());
+		}
+		if(embed.containsKey("color")) {
+			Mixed mColor = embed.get("color", t);
+			MCColor color;
+			if(mColor instanceof CArray) {
+				color = ObjectGenerator.GetGenerator().color((CArray) mColor, t);
+			} else {
+				color = StaticLayer.GetConvertor().GetColor(mColor.val(), t);
+			}
+			builder.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+		}
+		if(embed.containsKey("footer")) {
+			Mixed cFooter = embed.get("footer", t);
+			if(cFooter instanceof CArray) {
+				CArray footerArray = ArgumentValidation.getArray(cFooter, t);
+				if (!footerArray.isAssociative()) {
+					throw new CREIllegalArgumentException("Footer array must be associative.", t);
+				}
+				String text = footerArray.get("text", t).val();
+				if (footerArray.containsKey("icon_url")) {
+					builder.setFooter(text, footerArray.get("icon_url", t).val());
+				} else {
+					builder.setFooter(text);
+				}
+			} else {
+				builder.setFooter(cFooter.val());
+			}
+		}
+		if(embed.containsKey("author")) {
+			CArray cAuthor = ArgumentValidation.getArray(embed.get("author", t), t);
+			if(!cAuthor.isAssociative()) {
+				throw new CREIllegalArgumentException("Author array must be associative.", t);
+			}
+			String name = cAuthor.get("name", t).val();
+			String url = null;
+			String iconUrl = null;
+			if(cAuthor.containsKey("url")) {
+				url = cAuthor.get("url", t).val();
+			}
+			if(cAuthor.containsKey("icon_url")) {
+				iconUrl = cAuthor.get("icon_url", t).val();
+			}
+			builder.setAuthor(name, url, iconUrl);
+		}
+		if(embed.containsKey("fields")) {
+			CArray cFields = ArgumentValidation.getArray(embed.get("fields", t), t);
+			if(cFields.isAssociative()) {
+				throw new CREIllegalArgumentException("Fields array must not be associative.", t);
+			}
+			for(Mixed entry : cFields.asList()) {
+				CArray cField = ArgumentValidation.getArray(entry, t);
+				if(cFields.isAssociative()) {
+					throw new CREIllegalArgumentException("Field array must be associative.", t);
+				}
+				String name = cField.get("name", t).val();
+				String value = cField.get("value", t).val();
+				boolean inline = false;
+				if(cField.containsKey("inline")) {
+					inline = ArgumentValidation.getBooleanObject(cField.get("inline", t), t);
+				}
+				builder.addField(name, value, inline);
+			}
+		}
+		return builder.build();
 	}
 }
