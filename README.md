@@ -42,6 +42,41 @@ Embed array can include any of the following keys: 'title', 'url' (requires titl
 (an array of field arrays, each with 'name', 'value', and optionally an 'inline' boolean).
 Requires the 'Send Messages' permission (and 'Embed Links' permission if only sending an embed)
 
+Message object array format: (as displayed, top to bottom, left to right)
+```
+{
+  content: "This displays above the embed as normal text.",
+  embed: {
+    color: {
+      r: 255,
+      g: 255,
+      b: 255
+    },
+    author: {
+      icon_url: "https://website.com/author_avatar.png",
+      name: "PseudoKnight",
+      url: "https://website.com/author_link/"
+    },
+    thumbnail: "https://website.com/top_right_thumbnail.png",
+    title: "Large Bold Text",
+    url: "https://website.com/title_link/",
+    description: "Normal sized text just under title.",
+    fields: [
+      {
+        name: "Field A",
+        value: "Value A Below Name",
+        inline: true
+      }
+    ],
+    image: "https://website.com/image.png",
+    footer: {
+        icon_url: "https://website.com/footer_icon.png",
+        text: "Small text at the bottom."
+    }
+  }
+}
+```
+
 ### discord_delete_message(channel, id)
 Deletes a message on a channel with the given id.
 Requires the 'Manage Messages' permission.
