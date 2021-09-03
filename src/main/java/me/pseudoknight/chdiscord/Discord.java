@@ -58,7 +58,7 @@ public class Discord {
 				jda = JDABuilder.create(token, EnumSet.of(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES,
 								GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES))
 						.disableCache(EnumSet.of(CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS,
-								CacheFlag.EMOTE, CacheFlag.MEMBER_OVERRIDES))
+								CacheFlag.EMOTE, CacheFlag.MEMBER_OVERRIDES, CacheFlag.ONLINE_STATUS))
 						.setAutoReconnect(true)
 						.addEventListeners(new Listener())
 						.build()
