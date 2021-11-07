@@ -8,6 +8,7 @@ import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.exceptions.IllegalStateException;
 
 public class MemberFunctions {
 	public static String docs() {
@@ -118,6 +119,45 @@ public class MemberFunctions {
 	}
 
 	@api
+	public static class discord_member_is_muted extends Discord.Function {
+
+		public String getName() {
+			return "discord_member_is_muted";
+		}
+
+		public String docs() {
+			return "boolean {member} Check if a user is muted, either self muted or server muted."
+					+ " Member can be a user's numeric id or name."
+					+ " Throws NotFoundException if a member by that name or id doesn't exist.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{2};
+		}
+
+		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			if(Discord.guild == null) {
+				throw new CRENotFoundException("Not connected to Discord server.", t);
+			}
+			Member member = Discord.GetMember(args[0], t);
+			try {
+				GuildVoiceState voiceState = member.getVoiceState()
+				if(voiceState == null) {
+					return CBoolean.FALSE
+				}
+				return CBoolean.get(voiceState.isMuted());
+			} catch (PermissionException ex) {
+				throw new CREInsufficientPermissionException(ex.getMessage(), t);
+			}
+			return CBoolean.FALSE;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class};
+		}
+	}
+
+	@api
 	public static class discord_member_set_muted extends Discord.Function {
 
 		public String getName() {
@@ -143,15 +183,16 @@ public class MemberFunctions {
 			boolean muteState = ArgumentValidation.getBooleanObject(args[0], t)
 			try {
 				member.mute(muteState).queue();
-			} catch (PermissionException | IllegalStateException ex) {
+			} catch (PermissionException ex) {
+				throw new CREInsufficientPermissionException(ex.getMessage(), t);
+			} catch (IllegalStateException ex) {
 				throw new CRENotFoundException(ex.getMessage(), t);
 			}
 			return CVoid.VOID;
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class,
-				CREInsufficientPermissionException.class};
+			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class};
 		}
 	}
 }
