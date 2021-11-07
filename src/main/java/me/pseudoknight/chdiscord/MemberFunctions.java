@@ -7,6 +7,8 @@ import com.laytonsmith.core.exceptions.CRE.*;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.exceptions.IllegalStateException;
 
@@ -119,6 +121,50 @@ public class MemberFunctions {
 	}
 
 	@api
+	public static class discord_member_get_voice_channel extends Discord.Function {
+
+		public String getName() {
+			return "discord_member_get_voice_channel";
+		}
+
+		public String docs() {
+			return "string {member} Get the member's current voice channel."
+					+ " If the member is not connected to a voice channel, null is returned."
+					+ " Member can be a user's numeric id or name."
+					+ " Throws NotFoundException if a member by that name or id doesn't exist.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{1};
+		}
+
+		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			if(Discord.guild == null) {
+				throw new CRENotFoundException("Not connected to Discord server.", t);
+			}
+			Member member = Discord.GetMember(args[0], t);
+			try {
+				GuildVoiceState voiceState = member.getVoiceState();
+				if(voiceState == null) {
+					return CNull.NULL;
+				}
+				VoiceChannel channel = voiceState.getChannel();
+				if(channel == null) {
+					return CNull.NULL;
+				}
+				return new CString(channel.getId());
+			} catch (PermissionException ex) {
+				throw new CREInsufficientPermissionException(ex.getMessage(), t);
+			}
+			return CNull.NULL;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class};
+		}
+	}
+
+	@api
 	public static class discord_member_is_muted extends Discord.Function {
 
 		public String getName() {
@@ -132,7 +178,7 @@ public class MemberFunctions {
 		}
 
 		public Integer[] numArgs() {
-			return new Integer[]{2};
+			return new Integer[]{1};
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
@@ -141,9 +187,9 @@ public class MemberFunctions {
 			}
 			Member member = Discord.GetMember(args[0], t);
 			try {
-				GuildVoiceState voiceState = member.getVoiceState()
+				GuildVoiceState voiceState = member.getVoiceState();
 				if(voiceState == null) {
-					return CBoolean.FALSE
+					return CBoolean.FALSE;
 				}
 				return CBoolean.get(voiceState.isMuted());
 			} catch (PermissionException ex) {
@@ -180,7 +226,7 @@ public class MemberFunctions {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
 			Member member = Discord.GetMember(args[0], t);
-			boolean muteState = ArgumentValidation.getBooleanObject(args[0], t)
+			boolean muteState = ArgumentValidation.getBooleanObject(args[0], t);
 			try {
 				member.mute(muteState).queue();
 			} catch (PermissionException ex) {
