@@ -128,7 +128,7 @@ public class MemberFunctions {
 		}
 
 		public String docs() {
-			return "string {member} Get the member's current voice channel."
+			return "string {member} Get the ID of the member's current voice channel."
 					+ " If the member is not connected to a voice channel, null is returned."
 					+ " Member can be a user's numeric id or name."
 					+ " Throws NotFoundException if a member by that name or id doesn't exist.";
@@ -225,8 +225,9 @@ public class MemberFunctions {
 			if(Discord.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
+			
 			Member member = Discord.GetMember(args[0], t);
-			boolean muteState = ArgumentValidation.getBooleanObject(args[0], t);
+			boolean muteState = ArgumentValidation.getBooleanObject(args[1], t);
 			try {
 				member.mute(muteState).queue();
 			} catch (PermissionException ex) {
