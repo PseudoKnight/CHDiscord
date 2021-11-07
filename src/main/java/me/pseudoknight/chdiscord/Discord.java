@@ -31,6 +31,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
@@ -289,5 +290,33 @@ public class Discord {
 			}
 		}
 		return builder.build();
+	}
+
+	static VoiceChannel GetVoiceChannel(Mixed m, Target t) {
+		VoiceChannel channel;
+		if(m.val().isEmpty()) {
+			throw new CREIllegalArgumentException("A voice channel id or name was expected but was given an empty string.", t);
+		}
+
+		if(m instanceof CInt) {
+			channel = guild.getVoiceChannelById(((CInt) m).getInt());
+			if(channel == null) {
+				throw new CRENotFoundException("A voice channel with the id \"" + m.val() + "\" was not found on Discord server.", t);
+			}
+		} else {
+			try {
+				channel = guild.getVoiceChannelById(m.val());
+				if(channel == null) {
+					throw new CRENotFoundException("A voice channel with the id \"" + m.val() + "\" was not found on Discord server.", t);
+				}
+			} catch (NumberFormatException ex) {
+				List<VoiceChannel> channels = guild.getVoiceChannelsByName(m.val(), false);
+				if(channels.isEmpty()) {
+					throw new CRENotFoundException("A channel with the name \"" + m.val() + "\" was not found on Discord server.", t);
+				}
+				channel = channels.get(0);
+			}
+		}
+		return channel;
 	}
 }
