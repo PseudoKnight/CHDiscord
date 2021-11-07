@@ -117,4 +117,41 @@ public class MemberFunctions {
 		}
 	}
 
+	@api
+	public static class discord_member_set_muted extends Discord.Function {
+
+		public String getName() {
+			return "discord_member_set_muted";
+		}
+
+		public String docs() {
+			return "void {member, boolean} Set a user's server muted state."
+					+ " Member can be a user's numeric id or name."
+					+ " Throws NotFoundException if a member by that name or id doesn't exist or is not connected to a voice channel."
+					+ " Requires the 'Deafen Members' permission.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{2};
+		}
+
+		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			if(Discord.guild == null) {
+				throw new CRENotFoundException("Not connected to Discord server.", t);
+			}
+			Member member = Discord.GetMember(args[0], t);
+			boolean muteState = ArgumentValidation.getBooleanObject(args[0], t)
+			try {
+				member.mute(muteState).queue();
+			} catch (PermissionException | IllegalStateException ex) {
+				throw new CRENotFoundException(ex.getMessage(), t);
+			}
+			return CVoid.VOID;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class,
+				CREInsufficientPermissionException.class};
+		}
+	}
 }
