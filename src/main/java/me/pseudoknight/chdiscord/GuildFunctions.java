@@ -115,8 +115,7 @@ public class GuildFunctions {
 		public String docs() {
 			return "void {member, channel} Moves a member to another voice channel."
 					+ " The member must already be connected to a voice channel in the guild."
-					+ " Member can be a user's numeric id or name."
-					+ " Channel can be a voice channel's numeric id or name."
+					+ " Member and channel can be a numeric id or name."
 					+ " Throws NotFoundException if a member or channel by that name doesn't exist."
 					+ " Throws InsufficientPermissionException if the member does not have access to the destination channel."
 					+ " Requires the 'Move Members' permission.";
