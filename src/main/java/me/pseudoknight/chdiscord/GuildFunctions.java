@@ -11,8 +11,6 @@ import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.exceptions.PermissionException;
-import net.dv8tion.jda.api.exceptions.IllegalStateException;
-import net.dv8tion.jda.api.exceptions.IllegalArgumentException;
 
 import java.util.ArrayList;
 import java.util.List;

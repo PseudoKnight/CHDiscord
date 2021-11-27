@@ -2,6 +2,7 @@ package me.pseudoknight.chdiscord;
 
 import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.constructs.*;
+import com.laytonsmith.core.ArgumentValidation;
 import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.exceptions.CRE.*;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
@@ -10,7 +11,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
-import net.dv8tion.jda.api.exceptions.IllegalStateException;
 
 public class MemberFunctions {
 	public static String docs() {
@@ -152,11 +152,10 @@ public class MemberFunctions {
 				if(channel == null) {
 					return CNull.NULL;
 				}
-				return new CString(channel.getId());
+				return new CString(channel.getId(), t);
 			} catch (PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);
 			}
-			return CNull.NULL;
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
@@ -195,7 +194,6 @@ public class MemberFunctions {
 			} catch (PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);
 			}
-			return CBoolean.FALSE;
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
