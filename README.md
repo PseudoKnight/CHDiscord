@@ -35,7 +35,7 @@ Disconnects from the Discord server.
 ### discord_broadcast([channel], message)
 Broadcasts text and embeds to the specified channel (or server default).
 Message can be a string or a message array object.
-Message array must contain at least one of the following keys: 'content' or 'embed'.
+Message array must contain at least one of the following keys: 'content', 'embed', or 'embeds'.
 Embed array can include any of the following keys: 'title', 'url' (requires title), 'description',
 'image' (URL), 'thumbnail' (URL), 'color' (rgb array), 'footer' (contains 'text' and optionally 'icon_url'),
 'author' (contains 'name' and optionally 'url' and/or 'icon_url'), and 'fields'
@@ -46,7 +46,7 @@ Message object array format: (as displayed, top to bottom, left to right)
 ```
 {
   content: "This displays above the embed as normal text.",
-  embed: {
+  embeds: [{
     color: {
       r: 255,
       g: 255,
@@ -73,7 +73,7 @@ Message object array format: (as displayed, top to bottom, left to right)
         icon_url: "https://website.com/footer_icon.png",
         text: "Small text at the bottom."
     }
-  }
+  }]
 }
 ```
 

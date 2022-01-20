@@ -147,6 +147,23 @@ public class Discord {
 		return mem;
 	}
 
+	static CArray GetMemberData(Member mem, Target t) {
+		CArray data = CArray.GetAssociativeArray(t);
+		data.set("userid", new CInt(mem.getIdLong(), t), t);
+		data.set("username", mem.getUser().getName());
+		data.set("tag", mem.getUser().getAsTag());
+		data.set("nickname", mem.getNickname());
+		CArray roles = CArray.GetAssociativeArray(t);
+		for(Role role : mem.getRoles()) {
+			roles.set(role.getName(), new CInt(role.getIdLong(), t), t);
+		}
+		data.set("roles", roles, t);
+		if(mem.hasTimeJoined()) {
+			data.set("joined", new CInt(mem.getTimeJoined().toEpochSecond(), t), t);
+		}
+		return data;
+	}
+
 	static Role GetRole(Mixed m, Target t) {
 		Role role;
 		if(m instanceof CInt) {
@@ -193,7 +210,14 @@ public class Discord {
 				throw new CREIllegalArgumentException("Message array must be associative.", t);
 			}
 			if(array.containsKey("embed")) {
-				builder.setEmbed(GetEmbed(array.get("embed", t), t));
+				builder.setEmbeds(GetEmbed(array.get("embed", t), t));
+			} else if(array.containsKey("embeds")) {
+				CArray cEmbeds = ArgumentValidation.getArray(array.get("embeds", t), t);
+				MessageEmbed[] embeds = new MessageEmbed[(int) cEmbeds.size()];
+				for(int i = 0; i < cEmbeds.size(); i++) {
+					embeds[i] = GetEmbed(cEmbeds.get(i, t), t);
+				}
+				builder.setEmbeds(embeds);
 			}
 			if(array.containsKey("content")) {
 				builder.setContent(array.get("content", t).val());
