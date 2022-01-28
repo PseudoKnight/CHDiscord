@@ -121,6 +121,30 @@ Member can be a user's numeric id or name.
 Throws NotFoundException if a member by that name or id doesn't exist.
 Requires the 'Manage Nicknames' permission.
 
+### discord_member_get_voice_channel(member)
+Get the ID of member's current voice channel.
+If the member is not connected to a voice channel, null is returned.
+Member can be a user's numeric id or name.
+Throws NotFoundException if a member by that name or id doesn't exist.
+
+### discord_member_is_muted(member)
+Check if a user is muted, either self muted or server muted.
+Member can be a user's numeric id or name.
+Throws NotFoundException if a member by that name or id doesn't exist.
+
+### discord_member_set_muted(member, boolean)
+Set a user's server muted state.
+Member can be a user's numeric id or name.
+Throws NotFoundException if a member by that name or id doesn't exist or is not connected to a voice channel.
+Requires the 'Deafen Members' permission.
+
+### discord_member_move_voice_channel(member, channel)
+Moves a member to another voice channel.
+The member must already be connected to a voice channel in the guild.
+Member and channel can be a numeric id or name.
+Throws InsufficientPermissionException if the member does not have access to the destination channel.
+Requires the 'Move Members' permission.
+
 ## Events
 
 ### discord_message_received
