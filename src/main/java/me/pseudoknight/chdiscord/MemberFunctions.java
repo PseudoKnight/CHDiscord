@@ -212,7 +212,7 @@ public class MemberFunctions {
 			return "void {member, boolean} Set a user's server muted state."
 					+ " Member can be a user's numeric id or name."
 					+ " Throws NotFoundException if a member by that name or id doesn't exist or is not connected to a voice channel."
-					+ " Requires the 'Deafen Members' permission.";
+					+ " Requires the 'Mute Members' permission.";
 		}
 
 		public Integer[] numArgs() {
