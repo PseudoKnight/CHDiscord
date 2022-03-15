@@ -8,12 +8,12 @@ import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordGuildMessageRe
 import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordPrivateMessageReceivedEvent;
 import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordVoiceJoinEvent;
 import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordVoiceLeaveEvent;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.annotation.Nonnull;
@@ -23,32 +23,28 @@ import java.util.logging.Logger;
 public class Listener extends ListenerAdapter {
 
 	@Override
-	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+	public void onMessageReceived(MessageReceivedEvent event) {
 		if(event.getAuthor().equals(Discord.jda.getSelfUser())) {
 			return;
 		}
-		final JDADiscordGuildMessageReceivedEvent mre = new JDADiscordGuildMessageReceivedEvent(event);
-		try {
-			StaticLayer.GetConvertor().runOnMainThreadLater(null, () -> {
-				EventUtils.TriggerListener(Driver.EXTENSION, "discord_message_received", mre);
-			});
-		} catch(Exception ex) {
-			Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
-		}
-	}
-
-	@Override
-	public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
-		if(event.getAuthor().equals(Discord.jda.getSelfUser())) {
-			return;
-		}
-		final JDADiscordPrivateMessageReceivedEvent mre = new JDADiscordPrivateMessageReceivedEvent(event);
-		try {
-			StaticLayer.GetConvertor().runOnMainThreadLater(null, () -> {
-				EventUtils.TriggerListener(Driver.EXTENSION, "discord_private_message_received", mre);
-			});
-		} catch(Exception ex) {
-			Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
+		if(event.getChannelType() == ChannelType.PRIVATE) {
+			final JDADiscordPrivateMessageReceivedEvent mre = new JDADiscordPrivateMessageReceivedEvent(event);
+			try {
+				StaticLayer.GetConvertor().runOnMainThreadLater(null, () -> {
+					EventUtils.TriggerListener(Driver.EXTENSION, "discord_private_message_received", mre);
+				});
+			} catch(Exception ex) {
+				Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
+			}
+		} else {
+			final JDADiscordGuildMessageReceivedEvent mre = new JDADiscordGuildMessageReceivedEvent(event);
+			try {
+				StaticLayer.GetConvertor().runOnMainThreadLater(null, () -> {
+					EventUtils.TriggerListener(Driver.EXTENSION, "discord_message_received", mre);
+				});
+			} catch (Exception ex) {
+				Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
+			}
 		}
 	}
 

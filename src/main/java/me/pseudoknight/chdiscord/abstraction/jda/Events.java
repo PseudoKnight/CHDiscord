@@ -3,24 +3,19 @@ package me.pseudoknight.chdiscord.abstraction.jda;
 import com.laytonsmith.abstraction.Implementation;
 import com.laytonsmith.annotations.abstraction;
 import me.pseudoknight.chdiscord.abstraction.events.*;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Events {
 	@abstraction(type = Implementation.Type.BUKKIT)
 	public static class JDADiscordGuildMessageReceivedEvent implements DiscordGuildMessageReceivedEvent {
-		GuildMessageReceivedEvent e;
+		MessageReceivedEvent e;
 
-		JDADiscordGuildMessageReceivedEvent(GuildMessageReceivedEvent e) {
+		JDADiscordGuildMessageReceivedEvent(MessageReceivedEvent e) {
 			this.e = e;
 		}
 
@@ -48,9 +43,9 @@ public class Events {
 
 	@abstraction(type = Implementation.Type.BUKKIT)
 	public static class JDADiscordPrivateMessageReceivedEvent implements DiscordPrivateMessageReceivedEvent {
-		PrivateMessageReceivedEvent e;
+		MessageReceivedEvent e;
 
-		JDADiscordPrivateMessageReceivedEvent(PrivateMessageReceivedEvent e) {
+		JDADiscordPrivateMessageReceivedEvent(MessageReceivedEvent e) {
 			this.e = e;
 		}
 
@@ -76,7 +71,7 @@ public class Events {
 			this.e = e;
 		}
 
-		public VoiceChannel getChannel() {
+		public AudioChannel getChannel() {
 			return e.getChannelJoined();
 		}
 
@@ -98,7 +93,7 @@ public class Events {
 			this.e = e;
 		}
 
-		public VoiceChannel getChannel() {
+		public AudioChannel getChannel() {
 			return e.getChannelLeft();
 		}
 
