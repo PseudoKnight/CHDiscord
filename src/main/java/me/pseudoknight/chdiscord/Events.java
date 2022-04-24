@@ -11,6 +11,7 @@ import com.laytonsmith.core.exceptions.PrefilterNonMatchException;
 import me.pseudoknight.chdiscord.abstraction.events.*;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -256,6 +257,49 @@ public class Events {
 			map.put("username", new CString(event.getMember().getUser().getName(), t));
 			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
 			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
+
+			return map;
+		}
+	}
+
+	@api
+	public static class discord_member_left extends DiscordEvent {
+
+		@Override
+		public String getName() {
+			return "discord_member_left";
+		}
+
+		@Override
+		public String docs() {
+			return "{} "
+					+ "This event is called when a user left the Discord server, including kick/ban."
+					+ "{username: The Discord username | nickname: The display name on Discord"
+					+ " | userid: The Discord user's unique id} "
+					+ "{} "
+					+ "{}";
+		}
+
+		@Override
+		public boolean matches(Map<String, Construct> prefilter, BindableEvent e) throws PrefilterNonMatchException {
+			return e instanceof DiscordMemberLeaveEvent;
+		}
+
+		@Override
+		public Map<String, Construct> evaluate(BindableEvent e) throws EventException {
+			DiscordMemberLeaveEvent event = (DiscordMemberLeaveEvent) e;
+			Target t = Target.UNKNOWN;
+			Map<String, Construct> map = new HashMap<>();
+
+			Member mem = event.getMember();
+			User user = event.getUser();
+			map.put("username", new CString(user.getName(), t));
+			map.put("userid", new CInt(user.getIdLong(), t));
+			if(mem != null) {
+				map.put("nickname", new CString(mem.getEffectiveName(), t));
+			} else {
+				map.put("nickname", new CString(user.getName(), t));
+			}
 
 			return map;
 		}

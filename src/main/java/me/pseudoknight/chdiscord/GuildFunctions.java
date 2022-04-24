@@ -101,4 +101,48 @@ public class GuildFunctions {
 					CREIllegalArgumentException.class};
 		}
 	}
+
+	@api
+	public static class discord_member_move_voice_channel extends Discord.Function {
+
+		public String getName() {
+			return "discord_member_move_voice_channel";
+		}
+
+		public String docs() {
+			return "void {member, channel} Moves a member to another voice channel."
+					+ " The member must already be connected to a voice channel in the guild."
+					+ " Member and channel can be a numeric id or name."
+					+ " Throws NotFoundException if a member or channel by that name doesn't exist."
+					+ " Throws InsufficientPermissionException if the member does not have access to the destination channel."
+					+ " Requires the 'Move Members' permission.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{2};
+		}
+
+		public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
+			if(Discord.guild == null) {
+				throw new CRENotFoundException("Not connected to Discord server.", t);
+			}
+
+			Member member = Discord.GetMember(args[0], t);
+			VoiceChannel channel = Discord.GetVoiceChannel(args[1], t);
+
+			try {
+				Discord.guild.moveVoiceMember(member, channel).queue();
+			} catch (PermissionException ex) {
+				throw new CREInsufficientPermissionException(ex.getMessage(), t);
+			} catch (IllegalArgumentException | IllegalStateException ex) {
+				throw new CREIllegalArgumentException(ex.getMessage(), t);
+			}
+			return CVoid.VOID;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class,
+					CREIllegalArgumentException.class};
+		}
+	}
 }
