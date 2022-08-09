@@ -21,14 +21,14 @@ public class Extension extends AbstractExtension {
 	@Override
 	public void onStartup() {
 		if(!Implementation.GetServerType().equals(Implementation.Type.SHELL)) {
-			Static.getLogger().log(Level.INFO, "CHDiscord " + getVersion() + " loaded.");
+			Static.getLogger().info("CHDiscord " + getVersion() + " loaded.");
 		}
 	}
 
 	@Override
 	public void onShutdown() {
 		if(!Implementation.GetServerType().equals(Implementation.Type.SHELL)) {
-			Static.getLogger().log(Level.INFO, "CHDiscord " + getVersion() + " unloaded.");
+			Static.getLogger().info( "CHDiscord " + getVersion() + " unloaded.");
 		}
 	}
 

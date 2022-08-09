@@ -96,7 +96,7 @@ public class GeneralFunctions {
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{};
+			return new Class[]{CRECastException.class, CREIllegalArgumentException.class};
 		}
 	}
 
@@ -121,7 +121,7 @@ public class GeneralFunctions {
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{};
+			return null;
 		}
 	}
 

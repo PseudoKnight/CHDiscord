@@ -2,16 +2,13 @@
 
 This is CommandHelper extension that uses the JDA library to talk to your Discord server.
 
+CommandHelper 3.3.4 build #3978 or later is required for CHDiscord 2.4.0 or later. There are builds backported to
+CommandHelper 3.3.2 as well.
+
 You'll need to have created a Discord application [here](https://discordapp.com/developers/applications/me).
 Then add a Bot to it. Grab the "TOKEN" for the Bot that you'll use to connect this extension to Discord.
-Finally, you'll need your server id, which you can get by right-clicking your server name and clicking "Copy ID".
-
-You have to run discord_connect() before you can use the other functionality of this extension, otherwise a
-NotFoundException will be thrown.
-
-##### Additional Requirements as of Version 2.4.0:
-- The Server Members Intent, which is used for member caching, is required on the Bot page
-- CommandHelper 3.3.4 build #3978 or later is required
+Enable the 'SERVER MEMBERS INTENT' and 'MESSAGE CONTENT INTENT' of the Privileged Gateway Intents.
+Finally, you'll need your server id, which you can get by right-clicking your server name in Discord and clicking "Copy ID".
 
 ## Functions
 
@@ -28,6 +25,9 @@ The profile should be defined such as
         <token>abcdefg</token>
         <serverId>12345</serverId>
     </profile>
+
+You have to run discord_connect() before you can use the other functionality of this extension, otherwise a
+NotFoundException will be thrown. You cannot use other functions until the callback closure is executed.
 
 ### discord_disconnect()
 Disconnects from the Discord server.

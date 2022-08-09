@@ -32,6 +32,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
@@ -57,16 +58,16 @@ public class Discord {
 		connection = new Thread(() -> {
 			try {
 				jda = JDABuilder.create(token, EnumSet.of(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES,
-								GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES))
-						.disableCache(EnumSet.of(CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS,
-								CacheFlag.EMOTE, CacheFlag.MEMBER_OVERRIDES, CacheFlag.ONLINE_STATUS))
+								GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.MESSAGE_CONTENT))
+						.disableCache(EnumSet.of(CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS, CacheFlag.STICKER,
+								CacheFlag.EMOJI, CacheFlag.MEMBER_OVERRIDES, CacheFlag.ONLINE_STATUS))
 						.setAutoReconnect(true)
 						.addEventListeners(new Listener())
 						.build()
 						.awaitReady();
 
-			} catch(LoginException | IllegalStateException | InterruptedException ex) {
-				MSLog.GetLogger().e(MSLog.Tags.RUNTIME, "Could not connect to Discord.", t);
+			} catch(LoginException | IllegalStateException | InterruptedException | ErrorResponseException ex) {
+				MSLog.GetLogger().e(MSLog.Tags.RUNTIME, "Could not connect to Discord. " + ex.getMessage(), t);
 				Disconnect();
 				return;
 			}

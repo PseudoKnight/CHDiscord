@@ -10,7 +10,6 @@ import com.laytonsmith.core.natives.interfaces.Mixed;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
 public class MemberFunctions {

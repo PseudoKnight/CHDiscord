@@ -7,10 +7,10 @@ import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.exceptions.CRE.*;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
-import net.dv8tion.jda.api.entities.BaseGuildMessageChannel;
-import net.dv8tion.jda.api.entities.Channel;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
 public class ChannelFunctions {
@@ -44,14 +44,15 @@ public class ChannelFunctions {
 			if(Discord.guild == null) {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
-			BaseGuildMessageChannel channel;
+			TextChannel channel;
 			if(args.length == 2) {
 				channel = Discord.GetTextChannel(args[0], t);
 			} else {
-				channel = Discord.guild.getDefaultChannel();
-				if(channel == null) {
+				DefaultGuildChannelUnion defaultChannel = Discord.guild.getDefaultChannel();
+				if(defaultChannel == null || defaultChannel.getType() != ChannelType.TEXT) {
 					throw new CRENotFoundException("Default channel for bot not found.", t);
 				}
+				channel = defaultChannel.asTextChannel();
 			}
 			try {
 				Message message = Discord.GetMessage(args[args.length - 1], t);
