@@ -8,10 +8,10 @@ import com.laytonsmith.core.exceptions.CRE.*;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 public class ChannelFunctions {
 	public static String docs() {
@@ -55,7 +55,7 @@ public class ChannelFunctions {
 				channel = defaultChannel.asTextChannel();
 			}
 			try {
-				Message message = Discord.GetMessage(args[args.length - 1], t);
+				MessageCreateData message = Discord.GetMessage(args[args.length - 1], t);
 				channel.sendMessage(message).queue();
 			} catch(PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);

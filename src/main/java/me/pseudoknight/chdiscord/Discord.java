@@ -24,10 +24,8 @@ import me.pseudoknight.chdiscord.abstraction.jda.Listener;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -35,6 +33,8 @@ import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import javax.security.auth.login.LoginException;
 import java.awt.Color;
@@ -204,8 +204,8 @@ public class Discord {
 		return channels.get(0);
 	}
 
-	static Message GetMessage(Mixed m, Target t) {
-		MessageBuilder builder = new MessageBuilder();
+	static MessageCreateData GetMessage(Mixed m, Target t) {
+		MessageCreateBuilder  builder = new MessageCreateBuilder();
 		if(m instanceof CArray) {
 			CArray array = ArgumentValidation.getArray(m, t);
 			if(!array.isAssociative()) {
