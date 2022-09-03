@@ -2,10 +2,7 @@ package me.pseudoknight.chdiscord;
 
 import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.MSVersion;
-import com.laytonsmith.core.constructs.CArray;
-import com.laytonsmith.core.constructs.CInt;
-import com.laytonsmith.core.constructs.CString;
-import com.laytonsmith.core.constructs.Target;
+import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.events.AbstractEvent;
 import com.laytonsmith.core.events.BindableEvent;
 import com.laytonsmith.core.events.Driver;
@@ -63,7 +60,8 @@ public class Events {
 					+ "{username: The Discord username | nickname: The display name on Discord"
 					+ " | userid: The Discord user's unique id"
 					+ " | channel: The channel the message was sent | message: The message the user sent."
-					+ " | id: The message id.} "
+					+ " | id: The message id. | attachments: An array of attachment arrays, each with the keys 'url',"
+					+ " 'filename', and 'description'.}"
 					+ "{} "
 					+ "{}";
 		}
@@ -104,6 +102,15 @@ public class Events {
 			map.put("channel", new CString(event.getChannel().getName(), t));
 			map.put("message", new CString(msg.getContentDisplay(), t));
 			map.put("id", new CInt(msg.getIdLong(), t));
+			CArray attachments = new CArray(t);
+			for(Message.Attachment msgAttachment : msg.getAttachments()) {
+				CArray attachment = CArray.GetAssociativeArray(t);
+				attachment.set("url", new CString(msgAttachment.getUrl(), t), t);
+				attachment.set("filename", new CString(msgAttachment.getFileName(), t), t);
+				attachment.set("description", new CString(msgAttachment.getDescription(), t), t);
+				attachments.push(attachment, t);
+			}
+			map.put("attachments", attachments);
 
 			return map;
 		}
@@ -122,7 +129,8 @@ public class Events {
 			return "{} "
 					+ "This event is called when a user sends a private message to the bot."
 					+ "{username: The Discord username | userid: The Discord user's unique id"
-					+ " | message: The message the user sent. | id: The message id.} "
+					+ " | message: The message the user sent. | id: The message id. | attachments: An array of"
+					+ " attachment arrays, each with the keys 'url', 'filename', and 'description'.}"
 					+ "{} "
 					+ "{}";
 		}
@@ -143,6 +151,15 @@ public class Events {
 			map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
 			map.put("message", new CString(msg.getContentDisplay(), t));
 			map.put("id", new CInt(msg.getIdLong(), t));
+			CArray attachments = new CArray(t);
+			for(Message.Attachment msgAttachment : msg.getAttachments()) {
+				CArray attachment = CArray.GetAssociativeArray(t);
+				attachment.set("url", new CString(msgAttachment.getUrl(), t), t);
+				attachment.set("filename", new CString(msgAttachment.getFileName(), t), t);
+				attachment.set("description", new CString(msgAttachment.getDescription(), t), t);
+				attachments.push(attachment, t);
+			}
+			map.put("attachments", attachments);
 
 			return map;
 		}
