@@ -24,7 +24,7 @@ public class Listener extends ListenerAdapter {
 
 	@Override
 	public void onMessageReceived(MessageReceivedEvent event) {
-		if(event.getAuthor().equals(Discord.jda.getSelfUser())) {
+		if(Discord.jda == null || event.getAuthor().equals(Discord.jda.getSelfUser())) {
 			return;
 		}
 		if(event.getChannelType() == ChannelType.PRIVATE) {
