@@ -186,19 +186,19 @@ public class Events {
 
 		@Override
 		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-			return e instanceof DiscordVoiceJoinEvent;
+			return e instanceof DiscordVoiceUpdateEvent;
 		}
 
 		@Override
 		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
-			DiscordVoiceJoinEvent event = (DiscordVoiceJoinEvent) e;
+			DiscordVoiceUpdateEvent event = (DiscordVoiceUpdateEvent) e;
 			Target t = Target.UNKNOWN;
 			Map<String, Mixed> map = new HashMap<>();
 
 			map.put("username", new CString(event.getMember().getUser().getName(), t));
 			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
 			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
-			map.put("channel", new CString(event.getChannel().getName(), t));
+			map.put("channel", new CString(event.getChannelJoined().getName(), t));
 
 			return map;
 		}
@@ -225,7 +225,7 @@ public class Events {
 
 		@Override
 		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-			if(e instanceof DiscordVoiceLeaveEvent) {
+			if(e instanceof DiscordVoiceUpdateEvent) {
 				return true;
 			}
 			return false;
@@ -233,14 +233,14 @@ public class Events {
 
 		@Override
 		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
-			DiscordVoiceLeaveEvent event = (DiscordVoiceLeaveEvent) e;
+			DiscordVoiceUpdateEvent event = (DiscordVoiceUpdateEvent) e;
 			Target t = Target.UNKNOWN;
 			Map<String, Mixed> map = new HashMap<>();
 
 			map.put("username", new CString(event.getMember().getUser().getName(), t));
 			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
 			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
-			map.put("channel", new CString(event.getChannel().getName(), t));
+			map.put("channel", new CString(event.getChannelLeft().getName(), t));
 
 			return map;
 		}

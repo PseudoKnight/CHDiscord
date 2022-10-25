@@ -4,10 +4,11 @@ import com.laytonsmith.abstraction.Implementation;
 import com.laytonsmith.annotations.abstraction;
 import me.pseudoknight.chdiscord.abstraction.events.*;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Events {
@@ -64,37 +65,19 @@ public class Events {
 	}
 
 	@abstraction(type = Implementation.Type.BUKKIT)
-	public static class JDADiscordVoiceJoinEvent implements DiscordVoiceJoinEvent {
-		GuildVoiceJoinEvent e;
+	public static class JDADiscordVoiceUpdateEvent implements DiscordVoiceUpdateEvent {
+		GuildVoiceUpdateEvent e;
 
-		JDADiscordVoiceJoinEvent(GuildVoiceJoinEvent e) {
+		JDADiscordVoiceUpdateEvent(GuildVoiceUpdateEvent e) {
 			this.e = e;
 		}
 
-		public AudioChannel getChannel() {
-			return e.getChannelJoined();
-		}
-
-		public Member getMember() {
-			return e.getMember();
-		}
-
-		@Override
-		public Object _GetObject() {
-			return e;
-		}
-	}
-
-	@abstraction(type = Implementation.Type.BUKKIT)
-	public static class JDADiscordVoiceLeaveEvent implements DiscordVoiceLeaveEvent {
-		GuildVoiceLeaveEvent e;
-
-		JDADiscordVoiceLeaveEvent(GuildVoiceLeaveEvent e) {
-			this.e = e;
-		}
-
-		public AudioChannel getChannel() {
+		public AudioChannel getChannelLeft() {
 			return e.getChannelLeft();
+		}
+
+		public AudioChannel getChannelJoined() {
+			return e.getChannelJoined();
 		}
 
 		public Member getMember() {

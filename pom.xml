@@ -28,7 +28,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-alpha.18</version>
+            <version>5.0.0-alpha.22</version>
             <exclusions>
                 <exclusion>
                     <groupId>club.minnced</groupId>
@@ -44,11 +44,6 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.11</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
             <version>1.2.11</version>
         </dependency>
     </dependencies>
@@ -100,8 +95,8 @@
                 <configuration>
                     <mainClass>com.laytonsmith.PureUtilities.ClassLoading.Annotations.CacheAnnotations</mainClass>
                     <arguments>
-                        <argument>${basedir}/target/classes</argument>
-                        <argument>${basedir}/target/classes</argument>
+                        <argument>${project.basedir}/target/classes</argument>
+                        <argument>${project.basedir}/target/classes</argument>
                     </arguments>
                 </configuration>
             </plugin>
@@ -138,7 +133,7 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <finalName>MSDiscord-${version}</finalName>
+                            <finalName>MSDiscord-${project.version}</finalName>
                             <minimizeJar>true</minimizeJar>
                             <artifactSet>
                                 <includes>
