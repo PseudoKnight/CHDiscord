@@ -9,13 +9,12 @@ import com.laytonsmith.core.extensions.AbstractExtension;
 import com.laytonsmith.core.extensions.MSExtension;
 
 import java.util.Map;
-import java.util.logging.Level;
 
 @MSExtension("CHDiscord")
 public class Extension extends AbstractExtension {
 
 	public Version getVersion() {
-		return new SimpleVersion(2,6,0, "SNAPSHOT");
+		return new SimpleVersion(2,6,0);
 	}
 
 	@Override
