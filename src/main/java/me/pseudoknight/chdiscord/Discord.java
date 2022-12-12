@@ -169,28 +169,25 @@ public class Discord {
 	}
 
 	static Role GetRole(Mixed m, Target t) {
+		if(m.val().isEmpty()) {
+			throw new CREIllegalArgumentException("A role id was expected but was given an empty string.", t);
+		}
 		Role role;
 		if(m instanceof CInt) {
 			role = guild.getRoleById(((CInt) m).getInt());
-			if(role == null) {
-				throw new CRENotFoundException("A role with the id \"" + m.val() + "\" was not found on Discord server.", t);
-			}
 		} else {
 			try {
 				role = guild.getRoleById(m.val());
-				if(role == null) {
-					throw new CRENotFoundException("A role with the id \"" + m.val() + "\" was not found on Discord server.", t);
-				}
 			} catch (NumberFormatException ex) {
-				if(m.val().isEmpty()) {
-					throw new CREIllegalArgumentException("A role id was expected but was given an empty string.", t);
-				}
 				List<Role> r = guild.getRolesByName(m.val(), false);
 				if(r.isEmpty()) {
 					throw new CRENotFoundException("A role with the name \"" + m.val() + "\" was not found on Discord server.", t);
 				}
 				role = r.get(0);
 			}
+		}
+		if(role == null) {
+			throw new CRENotFoundException("A role with the id \"" + m.val() + "\" was not found on Discord server.", t);
 		}
 		return role;
 	}
@@ -324,18 +321,11 @@ public class Discord {
 		if(m.val().isEmpty()) {
 			throw new CREIllegalArgumentException("A voice channel id or name was expected but was given an empty string.", t);
 		}
-
 		if(m instanceof CInt) {
 			channel = guild.getVoiceChannelById(((CInt) m).getInt());
-			if(channel == null) {
-				throw new CRENotFoundException("A voice channel with the id \"" + m.val() + "\" was not found on Discord server.", t);
-			}
 		} else {
 			try {
 				channel = guild.getVoiceChannelById(m.val());
-				if(channel == null) {
-					throw new CRENotFoundException("A voice channel with the id \"" + m.val() + "\" was not found on Discord server.", t);
-				}
 			} catch (NumberFormatException ex) {
 				List<VoiceChannel> channels = guild.getVoiceChannelsByName(m.val(), false);
 				if(channels.isEmpty()) {
@@ -343,6 +333,9 @@ public class Discord {
 				}
 				channel = channels.get(0);
 			}
+		}
+		if(channel == null) {
+			throw new CRENotFoundException("A voice channel with the id \"" + m.val() + "\" was not found on Discord server.", t);
 		}
 		return channel;
 	}
