@@ -37,7 +37,6 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
-import javax.security.auth.login.LoginException;
 import java.awt.Color;
 import java.util.EnumSet;
 import java.util.List;
@@ -50,11 +49,17 @@ public class Discord {
 
 	private static Thread connection;
 	private static DaemonManager dm;
+	private static boolean connecting = false;
 
 	static void Connect(String token, String guildID, CClosure callback, Environment env, Target t) {
+		if(connecting) {
+			MSLog.GetLogger().e(MSLog.Tags.RUNTIME, "Attempted to connect to Discord multiple times simultaneously.", t);
+			return;
+		}
 		if(jda != null) {
 			Disconnect();
 		}
+		connecting = true;
 		dm = env.getEnv(StaticRuntimeEnv.class).GetDaemonManager();
 		connection = new Thread(() -> {
 			try {
@@ -72,6 +77,8 @@ public class Discord {
 				MSLog.GetLogger().e(MSLog.Tags.RUNTIME, "Could not connect to Discord. " + ex.getMessage(), t);
 				Disconnect();
 				return;
+			} finally {
+				connecting = false;
 			}
 
 			guild = jda.getGuildById(guildID);
