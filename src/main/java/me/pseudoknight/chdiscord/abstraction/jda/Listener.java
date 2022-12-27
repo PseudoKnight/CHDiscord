@@ -31,7 +31,8 @@ public class Listener extends ListenerAdapter {
 			String id = message.getNonce();
 			CClosure callback = ChannelFunctions.discord_broadcast.callbacks.remove(id);
 			if(callback != null) {
-				callback.executeCallable(callback.getEnv(), callback.getTarget(), new CInt(message.getIdLong(), callback.getTarget()));
+				StaticLayer.GetConvertor().runOnMainThreadLater(null, () ->
+					callback.executeCallable(callback.getEnv(), callback.getTarget(), new CInt(message.getIdLong(), callback.getTarget())));
 			}
 		} else if(event.getChannelType() == ChannelType.PRIVATE) {
 			final JDADiscordPrivateMessageReceivedEvent e = new JDADiscordPrivateMessageReceivedEvent(event);
