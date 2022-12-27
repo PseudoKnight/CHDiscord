@@ -11,7 +11,11 @@ import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ChannelFunctions {
 	public static String docs() {
@@ -21,13 +25,17 @@ public class ChannelFunctions {
 	@api
 	public static class discord_broadcast extends Discord.Function {
 
+		public static Map<String, CClosure> callbacks = new HashMap<>();
+
 		public String getName() {
 			return "discord_broadcast";
 		}
 
 		public String docs() {
-			return "void {[channel], message} Broadcasts text and embeds to the specified channel (or server default)."
+			return "void {[channel], message, [callback]} Broadcasts text and embeds to the specified channel."
+					+ " Channel can be specified using its numeric id or text channel name."
 					+ " Message can be a string or a message array object."
+					+ " Callback closure is later executed with the message id for this message."
 					+ " Message array must contain at least one of the following keys: 'content', 'embed', or 'embeds'."
 					+ " Embed array can include any of the following keys: 'title', 'url' (requires title), 'description',"
 					+ " 'image', 'thumbnail', 'color' (rgb array), 'footer' (contains 'text' and optionally 'icon_url'),"
@@ -37,7 +45,7 @@ public class ChannelFunctions {
 		}
 
 		public Integer[] numArgs() {
-			return new Integer[]{1, 2};
+			return new Integer[]{1, 2, 3};
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
@@ -45,18 +53,34 @@ public class ChannelFunctions {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
 			TextChannel channel;
-			if(args.length == 2) {
+			CClosure callback = null;
+			Mixed message;
+			if(args.length > 1) {
 				channel = Discord.GetTextChannel(args[0], t);
+				message = args[1];
+				if(args.length == 3) {
+					if(!(args[2] instanceof CClosure)) {
+						throw new CREIllegalArgumentException("Expected a closure but got: " + args[2].val(), t);
+					}
+					callback = (CClosure) args[2];
+				}
 			} else {
 				DefaultGuildChannelUnion defaultChannel = Discord.guild.getDefaultChannel();
 				if(defaultChannel == null || defaultChannel.getType() != ChannelType.TEXT) {
 					throw new CRENotFoundException("Default channel for bot not found.", t);
 				}
 				channel = defaultChannel.asTextChannel();
+				message = args[0];
 			}
 			try {
-				MessageCreateData message = Discord.GetMessage(args[args.length - 1], t);
-				channel.sendMessage(message).queue();
+				MessageCreateData data = Discord.GetMessage(message, t);
+				MessageCreateAction action = channel.sendMessage(data);
+				String id = String.valueOf(data.hashCode() + System.currentTimeMillis());
+				action.setNonce(id);
+				action.queue();
+				if(callback != null) {
+					callbacks.put(id, callback);
+				}
 			} catch(PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);
 			} catch(IllegalArgumentException ex) {
