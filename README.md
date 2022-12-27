@@ -167,3 +167,7 @@ Data: userid, username, nickname, channel
 ### discord_member_joined
 This event is called when a user joined the Discord server.  
 Data: userid, username, nickname
+
+### discord_member_left
+This event is called when a user left the Discord server, including kick/ban.
+Data: userid, username, nickname
