@@ -41,6 +41,7 @@ public class ChannelFunctions {
 					+ " 'image', 'thumbnail', 'color' (rgb array), 'footer' (contains 'text' and optionally 'icon_url'),"
 					+ " 'author' (contains 'name' and optionally 'url' and/or 'icon_url'), and 'fields'"
 					+ " (an array of field arrays, each with 'name', 'value', and optionally an 'inline' boolean)."
+					+ " Messages have a 2000 character limit."
 					+ " Requires the 'Send Messages' permission (and 'Embed Links' permission if only sending an embed)";
 		}
 

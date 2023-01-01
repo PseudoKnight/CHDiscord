@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 public class MemberFunctions {
 	public static String docs() {
@@ -28,7 +29,8 @@ public class MemberFunctions {
 			return "void {member, string} Sends a private message to the specified Discord server member."
 					+ " The user numeric id or name can be used to specify which server member to send to."
 					+ " If there are multiple members with the same user name, only the first one is messaged."
-					+ " Therefore it is recommended to use the user id.";
+					+ " Therefore it is recommended to use the user id."
+					+ " Messages have a 2000 character limit.";
 		}
 
 		public Integer[] numArgs() {
@@ -40,13 +42,18 @@ public class MemberFunctions {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
 			Member mem = Discord.GetMember(args[0], t);
-			final String message = args[1].val();
-			mem.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(message).queue());
+			Mixed message = args[1];
+			try {
+				MessageCreateData data = Discord.GetMessage(message, t);
+				mem.getUser().openPrivateChannel().queue(channel -> channel.sendMessage(data).queue());
+			} catch(IllegalArgumentException ex) {
+				throw new CREFormatException(ex.getMessage(), t);
+			}
 			return CVoid.VOID;
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class};
+			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class, CREFormatException.class};
 		}
 	}
 
