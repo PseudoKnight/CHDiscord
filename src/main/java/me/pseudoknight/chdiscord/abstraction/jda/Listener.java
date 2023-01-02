@@ -1,16 +1,12 @@
 package me.pseudoknight.chdiscord.abstraction.jda;
 
 import com.laytonsmith.abstraction.StaticLayer;
-import com.laytonsmith.core.constructs.CClosure;
-import com.laytonsmith.core.constructs.CInt;
 import com.laytonsmith.core.events.Driver;
 import com.laytonsmith.core.events.EventUtils;
-import me.pseudoknight.chdiscord.ChannelFunctions;
 import me.pseudoknight.chdiscord.Discord;
 import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordGuildMessageReceivedEvent;
 import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordPrivateMessageReceivedEvent;
 import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordVoiceUpdateEvent;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
@@ -23,18 +19,10 @@ public class Listener extends ListenerAdapter {
 
 	@Override
 	public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-		if(Discord.jda == null) {
+		if(Discord.jda == null || event.getAuthor().equals(Discord.jda.getSelfUser())) {
 			return;
 		}
-		if(event.getAuthor().equals(Discord.jda.getSelfUser())) {
-			Message message = event.getMessage();
-			String id = message.getNonce();
-			CClosure callback = ChannelFunctions.discord_broadcast.callbacks.remove(id);
-			if(callback != null) {
-				StaticLayer.GetConvertor().runOnMainThreadLater(null, () ->
-					callback.executeCallable(callback.getEnv(), callback.getTarget(), new CInt(message.getIdLong(), callback.getTarget())));
-			}
-		} else if(event.getChannelType() == ChannelType.PRIVATE) {
+		if(event.getChannelType() == ChannelType.PRIVATE) {
 			final JDADiscordPrivateMessageReceivedEvent e = new JDADiscordPrivateMessageReceivedEvent(event);
 			StaticLayer.GetConvertor().runOnMainThreadLater(null,
 					() -> EventUtils.TriggerListener(Driver.EXTENSION, "discord_private_message_received", e));

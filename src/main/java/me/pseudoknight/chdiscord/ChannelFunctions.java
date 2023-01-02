@@ -1,5 +1,6 @@
 package me.pseudoknight.chdiscord;
 
+import com.laytonsmith.abstraction.StaticLayer;
 import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.ArgumentValidation;
 import com.laytonsmith.core.constructs.*;
@@ -7,15 +8,14 @@ import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.exceptions.CRE.*;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.exceptions.PermissionException;
-import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.function.Consumer;
 
 public class ChannelFunctions {
 	public static String docs() {
@@ -24,8 +24,6 @@ public class ChannelFunctions {
 
 	@api
 	public static class discord_broadcast extends Discord.Function {
-
-		public static Map<String, CClosure> callbacks = new HashMap<>();
 
 		public String getName() {
 			return "discord_broadcast";
@@ -54,8 +52,8 @@ public class ChannelFunctions {
 				throw new CRENotFoundException("Not connected to Discord server.", t);
 			}
 			TextChannel channel;
-			CClosure callback = null;
 			Mixed message;
+			Consumer<Message> onSuccess = null;
 			if(args.length > 1) {
 				channel = Discord.GetTextChannel(args[0], t);
 				message = args[1];
@@ -63,7 +61,9 @@ public class ChannelFunctions {
 					if(!(args[2] instanceof CClosure)) {
 						throw new CREIllegalArgumentException("Expected a closure but got: " + args[2].val(), t);
 					}
-					callback = (CClosure) args[2];
+					final CClosure closure = (CClosure) args[2];
+					onSuccess = (msg) -> StaticLayer.GetConvertor().runOnMainThreadLater(null, () ->
+							closure.executeCallable(new CInt(msg.getIdLong(), t)));
 				}
 			} else {
 				DefaultGuildChannelUnion defaultChannel = Discord.guild.getDefaultChannel();
@@ -75,13 +75,7 @@ public class ChannelFunctions {
 			}
 			try {
 				MessageCreateData data = Discord.GetMessage(message, t);
-				MessageCreateAction action = channel.sendMessage(data);
-				String id = String.valueOf(data.hashCode() + System.currentTimeMillis());
-				action.setNonce(id);
-				action.queue();
-				if(callback != null) {
-					callbacks.put(id, callback);
-				}
+				channel.sendMessage(data).queue(onSuccess);
 			} catch(PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);
 			} catch(IllegalArgumentException ex) {
