@@ -40,9 +40,7 @@ public class GuildFunctions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Discord.guild == null) {
-				throw new CRENotFoundException("Not connected to Discord server.", t);
-			}
+			Discord.CheckConnection(t);
 			Member mem = Discord.GetMember(args[0], t);
 			CArray roles = CArray.GetAssociativeArray(t);
 			for(Role role : mem.getRoles()) {
@@ -76,9 +74,7 @@ public class GuildFunctions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Discord.guild == null) {
-				throw new CRENotFoundException("Not connected to Discord server.", t);
-			}
+			Discord.CheckConnection(t);
 			Member mem = Discord.GetMember(args[0], t);
 			List<Role> roles = new ArrayList<>();
 			if(args[1].isInstanceOf(CArray.TYPE)) {
@@ -126,9 +122,7 @@ public class GuildFunctions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Discord.guild == null) {
-				throw new CRENotFoundException("Not connected to Discord server.", t);
-			}
+			Discord.CheckConnection(t);
 
 			Member member = Discord.GetMember(args[0], t);
 			VoiceChannel channel = Discord.GetVoiceChannel(args[1], t);

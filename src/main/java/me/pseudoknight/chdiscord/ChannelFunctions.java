@@ -48,9 +48,7 @@ public class ChannelFunctions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Discord.guild == null) {
-				throw new CRENotFoundException("Not connected to Discord server.", t);
-			}
+			Discord.CheckConnection(t);
 			TextChannel channel;
 			Mixed message;
 			Consumer<Message> onSuccess = null;
@@ -107,9 +105,7 @@ public class ChannelFunctions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Discord.guild == null) {
-				throw new CRENotFoundException("Not connected to Discord server.", t);
-			}
+			Discord.CheckConnection(t);
 			TextChannel channel = Discord.GetTextChannel(args[0], t);
 			long id = ArgumentValidation.getInt(args[1], t);
 			try {
@@ -145,9 +141,7 @@ public class ChannelFunctions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Discord.guild == null) {
-				throw new CRENotFoundException("Not connected to Discord server.", t);
-			}
+			Discord.CheckConnection(t);
 			TextChannel channel = Discord.GetTextChannel(args[0], t);
 			String message = args[1].val();
 			try {

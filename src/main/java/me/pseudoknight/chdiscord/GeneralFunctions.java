@@ -145,9 +145,7 @@ public class GeneralFunctions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Discord.guild == null) {
-				throw new CRENotFoundException("Not connected to Discord server.", t);
-			}
+			Discord.CheckConnection(t);
 			try {
 				Activity.ActivityType type = Activity.ActivityType.valueOf(args[0].val().toUpperCase());
 				Activity activity = null;

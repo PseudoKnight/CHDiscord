@@ -105,6 +105,12 @@ public class Discord {
 		StaticLayer.GetConvertor().addShutdownHook(Discord::Disconnect);
 	}
 
+	static void CheckConnection(Target t) {
+		if(jda == null || jda.getStatus() != JDA.Status.CONNECTED) {
+			throw new CRENotFoundException("Not connected to Discord.", t);
+		}
+	}
+
 	static void Disconnect() {
 		if(jda != null) {
 			jda.shutdownNow();

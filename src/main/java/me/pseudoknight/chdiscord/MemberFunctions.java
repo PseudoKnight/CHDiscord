@@ -38,9 +38,7 @@ public class MemberFunctions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Discord.guild == null) {
-				throw new CRENotFoundException("Not connected to Discord server.", t);
-			}
+			Discord.CheckConnection(t);
 			Member mem = Discord.GetMember(args[0], t);
 			Mixed message = args[1];
 			try {
@@ -75,9 +73,7 @@ public class MemberFunctions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Discord.guild == null) {
-				throw new CRENotFoundException("Not connected to Discord server.", t);
-			}
+			Discord.CheckConnection(t);
 			Member member = Discord.GetMember(args[0], t);
 			return new CString(member.getNickname(), t);
 		}
@@ -106,9 +102,7 @@ public class MemberFunctions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Discord.guild == null) {
-				throw new CRENotFoundException("Not connected to Discord server.", t);
-			}
+			Discord.CheckConnection(t);
 			Member member = Discord.GetMember(args[0], t);
 			String newNickname = args[1].val();
 			try {
@@ -146,9 +140,7 @@ public class MemberFunctions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Discord.guild == null) {
-				throw new CRENotFoundException("Not connected to Discord server.", t);
-			}
+			Discord.CheckConnection(t);
 			Member member = Discord.GetMember(args[0], t);
 			try {
 				GuildVoiceState voiceState = member.getVoiceState();
@@ -188,9 +180,7 @@ public class MemberFunctions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Discord.guild == null) {
-				throw new CRENotFoundException("Not connected to Discord server.", t);
-			}
+			Discord.CheckConnection(t);
 			Member member = Discord.GetMember(args[0], t);
 			try {
 				GuildVoiceState voiceState = member.getVoiceState();
@@ -227,9 +217,7 @@ public class MemberFunctions {
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
-			if(Discord.guild == null) {
-				throw new CRENotFoundException("Not connected to Discord server.", t);
-			}
+			Discord.CheckConnection(t);
 			
 			Member member = Discord.GetMember(args[0], t);
 			boolean muteState = ArgumentValidation.getBooleanObject(args[1], t);
