@@ -10,9 +10,11 @@ import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.managers.channel.ChannelManager;
+import net.dv8tion.jda.api.managers.channel.middleman.StandardGuildMessageChannelManager;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.util.function.Consumer;
@@ -21,6 +23,9 @@ public class ChannelFunctions {
 	public static String docs() {
 		return "Functions for managing a Discord channel.";
 	}
+
+	static final String CHANNEL_ARGUMENT = " The 'channel' argument can be a channel's unique int id. A channel name"
+			+ " can also be used if you use only unique channel names, otherwise the first matching channel will be used.";
 
 	@api
 	public static class discord_broadcast extends Discord.Function {
@@ -31,9 +36,10 @@ public class ChannelFunctions {
 
 		public String docs() {
 			return "void {[channel], message, [callback]} Broadcasts text and embeds to the specified channel."
-					+ " Channel can be specified using its numeric id or text channel name."
+					+ CHANNEL_ARGUMENT
+					+ " If omitted, this function will use the server default channel."
 					+ " Message can be a string or a message array object."
-					+ " Callback closure is later executed with the message id for this message."
+					+ " Callback closure is eventually executed with the message id for this message."
 					+ " Message array must contain at least one of the following keys: 'content', 'embed', or 'embeds'."
 					+ " Embed array can include any of the following keys: 'title', 'url' (requires title), 'description',"
 					+ " 'image', 'thumbnail', 'color' (rgb array), 'footer' (contains 'text' and optionally 'icon_url'),"
@@ -49,11 +55,11 @@ public class ChannelFunctions {
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
 			Discord.CheckConnection(t);
-			TextChannel channel;
+			GuildMessageChannel channel;
 			Mixed message;
 			Consumer<Message> onSuccess = null;
 			if(args.length > 1) {
-				channel = Discord.GetTextChannel(args[0], t);
+				channel = Discord.GetMessageChannel(args[0], t);
 				message = args[1];
 				if(args.length == 3) {
 					if(!(args[2] instanceof CClosure)) {
@@ -96,7 +102,8 @@ public class ChannelFunctions {
 		}
 
 		public String docs() {
-			return "void {channel, id} Deletes a message on a channel with the given id."
+			return "void {channel, id} Deletes a message with the given id on a channel."
+					+ CHANNEL_ARGUMENT
 					+ " Requires 'Manage Messages' permission.";
 		}
 
@@ -106,7 +113,7 @@ public class ChannelFunctions {
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
 			Discord.CheckConnection(t);
-			TextChannel channel = Discord.GetTextChannel(args[0], t);
+			GuildMessageChannel channel = Discord.GetMessageChannel(args[0], t);
 			long id = ArgumentValidation.getInt(args[1], t);
 			try {
 				channel.deleteMessageById(id).queue();
@@ -132,7 +139,10 @@ public class ChannelFunctions {
 		}
 
 		public String docs() {
-			return "void {channel, string} Sets a text channel's topic."
+			return "void {channel, string} Sets a topic for a text or news channel."
+					+ CHANNEL_ARGUMENT
+					+ " Currently rate-limited to twice every 10 minutes."
+					+ " Only Text and News channels support topics, otherwise an IllegalArgumentException is thrown."
 					+ " Requires the 'Manage Channels' permission.";
 		}
 
@@ -142,10 +152,15 @@ public class ChannelFunctions {
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
 			Discord.CheckConnection(t);
-			TextChannel channel = Discord.GetTextChannel(args[0], t);
+			GuildMessageChannel channel = Discord.GetMessageChannel(args[0], t);
 			String message = args[1].val();
 			try {
-				channel.getManager().setTopic(message).queue();
+				ChannelManager<?, ?> channelManager = channel.getManager();
+				if(channelManager instanceof StandardGuildMessageChannelManager) {
+					((StandardGuildMessageChannelManager<?, ?>) channelManager).setTopic(message).queue();
+				} else {
+					throw new CREIllegalArgumentException("Cannot set topic for this channel type.", t);
+				}
 			} catch(PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);
 			} catch(IllegalArgumentException ex) {

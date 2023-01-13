@@ -55,13 +55,19 @@ public class Events {
 
 		@Override
 		public String docs() {
-			return "{username: <string match> | channel: <string match>} "
+			return "{username: <string match> Sender's name | channel: <string match> Channel's name} "
 					+ "This event is called when a user sends a message in the Discord server."
-					+ "{username: The Discord username | nickname: The display name on Discord"
-					+ " | userid: The Discord user's unique id"
-					+ " | channel: The channel the message was sent | message: The message the user sent."
-					+ " | id: The message id. | attachments: An array of attachment arrays, each with the keys 'url',"
-					+ " 'filename', and 'description'.}"
+					+ "{username: The username of the sender"
+					+ " | nickname: The display name of the sender in this guild"
+					+ " | userid: The sender's unique id"
+					+ " | channel: The name of the channel in which the message was sent"
+					+ " | channelid: The unique id for the channel."
+					+ " | channeltype: The type of channel. (TEXT, VOICE, NEWS, GUILD_NEWS_THREAD, GUILD_PUBLIC_THREAD,"
+					+ " or GUILD_PRIVATE_THREAD)"
+					+ " | message: The message the user sent."
+					+ " | id: The message id."
+					+ " | attachments: An array of attachment arrays, each with the keys 'url', 'filename', and"
+					+ " 'description'.}"
 					+ "{} "
 					+ "{}";
 		}
@@ -100,6 +106,8 @@ public class Events {
 			map.put("username", new CString(event.getAuthor().getName(), t));
 			map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
 			map.put("channel", new CString(event.getChannel().getName(), t));
+			map.put("channelid", new CInt(event.getChannel().getIdLong(), t));
+			map.put("channeltype", new CString(event.getChannel().getType().name(), t));
 			map.put("message", new CString(msg.getContentDisplay(), t));
 			map.put("id", new CInt(msg.getIdLong(), t));
 			CArray attachments = new CArray(t);
@@ -179,7 +187,8 @@ public class Events {
 					+ "This event is called when a user joins a voice channel on the Discord server."
 					+ "{username: The Discord username | nickname: The display name on Discord"
 					+ " | userid: The Discord user's unique id"
-					+ " | channel: The channel the user joined} "
+					+ " | channel: The name of the channel the user joined"
+					+ " | channelid: The unique id for the channel.}"
 					+ "{} "
 					+ "{}";
 		}
@@ -199,6 +208,7 @@ public class Events {
 			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
 			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
 			map.put("channel", new CString(event.getChannelJoined().getName(), t));
+			map.put("channelid", new CInt(event.getChannelLeft().getIdLong(), t));
 
 			return map;
 		}
@@ -218,7 +228,8 @@ public class Events {
 					+ "This event is called when a user leaves a voice channel on the Discord server."
 					+ "{username: The Discord username | nickname: The display name on Discord"
 					+ " | userid: The Discord user's unique id"
-					+ " | channel: The channel the user left} "
+					+ " | channel: The name of the channel the user left"
+					+ " | channelid: The unique id for the channel.}"
 					+ "{} "
 					+ "{}";
 		}
@@ -241,6 +252,7 @@ public class Events {
 			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
 			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
 			map.put("channel", new CString(event.getChannelLeft().getName(), t));
+			map.put("channelid", new CInt(event.getChannelLeft().getIdLong(), t));
 
 			return map;
 		}

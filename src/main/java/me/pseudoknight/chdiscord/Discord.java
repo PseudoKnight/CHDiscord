@@ -28,11 +28,15 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MiscUtil;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -145,15 +149,15 @@ public class Discord {
 				throw new CRENotFoundException("A member with the id \"" + m.val() + "\" was not found on Discord server.", t);
 			}
 		} else {
+			if(m.val().isEmpty()) {
+				throw new CREIllegalArgumentException("A member id was expected but was given an empty string.", t);
+			}
 			try {
 				mem = guild.getMemberById(m.val());
 				if(mem == null) {
 					throw new CRENotFoundException("A member with the id \"" + m.val() + "\" was not found on Discord server.", t);
 				}
 			} catch (NumberFormatException ex) {
-				if(m.val().isEmpty()) {
-					throw new CREIllegalArgumentException("A member id was expected but was given an empty string.", t);
-				}
 				List<Member> mems = guild.getMembersByName(m.val(), false);
 				if(mems.isEmpty()) {
 					throw new CRENotFoundException("A member with the name \"" + m.val() + "\" was not found on Discord server.", t);
@@ -182,13 +186,13 @@ public class Discord {
 	}
 
 	static Role GetRole(Mixed m, Target t) {
-		if(m.val().isEmpty()) {
-			throw new CREIllegalArgumentException("A role id was expected but was given an empty string.", t);
-		}
 		Role role;
 		if(m instanceof CInt) {
 			role = guild.getRoleById(((CInt) m).getInt());
 		} else {
+			if(m.val().isEmpty()) {
+				throw new CREIllegalArgumentException("A role id was expected but was given an empty string.", t);
+			}
 			try {
 				role = guild.getRoleById(m.val());
 			} catch (NumberFormatException ex) {
@@ -205,15 +209,58 @@ public class Discord {
 		return role;
 	}
 
-	static TextChannel GetTextChannel(Mixed m, Target t) {
-		if(m.val().isEmpty()) {
-			throw new CREIllegalArgumentException("A channel name was expected but was given an empty string.", t);
+	/**
+	 * Returns the GuildMessageChannel of the given id.
+	 *
+	 * @param id The channel name or id
+	 * @param t Code target
+	 * @return GuildMessageChannel
+	 */
+	static GuildMessageChannel GetMessageChannel(Mixed id, Target t) {
+		long channelId;
+		if(id instanceof CInt) {
+			channelId = ((CInt) id).getInt();
+		} else {
+			if(id.val().isEmpty()) {
+				throw new CREIllegalArgumentException("A channel id was expected but was given an empty string.", t);
+			}
+			try {
+				channelId = MiscUtil.parseLong(id.val());
+			} catch (NumberFormatException ex) {
+				// get channel by name
+				List<TextChannel> textChannels = guild.getTextChannelsByName(id.val(), false);
+				if(!textChannels.isEmpty()) {
+					return textChannels.get(0);
+				}
+				List<NewsChannel> newsChannels = guild.getNewsChannelsByName(id.val(), false);
+				if(!newsChannels.isEmpty()) {
+					return newsChannels.get(0);
+				}
+				List<VoiceChannel> voiceChannels = guild.getVoiceChannelsByName(id.val(), false);
+				if(!voiceChannels.isEmpty()) {
+					return voiceChannels.get(0);
+				}
+				List<ThreadChannel> threadChannels = guild.getThreadChannelsByName(id.val(), false);
+				if(!threadChannels.isEmpty()) {
+					return threadChannels.get(0);
+				}
+				throw new CRENotFoundException("A channel with the name \"" + id.val() + "\" was not found on Discord server.", t);
+			}
 		}
-		List<TextChannel> channels =  guild.getTextChannelsByName(m.val(), false);
-		if(channels.isEmpty()) {
-			throw new CRENotFoundException("Channel by the name " + m.val() + " not found.", t);
+		GuildMessageChannel channel = guild.getTextChannelById(channelId);
+		if(channel == null) {
+			channel = guild.getNewsChannelById(channelId);
 		}
-		return channels.get(0);
+		if(channel == null) {
+			channel = guild.getVoiceChannelById(channelId);
+		}
+		if(channel == null) {
+			channel = guild.getThreadChannelById(channelId);
+		}
+		if(channel == null) {
+			throw new CRENotFoundException("A channel with the id \"" + id.val() + "\" was not found on Discord server.", t);
+		}
+		return channel;
 	}
 
 	static MessageCreateData GetMessage(Mixed m, Target t) {
@@ -331,12 +378,12 @@ public class Discord {
 
 	static VoiceChannel GetVoiceChannel(Mixed m, Target t) {
 		VoiceChannel channel;
-		if(m.val().isEmpty()) {
-			throw new CREIllegalArgumentException("A voice channel id or name was expected but was given an empty string.", t);
-		}
 		if(m instanceof CInt) {
 			channel = guild.getVoiceChannelById(((CInt) m).getInt());
 		} else {
+			if(m.val().isEmpty()) {
+				throw new CREIllegalArgumentException("A voice channel id or name was expected but was given an empty string.", t);
+			}
 			try {
 				channel = guild.getVoiceChannelById(m.val());
 			} catch (NumberFormatException ex) {

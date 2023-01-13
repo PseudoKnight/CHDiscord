@@ -31,6 +31,7 @@ public class GuildFunctions {
 
 		public String docs() {
 			return "array {member} Gets an associative array of all server roles for a member."
+					+ MemberFunctions.MEMBER_ARGUMENT
 					+ " The key is the role name, and the value is the role numeric id."
 					+ " Throws NotFoundException if a member by that name doesn't exist.";
 		}
@@ -63,9 +64,10 @@ public class GuildFunctions {
 
 		public String docs() {
 			return "void {member, role(s)} Sets the roles for a server member."
+					+ MemberFunctions.MEMBER_ARGUMENT
 					+ " The role argument can be an array or a single role."
-					+ " Like members, a role can be the name or the numeric id."
-					+ " Throws NotFoundException if a member or role by that name doesn't exist."
+					+ " A role is either a unique int id or name."
+					+ " Throws NotFoundException if a role by that name doesn't exist."
 					+ " Requires the 'Manage Roles' permission.";
 		}
 
@@ -110,9 +112,10 @@ public class GuildFunctions {
 
 		public String docs() {
 			return "void {member, channel} Moves a member to another voice channel."
+					+ MemberFunctions.MEMBER_ARGUMENT
 					+ " The member must already be connected to a voice channel in the guild."
-					+ " Member and channel can be a numeric id or name."
-					+ " Throws NotFoundException if a member or channel by that name doesn't exist."
+					+ ChannelFunctions.CHANNEL_ARGUMENT
+					+ " Throws IllegalArgumentException if member is not connected to a voice channel."
 					+ " Throws InsufficientPermissionException if the member does not have access to the destination channel."
 					+ " Requires the 'Move Members' permission.";
 		}
