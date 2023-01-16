@@ -34,10 +34,10 @@ Disconnects from the Discord server.
 
 ### discord_set_activity(type, string, [url])
 Sets the activity tag for the bot.  
-Activity type can be one of DEFAULT, STREAMING, or LISTENING.  
+Activity type can be one of PLAYER, STREAMING, LISTENING, WATCHING, CUSTOM_STATUS, COMPETING.  
 Activity string can be anything but an empty string.  
 If streaming, a valid Twitch URL must also be provided.  
-If not, or it's invalid, type will revert to DEFAULT (ie. playing).
+If not, or it's invalid, type will revert to PLAYING.
 
 ## Channel Functions
 * The `channel` argument can be a channel's unique int id. A channel name can also be used if you use

@@ -137,7 +137,7 @@ public class GeneralFunctions {
 					+ " Activity type can be one of " + StringUtils.Join(Activity.ActivityType.values(), ", ", ", or ") + "."
 					+ " Activity string can be anything but an empty string."
 					+ " If streaming, a valid Twitch URL must also be provided."
-					+ " If not, or it's invalid, type will revert to DEFAULT (ie. playing).";
+					+ " If not, or it's invalid, type will revert to PLAYING.";
 		}
 
 		public Integer[] numArgs() {
