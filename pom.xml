@@ -46,6 +46,11 @@
             <artifactId>logback-classic</artifactId>
             <version>1.2.11</version>
         </dependency>
+        <dependency>
+            <groupId>com.squareup.okio</groupId>
+            <artifactId>okio</artifactId>
+            <version>3.0.0</version> <!-- enforce later dependency version used by jda -->
+        </dependency>
     </dependencies>
 
     <properties>
