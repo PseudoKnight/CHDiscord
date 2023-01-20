@@ -208,7 +208,7 @@ public class Events {
 			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
 			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
 			map.put("channel", new CString(event.getChannelJoined().getName(), t));
-			map.put("channelid", new CInt(event.getChannelLeft().getIdLong(), t));
+			map.put("channelid", new CInt(event.getChannelJoined().getIdLong(), t));
 
 			return map;
 		}
