@@ -94,7 +94,7 @@ public class MemberFunctions {
 		public String docs() {
 			return "void {member, string} Set the server nickname for a member."
 					+ MEMBER_ARGUMENT
-					+ " Requires the 'Manage Nicknames' permission.";
+					+ " Requires the `Manage Nicknames` permission.";
 		}
 
 		public Integer[] numArgs() {

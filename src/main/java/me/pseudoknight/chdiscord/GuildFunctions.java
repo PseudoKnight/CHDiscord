@@ -68,7 +68,7 @@ public class GuildFunctions {
 					+ " The role argument can be an array or a single role."
 					+ " A role is either a unique int id or name."
 					+ " Throws NotFoundException if a role by that name doesn't exist."
-					+ " Requires the 'Manage Roles' permission.";
+					+ " Requires the `Manage Roles` permission.";
 		}
 
 		public Integer[] numArgs() {
@@ -116,8 +116,8 @@ public class GuildFunctions {
 					+ " The member must already be connected to a voice channel in the guild."
 					+ ChannelFunctions.CHANNEL_ARGUMENT
 					+ " Throws IllegalArgumentException if member is not connected to a voice channel."
-					+ " Throws InsufficientPermissionException if the member does not have access to the destination channel."
-					+ " Requires the 'Move Members' permission.";
+					+ " Throws InsufficientPermissionException if the member and bot do not have access to the destination channel."
+					+ " Requires the `Move Members` permission.";
 		}
 
 		public Integer[] numArgs() {

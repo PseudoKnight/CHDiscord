@@ -7,7 +7,7 @@ There are builds backported to CommandHelper 3.3.2 as well.
 
 You'll need to have created a Discord application [here](https://discordapp.com/developers/applications/me).
 Then add a Bot to it. Grab the "TOKEN" for the Bot that you'll use to connect this extension to Discord.
-Enable the 'SERVER MEMBERS INTENT' and 'MESSAGE CONTENT INTENT' of the Privileged Gateway Intents.
+Enable the `SERVER MEMBERS INTENT` and `MESSAGE CONTENT INTENT` of the Privileged Gateway Intents.
 Finally, you'll need your server id, which you can get by right-clicking your server name in Discord and clicking "Copy ID".
 
 ## Bot Functions
@@ -53,7 +53,7 @@ Embed array can include any of the following keys: 'title', 'url' (requires titl
 'image' (URL), 'thumbnail' (URL), 'color' (rgb array), 'footer' (contains 'text' and optionally 'icon_url'),
 'author' (contains 'name' and optionally 'url' and/or 'icon_url'), and 'fields'
 (an array of field arrays, each with 'name', 'value', and optionally an 'inline' boolean).  
-Requires the 'Send Messages' permission (and 'Embed Links' permission if only sending an embed)
+Requires the `View Channels` and `Send Messages` permissions. (or `Send Messages in Threads` for thread channels)
 
 Message object array format: (as displayed, top to bottom, left to right)
 ```
@@ -92,12 +92,12 @@ Message object array format: (as displayed, top to bottom, left to right)
 
 ### discord_delete_message(channel, id)
 Deletes a message with the given id on a channel.  
-Requires the 'Manage Messages' permission.
+Requires the `View Channels` permission. (and `Manage Messages` if message is from other user)
 
 ### discord_set_channel_topic(channel, string)
 Sets a topic for a text or news channel. (Currently rate-limited to twice every 10 minutes)  
 Only Text and News channels support topics, otherwise an IllegalArgumentException is thrown.  
-Requires the 'Manage Channels' permission.
+Requires the `Manage Channels` permission.
 
 ## Member Functions
 * The `member` argument is user's unique int id. A username can also be used, but if the name is not unique in
@@ -115,14 +115,14 @@ Sets the roles for a server member.
 The role argument can be an array or a single role.  
 A role is either a unique int id or name.  
 Throws NotFoundException if a role by that id doesn't exist.  
-Requires the 'Manage Roles' permission.
+Requires the `Manage Roles` permission. 
 
 ### discord_member_get_nickname(member)
 Get the server nickname for a guild member.  
 
 ### discord_member_set_nickname(member, string)
 Set the server nickname for a guild member.  
-Requires the 'Manage Nicknames' permission.
+Requires the `Manage Nicknames` permission.
 
 ## Voice Functions
 
@@ -134,8 +134,8 @@ If the member is not connected to a voice channel, null is returned.
 Moves a member to another voice channel.  
 The member must already be connected to a voice channel in the guild.  
 Throws IllegalArgumentException if member is not connected to a voice channel.  
-Throws InsufficientPermissionException if the member does not have access to the destination channel.  
-Requires the 'Move Members' permission.
+Throws InsufficientPermissionException if the member and bot do not have access to the destination channel.  
+Requires the `Move Members` permission.
 
 ### discord_member_is_muted(member)
 Check if a user is muted, either self muted or server muted.
@@ -143,7 +143,7 @@ Check if a user is muted, either self muted or server muted.
 ### discord_member_set_muted(member, boolean)
 Set a user's server muted state.  
 Throws IllegalArgumentException if member is not connected to a voice channel.  
-Requires the 'Mute Members' permission.
+Requires the `Mute Members` permission.
 
 ## Events
 

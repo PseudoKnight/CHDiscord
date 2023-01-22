@@ -46,7 +46,8 @@ public class ChannelFunctions {
 					+ " 'author' (contains 'name' and optionally 'url' and/or 'icon_url'), and 'fields'"
 					+ " (an array of field arrays, each with 'name', 'value', and optionally an 'inline' boolean)."
 					+ " Messages have a 2000 character limit."
-					+ " Requires the 'Send Messages' permission (and 'Embed Links' permission if only sending an embed)";
+					+ " Requires the `View Channels` and `Send Messages` permissions."
+					+ " (or `Send Messages in Threads` for thread channels)";
 		}
 
 		public Integer[] numArgs() {
@@ -104,7 +105,7 @@ public class ChannelFunctions {
 		public String docs() {
 			return "void {channel, id} Deletes a message with the given id on a channel."
 					+ CHANNEL_ARGUMENT
-					+ " Requires 'Manage Messages' permission.";
+					+ " Requires the `View Channels` permission. (and `Manage Messages` if message is from other user)";
 		}
 
 		public Integer[] numArgs() {
@@ -143,7 +144,7 @@ public class ChannelFunctions {
 					+ CHANNEL_ARGUMENT
 					+ " Currently rate-limited to twice every 10 minutes."
 					+ " Only Text and News channels support topics, otherwise an IllegalArgumentException is thrown."
-					+ " Requires the 'Manage Channels' permission.";
+					+ " Requires the `Manage Channels` permission.";
 		}
 
 		public Integer[] numArgs() {
