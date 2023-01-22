@@ -9,6 +9,7 @@ You'll need to have created a Discord application [here](https://discordapp.com/
 Then add a Bot to it. Grab the "TOKEN" for the Bot that you'll use to connect this extension to Discord.
 Enable the `SERVER MEMBERS INTENT` and `MESSAGE CONTENT INTENT` of the Privileged Gateway Intents.
 Finally, you'll need your server id, which you can get by right-clicking your server name in Discord and clicking "Copy ID".
+(only visible when developer mode is enabled in advanced user settings)
 
 ## Bot Functions
 
