@@ -5,11 +5,19 @@ This is extension for the CommandHelper plugin that uses the JDA library to talk
 CommandHelper 3.3.4 build #3978 or later is required.  
 There are builds backported to CommandHelper 3.3.2 as well.
 
-You'll need to have created a Discord application [here](https://discordapp.com/developers/applications/me).
-Then add a Bot to it. Grab the "TOKEN" for the Bot that you'll use to connect this extension to Discord.
-Enable the `SERVER MEMBERS INTENT` and `MESSAGE CONTENT INTENT` of the Privileged Gateway Intents.
-Finally, you'll need your server id, which you can get by right-clicking your server name in Discord and clicking "Copy ID".
-(only visible when developer mode is enabled in advanced user settings)
+## Instructions
+
+You'll first need to have create a Discord application [here](https://discordapp.com/developers/applications/me).
+Then add a Bot to it. Copy the TOKEN for the Bot, as you'll use this later in your connection script.
+Be sure to enable `SERVER MEMBERS INTENT` and `MESSAGE CONTENT INTENT` of the Privileged Gateway Intents.
+
+Next you'll need to add the bot to your Discord server. Go to the URL Generator under OAuth2.
+Select the scope 'bot', and optionally check any permissions you want it to start with. (see functions below)
+Go to the generated URL in your browser to authorize the bot for your server.
+
+Finally, to connect this extension to Discord you'll need your Discord server id, which you can get by right-clicking
+your server name in Discord and clicking "Copy ID". (only visible when Developer Mode is enabled in Advanced User Settings)
+Use this together with the TOKEN above to run `discord_connect()` in your connection script.
 
 ## Bot Functions
 
