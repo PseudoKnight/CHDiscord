@@ -159,11 +159,11 @@ Requires the `Mute Members` permission.
 ### discord_message_received
 This event is called when a user sends a message in the Discord server.  
 Prefilters: username, channel  
-Data: userid, username, nickname, channel, channelid, channeltype, message, id, attachments {{url, filename, description}}
+Data: userid, username, nickname, channel, channelid, channeltype, message, id, attachments {{url, filename, description}}, reference {{id, userid, username, message}}
 
 ### discord_private_message_received
 This event is called when a user sends a private message to the bot.  
-Data: userid, username, message, id, attachments {{url, filename, description}}
+Data: userid, username, message, id, attachments {{url, filename, description}}, reference {{id, userid, username, message}}
 
 ### discord_voice_joined
 This event is called when a user joined a voice channel.  

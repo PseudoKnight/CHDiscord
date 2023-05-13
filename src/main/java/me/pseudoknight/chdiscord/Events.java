@@ -67,7 +67,9 @@ public class Events {
 					+ " | message: The message the user sent."
 					+ " | id: The message id."
 					+ " | attachments: An array of attachment arrays, each with the keys 'url', 'filename', and"
-					+ " 'description'.}"
+					+ " 'description'."
+					+ " | reference: An associative array representing the message this was a reply to, with the keys"
+					+ " 'id', 'userid', 'username', and 'message'. Will be null if the message was not a reply.}"
 					+ "{} "
 					+ "{}";
 		}
@@ -119,6 +121,16 @@ public class Events {
 				attachments.push(attachment, t);
 			}
 			map.put("attachments", attachments);
+			map.put("reference", CNull.NULL);
+			if(msg.getReferencedMessage() != null) {
+				CArray reference = CArray.GetAssociativeArray(t);
+				Message referencedMsg = msg.getReferencedMessage();
+				reference.set("id", new CInt(referencedMsg.getIdLong(), t), t);
+				reference.set("username", new CString(referencedMsg.getAuthor().getName(), t), t);
+				reference.set("userid", new CInt(referencedMsg.getAuthor().getIdLong(), t), t);
+				reference.set("message", new CString(referencedMsg.getContentDisplay(), t), t);
+				map.put("reference", reference);
+			}
 
 			return map;
 		}
@@ -138,7 +150,9 @@ public class Events {
 					+ "This event is called when a user sends a private message to the bot."
 					+ "{username: The Discord username | userid: The Discord user's unique id"
 					+ " | message: The message the user sent. | id: The message id. | attachments: An array of"
-					+ " attachment arrays, each with the keys 'url', 'filename', and 'description'.}"
+					+ " attachment arrays, each with the keys 'url', 'filename', and 'description'."
+					+ " | reference: An associative array representing the message this was a reply to, with the keys"
+					+ " 'id', 'userid', 'username', and 'message'. Will be null if the message was not a reply.}"
 					+ "{} "
 					+ "{}";
 		}
@@ -168,6 +182,16 @@ public class Events {
 				attachments.push(attachment, t);
 			}
 			map.put("attachments", attachments);
+			map.put("reference", CNull.NULL);
+			if(msg.getReferencedMessage() != null) {
+				CArray reference = CArray.GetAssociativeArray(t);
+				Message referencedMsg = msg.getReferencedMessage();
+				reference.set("id", new CInt(referencedMsg.getIdLong(), t), t);
+				reference.set("username", new CString(referencedMsg.getAuthor().getName(), t), t);
+				reference.set("userid", new CInt(referencedMsg.getAuthor().getIdLong(), t), t);
+				reference.set("message", new CString(referencedMsg.getContentDisplay(), t), t);
+				map.put("reference", reference);
+			}
 
 			return map;
 		}
