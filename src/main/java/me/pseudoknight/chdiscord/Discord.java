@@ -30,6 +30,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
@@ -280,6 +281,7 @@ public class Discord {
 				if(!threadChannels.isEmpty()) {
 					return threadChannels.get(0);
 				}
+				List<StageChannel> stageChannels = guild.getStageChannelsByName(id.val(), false);
 				throw new CRENotFoundException("A channel with the name \"" + id.val() + "\" was not found on Discord server.", t);
 			}
 		}
@@ -292,6 +294,9 @@ public class Discord {
 		}
 		if(channel == null) {
 			channel = guild.getThreadChannelById(channelId);
+		}
+		if(channel == null) {
+			channel = guild.getStageChannelById(channelId);
 		}
 		if(channel == null) {
 			throw new CRENotFoundException("A channel with the id \"" + id.val() + "\" was not found on Discord server.", t);
@@ -337,6 +342,8 @@ public class Discord {
 			} else {
 				builder.setTitle(embed.get("title", t).val());
 			}
+		} else if(embed.containsKey("url")) {
+			builder.setUrl(embed.get("url", t).val());
 		}
 		if(embed.containsKey("description")) {
 			builder.setDescription(embed.get("description", t).val());

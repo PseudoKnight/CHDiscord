@@ -41,7 +41,7 @@ public class ChannelFunctions {
 					+ " Message can be a string or a message array object."
 					+ " Callback closure is eventually executed with the message id for this message."
 					+ " Message array must contain at least one of the following keys: 'content', 'embed', or 'embeds'."
-					+ " Embed array can include any of the following keys: 'title', 'url' (requires title), 'description',"
+					+ " Embed array can include any of the following keys: 'title', 'url', 'description',"
 					+ " 'image', 'thumbnail', 'color' (rgb array), 'footer' (contains 'text' and optionally 'icon_url'),"
 					+ " 'author' (contains 'name' and optionally 'url' and/or 'icon_url'), and 'fields'"
 					+ " (an array of field arrays, each with 'name', 'value', and optionally an 'inline' boolean)."

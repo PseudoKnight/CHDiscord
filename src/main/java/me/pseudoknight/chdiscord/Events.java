@@ -121,7 +121,6 @@ public class Events {
 				attachments.push(attachment, t);
 			}
 			map.put("attachments", attachments);
-			map.put("reference", CNull.NULL);
 			if(msg.getReferencedMessage() != null) {
 				CArray reference = CArray.GetAssociativeArray(t);
 				Message referencedMsg = msg.getReferencedMessage();
@@ -130,6 +129,8 @@ public class Events {
 				reference.set("userid", new CInt(referencedMsg.getAuthor().getIdLong(), t), t);
 				reference.set("message", new CString(referencedMsg.getContentDisplay(), t), t);
 				map.put("reference", reference);
+			} else {
+				map.put("reference", CNull.NULL);
 			}
 
 			return map;
@@ -182,7 +183,6 @@ public class Events {
 				attachments.push(attachment, t);
 			}
 			map.put("attachments", attachments);
-			map.put("reference", CNull.NULL);
 			if(msg.getReferencedMessage() != null) {
 				CArray reference = CArray.GetAssociativeArray(t);
 				Message referencedMsg = msg.getReferencedMessage();
@@ -191,6 +191,8 @@ public class Events {
 				reference.set("userid", new CInt(referencedMsg.getAuthor().getIdLong(), t), t);
 				reference.set("message", new CString(referencedMsg.getContentDisplay(), t), t);
 				map.put("reference", reference);
+			} else {
+				map.put("reference", CNull.NULL);
 			}
 
 			return map;

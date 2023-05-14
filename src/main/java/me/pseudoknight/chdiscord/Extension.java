@@ -14,7 +14,7 @@ import java.util.Map;
 public class Extension extends AbstractExtension {
 
 	public Version getVersion() {
-		return new SimpleVersion(2,7,0);
+		return new SimpleVersion(2,8,0);
 	}
 
 	@Override
