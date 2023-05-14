@@ -58,6 +58,12 @@ Array contains a list of user int ids.
 Gets an array of cached members in this guild with a given role.  
 Array contains a list of user int ids.
 
+### discord_retrieve_invites(closure)
+Retrieves an array of invite arrays for this guild.  
+Passes the array to the callback closure.  
+Each invite array contains data about the invite, including the keys 'code', 'channelid', and optionally 'userid' of the inviter.  
+Requires the `Manage Server` permission.
+
 ## Channel Functions
 * The `channel` argument can be a channel's unique int id. A channel name can also be used if you use
 only unique channel names, otherwise the first matching channel will be used.

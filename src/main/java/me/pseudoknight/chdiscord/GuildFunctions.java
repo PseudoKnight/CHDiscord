@@ -1,5 +1,6 @@
 package me.pseudoknight.chdiscord;
 
+import com.laytonsmith.abstraction.StaticLayer;
 import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.environments.Environment;
@@ -9,8 +10,10 @@ import com.laytonsmith.core.exceptions.CRE.CRENotFoundException;
 import com.laytonsmith.core.exceptions.CRE.CREThrowable;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
+import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.utils.cache.MemberCacheView;
@@ -146,6 +149,59 @@ public class GuildFunctions {
 					CREIllegalArgumentException.class};
 		}
 	}
+
+	@api
+	public static class discord_retrieve_invites extends Discord.Function {
+
+		public String getName() {
+			return "discord_retrieve_invites";
+		}
+
+		public String docs() {
+			return "void {closure} Retrieves an array of invite arrays for this guild."
+					+ " Passes the array to the callback closure."
+					+ " Each invite array contains data about the invite, including the keys 'code',"
+					+ " 'channelid', and optionally 'userid' of the inviter."
+					+ " Requires the `Manage Server` permission.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{1};
+		}
+
+		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			Discord.CheckConnection(t);
+			final CClosure closure = (CClosure) args[0];
+			try {
+				Discord.GetDefaultGuild().retrieveInvites().queue((List<Invite> list) -> {
+					CArray array = new CArray(t);
+					for (Invite invite : list) {
+						CArray inviteArray = CArray.GetAssociativeArray(t);
+						inviteArray.set("code", invite.getCode());
+						Invite.Channel channel = invite.getChannel();
+						if (channel != null) { // currently only null for group invites, but checking anyway
+							inviteArray.set("channelid", new CInt(channel.getIdLong(), t), t);
+						}
+						User inviter = invite.getInviter();
+						if (inviter != null) {
+							inviteArray.set("userid", new CInt(inviter.getIdLong(), t), t);
+						}
+						array.push(inviteArray, t);
+					}
+					StaticLayer.GetConvertor().runOnMainThreadLater(null, () ->
+							closure.executeCallable(array));
+				});
+			} catch(PermissionException ex) {
+				throw new CREInsufficientPermissionException(ex.getMessage(), t);
+			}
+			return CVoid.VOID;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class};
+		}
+	}
+
 	@api
 	public static class discord_get_members extends Discord.Function {
 
