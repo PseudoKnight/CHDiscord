@@ -74,7 +74,7 @@ public class GuildFunctions {
 					+ " A role is either a unique int id or name."
 					+ " Optional reason string is supported."
 					+ " Throws NotFoundException if a role by that name doesn't exist."
-					+ " Requires the `Manage Roles` permission.";
+					+ " Requires the `Manage Roles` permission and a role higher than any set roles.";
 		}
 
 		public Integer[] numArgs() {

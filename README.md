@@ -144,7 +144,7 @@ The role argument can be an array or a single role.
 A role is either a unique int id or name.  
 Optional reason string is supported.  
 Throws NotFoundException if a role by that id doesn't exist.  
-Requires the `Manage Roles` permission. 
+Requires the `Manage Roles` permission and a role higher than any set roles.
 
 ### discord_member_get_nickname(member)
 Get the server nickname for a guild member.  
