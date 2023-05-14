@@ -71,7 +71,7 @@ public class ChannelFunctions {
 							closure.executeCallable(new CInt(msg.getIdLong(), t)));
 				}
 			} else {
-				DefaultGuildChannelUnion defaultChannel = Discord.guild.getDefaultChannel();
+				DefaultGuildChannelUnion defaultChannel = Discord.GetDefaultGuild().getDefaultChannel();
 				if(defaultChannel == null || defaultChannel.getType() != ChannelType.TEXT) {
 					throw new CRENotFoundException("Default channel for bot not found.", t);
 				}

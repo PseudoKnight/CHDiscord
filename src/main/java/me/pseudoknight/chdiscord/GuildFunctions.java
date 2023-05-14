@@ -88,7 +88,7 @@ public class GuildFunctions {
 				roles.add(Discord.GetRole(args[1], t));
 			}
 			try {
-				Discord.guild.modifyMemberRoles(mem, roles).queue();
+				Discord.GetDefaultGuild().modifyMemberRoles(mem, roles).queue();
 			} catch (PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);
 			} catch (IllegalArgumentException ex) {
@@ -131,7 +131,7 @@ public class GuildFunctions {
 			VoiceChannel channel = Discord.GetVoiceChannel(args[1], t);
 
 			try {
-				Discord.guild.moveVoiceMember(member, channel).queue();
+				Discord.GetDefaultGuild().moveVoiceMember(member, channel).queue();
 			} catch (PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);
 			} catch (IllegalArgumentException | IllegalStateException ex) {

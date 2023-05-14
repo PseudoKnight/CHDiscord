@@ -11,6 +11,7 @@ import com.laytonsmith.core.ObjectGenerator;
 import com.laytonsmith.core.constructs.CClosure;
 import com.laytonsmith.core.constructs.CArray;
 import com.laytonsmith.core.constructs.CInt;
+import com.laytonsmith.core.constructs.CNull;
 import com.laytonsmith.core.constructs.Target;
 import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.environments.StaticRuntimeEnv;
@@ -49,8 +50,7 @@ public class Discord {
 
 	public static JDA jda = null;
 
-	static Guild guild = null;
-
+	private static Guild defaultGuild = null;
 	private static Thread connection;
 	private static DaemonManager dm;
 	private static boolean connecting = false;
@@ -85,8 +85,8 @@ public class Discord {
 				connecting = false;
 			}
 
-			guild = jda.getGuildById(guildID);
-			if(guild == null) {
+			defaultGuild = jda.getGuildById(guildID);
+			if(defaultGuild == null) {
 				MSLog.GetLogger().e(MSLog.Tags.RUNTIME, "The specified Discord server does not exist: " + guildID, t);
 				Disconnect();
 				return;
@@ -122,7 +122,7 @@ public class Discord {
 		}
 
 		jda = null;
-		guild = null;
+		defaultGuild = null;
 		dm = null;
 		connection = null;
 	}
@@ -141,7 +141,46 @@ public class Discord {
 		}
 	}
 
+	static Guild GetDefaultGuild() {
+		return defaultGuild;
+	}
+
+	static Guild GetGuild(Mixed m, Target t) {
+		if(m instanceof CNull) {
+			return defaultGuild;
+		}
+
+		Guild guild;
+
+		// Find by unique int id
+		if(m instanceof CInt) {
+			guild = jda.getGuildById(((CInt) m).getInt());
+			if(guild == null) {
+				throw new CRENotFoundException("A guild with the id \"" + m.val() + "\" was not found on Discord.", t);
+			}
+			return guild;
+		}
+
+		if(m.val().isEmpty()) {
+			throw new CREIllegalArgumentException("A guild id was expected but was given an empty string.", t);
+		}
+
+		// Find by unique string id.
+		try {
+			guild = jda.getGuildById(m.val());
+			if(guild != null) {
+				return guild;
+			}
+		} catch (NumberFormatException ignored) {}
+
+		throw new CRENotFoundException("A guild with the id \"" + m.val() + "\" was not found on Discord.", t);
+	}
+
 	static Member GetMember(Mixed m, Target t) {
+		return GetMember(m, Discord.defaultGuild, t);
+	}
+
+	static Member GetMember(Mixed m, Guild guild, Target t) {
 		Member mem;
 		if(m instanceof CInt) {
 			mem = guild.getMemberById(((CInt) m).getInt());
@@ -186,6 +225,10 @@ public class Discord {
 	}
 
 	static Role GetRole(Mixed m, Target t) {
+		return GetRole(m, defaultGuild, t);
+	}
+
+	static Role GetRole(Mixed m, Guild guild, Target t) {
 		Role role;
 		if(m instanceof CInt) {
 			role = guild.getRoleById(((CInt) m).getInt());
@@ -217,6 +260,10 @@ public class Discord {
 	 * @return GuildMessageChannel
 	 */
 	static GuildMessageChannel GetMessageChannel(Mixed id, Target t) {
+		return GetMessageChannel(id, defaultGuild, t);
+	}
+
+	static GuildMessageChannel GetMessageChannel(Mixed id, Guild guild, Target t) {
 		long channelId;
 		if(id instanceof CInt) {
 			channelId = ((CInt) id).getInt();
@@ -377,6 +424,10 @@ public class Discord {
 	}
 
 	static VoiceChannel GetVoiceChannel(Mixed m, Target t) {
+		return GetVoiceChannel(m, defaultGuild, t);
+	}
+
+	static VoiceChannel GetVoiceChannel(Mixed m, Guild guild, Target t) {
 		VoiceChannel channel;
 		if(m instanceof CInt) {
 			channel = guild.getVoiceChannelById(((CInt) m).getInt());
