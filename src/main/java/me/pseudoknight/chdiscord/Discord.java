@@ -182,46 +182,35 @@ public class Discord {
 
 	static Member GetMember(Mixed m, Guild guild, Target t) {
 		Member mem;
+
+		// Find by unique int id
 		if(m instanceof CInt) {
 			mem = guild.getMemberById(((CInt) m).getInt());
 			if(mem == null) {
 				throw new CRENotFoundException("A member with the id \"" + m.val() + "\" was not found on Discord server.", t);
 			}
-		} else {
-			if(m.val().isEmpty()) {
-				throw new CREIllegalArgumentException("A member id was expected but was given an empty string.", t);
-			}
-			try {
-				mem = guild.getMemberById(m.val());
-				if(mem == null) {
-					throw new CRENotFoundException("A member with the id \"" + m.val() + "\" was not found on Discord server.", t);
-				}
-			} catch (NumberFormatException ex) {
-				List<Member> mems = guild.getMembersByName(m.val(), false);
-				if(mems.isEmpty()) {
-					throw new CRENotFoundException("A member with the name \"" + m.val() + "\" was not found on Discord server.", t);
-				}
-				mem = mems.get(0);
-			}
+			return mem;
 		}
-		return mem;
-	}
 
-	static CArray GetMemberData(Member mem, Target t) {
-		CArray data = CArray.GetAssociativeArray(t);
-		data.set("userid", new CInt(mem.getIdLong(), t), t);
-		data.set("username", mem.getUser().getName());
-		data.set("tag", mem.getUser().getAsTag());
-		data.set("nickname", mem.getNickname());
-		CArray roles = CArray.GetAssociativeArray(t);
-		for(Role role : mem.getRoles()) {
-			roles.set(role.getName(), new CInt(role.getIdLong(), t), t);
+		if(m.val().isEmpty()) {
+			throw new CREIllegalArgumentException("A member id was expected but was given an empty string.", t);
 		}
-		data.set("roles", roles, t);
-		if(mem.hasTimeJoined()) {
-			data.set("joined", new CInt(mem.getTimeJoined().toEpochSecond(), t), t);
+
+		// Find by unique string id.
+		try {
+			mem = guild.getMemberById(m.val());
+			if(mem != null) {
+				return mem;
+			}
+		} catch (NumberFormatException ignored) {}
+
+		// Find by username
+		List<Member> mems = guild.getMembersByName(m.val(), false);
+		if(!mems.isEmpty()) {
+			return mems.get(0);
 		}
-		return data;
+
+		throw new CRENotFoundException("A member with the id \"" + m.val() + "\" was not found on Discord server.", t);
 	}
 
 	static Role GetRole(Mixed m, Target t) {

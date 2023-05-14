@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.utils.cache.MemberCacheView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -143,6 +144,65 @@ public class GuildFunctions {
 		public Class<? extends CREThrowable>[] thrown() {
 			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class,
 					CREIllegalArgumentException.class};
+		}
+	}
+	@api
+	public static class discord_get_members extends Discord.Function {
+
+		public String getName() {
+			return "discord_get_members";
+		}
+
+		public String docs() {
+			return "array {} Gets an array of all cached members in this guild."
+					+ " Array contains a list of user int ids.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{0};
+		}
+
+		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			Discord.CheckConnection(t);
+			MemberCacheView memberCache = Discord.GetDefaultGuild().getMemberCache();
+			CArray array = new CArray(t, (int) memberCache.size());
+			memberCache.forEach((Member mem) -> array.push(new CInt(mem.getIdLong(), t), t));
+			return array;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class};
+		}
+	}
+
+	@api
+	public static class discord_get_members_with_role extends Discord.Function {
+
+		public String getName() {
+			return "discord_get_members_with_role";
+		}
+
+		public String docs() {
+			return "array {role} Gets an array of cached members in this guild with a given role."
+					+ " Array contains a list of user int ids.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{1};
+		}
+
+		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			Discord.CheckConnection(t);
+			Role role = Discord.GetRole(args[0], t);
+			MemberCacheView memberCache = Discord.GetDefaultGuild().getMemberCache();
+			Iterable<Member> members = memberCache.getElementsWithRoles(role);
+			CArray array = new CArray(t, (int) memberCache.size());
+			members.forEach((Member mem) -> array.push(new CInt(mem.getIdLong(), t), t));
+			return array;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class};
 		}
 	}
 }

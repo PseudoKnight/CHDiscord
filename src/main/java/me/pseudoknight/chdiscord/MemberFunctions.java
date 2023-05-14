@@ -9,9 +9,12 @@ import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+
+import java.awt.Color;
 
 public class MemberFunctions {
 	public static String docs() {
@@ -232,6 +235,53 @@ public class MemberFunctions {
 		public Class<? extends CREThrowable>[] thrown() {
 			return new Class[]{CRENotFoundException.class, CREInsufficientPermissionException.class,
 					CREIllegalArgumentException.class};
+		}
+	}
+
+	@api
+	public static class discord_member_info extends Discord.Function {
+
+		public String getName() {
+			return "discord_member_info";
+		}
+
+		public String docs() {
+			return "array {member} Gets an array of data for Discord user."
+					+ " Array contains 'userid', 'username', 'bot', "
+					+ " 'nickname' (for server), 'color' array (for server), and 'avatar' url (for server).";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{1};
+		}
+
+		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			Discord.CheckConnection(t);
+			CArray ret = CArray.GetAssociativeArray(t);
+
+			Member member = Discord.GetMember(args[0], t);
+			ret.set("nickname", member.getNickname());
+			Color color = member.getColor();
+			if(color != null) {
+				CArray colorArray = CArray.GetAssociativeArray(t);
+				colorArray.set("r", new CInt(color.getRed(), t), t);
+				colorArray.set("g", new CInt(color.getGreen(), t), t);
+				colorArray.set("b", new CInt(color.getBlue(), t), t);
+				ret.set("color", colorArray, t);
+			} else {
+				ret.set("color", CNull.NULL, t);
+			}
+			ret.set("avatar", member.getEffectiveAvatarUrl());
+
+			User user = member.getUser();
+			ret.set("userid", new CInt(user.getIdLong(), t), t);
+			ret.set("username", user.getName());
+			ret.set("bot", CBoolean.get(user.isBot()), t);
+			return ret;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class};
 		}
 	}
 }

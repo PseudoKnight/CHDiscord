@@ -48,6 +48,16 @@ Activity string can be anything but an empty string.
 If streaming, a valid Twitch URL must also be provided.  
 If not, or it's invalid, type will revert to PLAYING.
 
+## Guild Server Functions
+
+### discord_get_members()
+Gets an array of all cached members in this guild.  
+Array contains a list of user int ids.
+
+### discord_get_members_with_role(role)
+Gets an array of cached members in this guild with a given role.  
+Array contains a list of user int ids.
+
 ## Channel Functions
 * The `channel` argument can be a channel's unique int id. A channel name can also be used if you use
 only unique channel names, otherwise the first matching channel will be used.
@@ -109,8 +119,11 @@ Only Text and News channels support topics, otherwise an IllegalArgumentExceptio
 Requires the `Manage Channels` permission.
 
 ## Member Functions
-* The `member` argument is user's unique int id. A username can also be used, but if the name is not unique in
-the guild only the first matching user will be used. Throws NotFoundException if a member by that id doesn't exist.
+* The `member` argument is a user's unique int id (or username). Throws NotFoundException if a member by that id doesn't exist.
+
+### discord_member_info(member)
+Gets an array of data for Discord user.  
+Array contains 'userid', 'username', 'bot', 'nickname' (for server), 'color' array (for server), and 'avatar' url (for server).
 
 ### discord_private_message(member, string)
 Sends a private message to a user.
