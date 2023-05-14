@@ -138,10 +138,11 @@ Sends a private message to a user.
 Gets an associative array of all server roles for a member.  
 The key is the role name, and the value is the role int id.
 
-### discord_member_set_roles(member, role(s))
+### discord_member_set_roles(member, role(s), [reason])
 Sets the roles for a server member.  
 The role argument can be an array or a single role.  
 A role is either a unique int id or name.  
+Optional reason string is supported.  
 Throws NotFoundException if a role by that id doesn't exist.  
 Requires the `Manage Roles` permission. 
 

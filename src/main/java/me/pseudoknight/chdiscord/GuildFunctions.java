@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 import net.dv8tion.jda.api.utils.cache.MemberCacheView;
 
 import java.util.ArrayList;
@@ -67,16 +68,17 @@ public class GuildFunctions {
 		}
 
 		public String docs() {
-			return "void {member, role(s)} Sets the roles for a server member."
+			return "void {member, role(s), [reason]} Sets the roles for a server member."
 					+ MemberFunctions.MEMBER_ARGUMENT
 					+ " The role argument can be an array or a single role."
 					+ " A role is either a unique int id or name."
+					+ " Optional reason string is supported."
 					+ " Throws NotFoundException if a role by that name doesn't exist."
 					+ " Requires the `Manage Roles` permission.";
 		}
 
 		public Integer[] numArgs() {
-			return new Integer[]{2};
+			return new Integer[]{2, 3};
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
@@ -92,7 +94,11 @@ public class GuildFunctions {
 				roles.add(Discord.GetRole(args[1], t));
 			}
 			try {
-				Discord.GetDefaultGuild().modifyMemberRoles(mem, roles).queue();
+				AuditableRestAction<Void> action = Discord.GetDefaultGuild().modifyMemberRoles(mem, roles);
+				if(args.length == 3) {
+					action.reason(args[2].val());
+				}
+				action.queue();
 			} catch (PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);
 			} catch (IllegalArgumentException ex) {
