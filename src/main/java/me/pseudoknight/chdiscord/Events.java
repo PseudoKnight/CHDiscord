@@ -60,6 +60,7 @@ public class Events {
 					+ "{username: The username of the sender"
 					+ " | nickname: The display name of the sender in this guild"
 					+ " | userid: The sender's unique id"
+					+ " | bot: If the user is a bot"
 					+ " | channel: The name of the channel in which the message was sent"
 					+ " | channelid: The unique id for the channel."
 					+ " | channeltype: The type of channel. (TEXT, VOICE, NEWS, GUILD_NEWS_THREAD, GUILD_PUBLIC_THREAD,"
@@ -107,6 +108,7 @@ public class Events {
 
 			map.put("username", new CString(event.getAuthor().getName(), t));
 			map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
+			map.put("bot", CBoolean.get(event.getAuthor().isBot()));
 			map.put("channel", new CString(event.getChannel().getName(), t));
 			map.put("channelid", new CInt(event.getChannel().getIdLong(), t));
 			map.put("channeltype", new CString(event.getChannel().getType().name(), t));
