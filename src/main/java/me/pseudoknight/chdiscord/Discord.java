@@ -282,6 +282,9 @@ public class Discord {
 					return threadChannels.get(0);
 				}
 				List<StageChannel> stageChannels = guild.getStageChannelsByName(id.val(), false);
+				if(!stageChannels.isEmpty()) {
+					return stageChannels.get(0);
+				}
 				throw new CRENotFoundException("A channel with the name \"" + id.val() + "\" was not found on Discord server.", t);
 			}
 		}
