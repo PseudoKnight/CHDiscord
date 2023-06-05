@@ -25,7 +25,7 @@ public class GeneralFunctions {
 		}
 
 		public String docs() {
-			return "boolean {token, server_id, [callback] | profile, [callback]} Connects to Discord server via token and server id."
+			return "boolean {token, serverId, [callback] | profile, [callback]} Connects to Discord server via token and server id."
 					+ " The server id can be retrieved by right-clicking the server name and clicking \"Copy ID\"."
 					+ " The optional callback closure will be executed when a connection is made. The profile may be"
 					+ " a string, which should refer to a profile defined in profiles.xml, with the keys token and"

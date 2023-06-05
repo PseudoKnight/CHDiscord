@@ -61,6 +61,7 @@ public class Events {
 					+ " | nickname: The display name of the sender in this guild"
 					+ " | userid: The sender's unique id"
 					+ " | bot: If the user is a bot"
+					+ " | serverid: The guild server in which this the message was sent"
 					+ " | channel: The name of the channel in which the message was sent"
 					+ " | channelid: The unique id for the channel."
 					+ " | channeltype: The type of channel. (TEXT, VOICE, NEWS, GUILD_NEWS_THREAD, GUILD_PUBLIC_THREAD,"
@@ -80,10 +81,12 @@ public class Events {
 			if (e instanceof DiscordGuildMessageReceivedEvent) {
 				DiscordGuildMessageReceivedEvent event = (DiscordGuildMessageReceivedEvent)e;
 
-				if(prefilter.containsKey("username") && !event.getMember().getUser().getName().equals(prefilter.get("username").val())) {
+				if(prefilter.containsKey("username")
+						&& !event.getMember().getUser().getName().equals(prefilter.get("username").val())) {
 					return false;
 				}
-				if(prefilter.containsKey("channel") && !event.getChannel().getName().equals(prefilter.get("channel").val())) {
+				if(prefilter.containsKey("channel")
+						&& !event.getChannel().getName().equals(prefilter.get("channel").val())) {
 					return false;
 				}
 
@@ -109,6 +112,7 @@ public class Events {
 			map.put("username", new CString(event.getAuthor().getName(), t));
 			map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
 			map.put("bot", CBoolean.get(event.getAuthor().isBot()));
+			map.put("serverid", new CInt(event.getGuild().getIdLong(), t));
 			map.put("channel", new CString(event.getChannel().getName(), t));
 			map.put("channelid", new CInt(event.getChannel().getIdLong(), t));
 			map.put("channeltype", new CString(event.getChannel().getType().name(), t));
@@ -215,6 +219,7 @@ public class Events {
 					+ "This event is called when a user joins a voice channel on the Discord server."
 					+ "{username: The Discord username | nickname: The display name on Discord"
 					+ " | userid: The Discord user's unique id"
+					+ " | serverid: The guild server in which this event occurred"
 					+ " | channel: The name of the channel the user joined"
 					+ " | channelid: The unique id for the channel.}"
 					+ "{} "
@@ -223,20 +228,21 @@ public class Events {
 
 		@Override
 		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-			return e instanceof DiscordVoiceUpdateEvent;
+			return e instanceof DiscordVoiceJoinedEvent;
 		}
 
 		@Override
 		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
-			DiscordVoiceUpdateEvent event = (DiscordVoiceUpdateEvent) e;
+			DiscordVoiceJoinedEvent event = (DiscordVoiceJoinedEvent) e;
 			Target t = Target.UNKNOWN;
 			Map<String, Mixed> map = new HashMap<>();
 
 			map.put("username", new CString(event.getMember().getUser().getName(), t));
 			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
 			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
-			map.put("channel", new CString(event.getChannelJoined().getName(), t));
-			map.put("channelid", new CInt(event.getChannelJoined().getIdLong(), t));
+			map.put("serverid", new CInt(event.getGuild().getIdLong(), t));
+			map.put("channel", new CString(event.getChannel().getName(), t));
+			map.put("channelid", new CInt(event.getChannel().getIdLong(), t));
 
 			return map;
 		}
@@ -256,6 +262,7 @@ public class Events {
 					+ "This event is called when a user leaves a voice channel on the Discord server."
 					+ "{username: The Discord username | nickname: The display name on Discord"
 					+ " | userid: The Discord user's unique id"
+					+ " | serverid: The guild server in which this event occurred"
 					+ " | channel: The name of the channel the user left"
 					+ " | channelid: The unique id for the channel.}"
 					+ "{} "
@@ -264,23 +271,21 @@ public class Events {
 
 		@Override
 		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-			if(e instanceof DiscordVoiceUpdateEvent) {
-				return true;
-			}
-			return false;
+			return e instanceof DiscordVoiceLeftEvent;
 		}
 
 		@Override
 		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
-			DiscordVoiceUpdateEvent event = (DiscordVoiceUpdateEvent) e;
+			DiscordVoiceLeftEvent event = (DiscordVoiceLeftEvent) e;
 			Target t = Target.UNKNOWN;
 			Map<String, Mixed> map = new HashMap<>();
 
 			map.put("username", new CString(event.getMember().getUser().getName(), t));
 			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
 			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
-			map.put("channel", new CString(event.getChannelLeft().getName(), t));
-			map.put("channelid", new CInt(event.getChannelLeft().getIdLong(), t));
+			map.put("serverid", new CInt(event.getGuild().getIdLong(), t));
+			map.put("channel", new CString(event.getChannel().getName(), t));
+			map.put("channelid", new CInt(event.getChannel().getIdLong(), t));
 
 			return map;
 		}
@@ -299,7 +304,7 @@ public class Events {
 			return "{} "
 					+ "This event is called when a user joined the Discord server."
 					+ "{username: The Discord username | nickname: The display name on Discord"
-					+ " | userid: The Discord user's unique id} "
+					+ " | userid: The Discord user's unique id | serverid: The guild server joined } "
 					+ "{} "
 					+ "{}";
 		}
@@ -318,6 +323,7 @@ public class Events {
 			map.put("username", new CString(event.getMember().getUser().getName(), t));
 			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
 			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
+			map.put("serverid", new CInt(event.getGuild().getIdLong(), t));
 
 			return map;
 		}
@@ -336,7 +342,7 @@ public class Events {
 			return "{} "
 					+ "This event is called when a user left the Discord server, including kick/ban."
 					+ "{username: The Discord username | nickname: The display name on Discord"
-					+ " | userid: The Discord user's unique id} "
+					+ " | userid: The Discord user's unique id | serverid: The guild server left } "
 					+ "{} "
 					+ "{}";
 		}
@@ -361,6 +367,7 @@ public class Events {
 			} else {
 				map.put("nickname", new CString(user.getName(), t));
 			}
+			map.put("serverid", new CInt(event.getGuild().getIdLong(), t));
 
 			return map;
 		}

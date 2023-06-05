@@ -8,19 +8,22 @@ import com.laytonsmith.core.ArgumentValidation;
 import com.laytonsmith.core.MSLog;
 import com.laytonsmith.core.MSVersion;
 import com.laytonsmith.core.ObjectGenerator;
-import com.laytonsmith.core.constructs.CClosure;
-import com.laytonsmith.core.constructs.CArray;
-import com.laytonsmith.core.constructs.CInt;
-import com.laytonsmith.core.constructs.CNull;
-import com.laytonsmith.core.constructs.Target;
+import com.laytonsmith.core.Static;
+import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.environments.Environment;
+import com.laytonsmith.core.environments.GlobalEnv;
 import com.laytonsmith.core.environments.StaticRuntimeEnv;
+import com.laytonsmith.core.events.AbstractEvent;
+import com.laytonsmith.core.events.BindableEvent;
+import com.laytonsmith.core.events.BoundEvent;
 import com.laytonsmith.core.exceptions.CRE.CREIllegalArgumentException;
 import com.laytonsmith.core.exceptions.CRE.CRENotFoundException;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.exceptions.ProgramFlowManipulationException;
 import com.laytonsmith.core.functions.AbstractFunction;
 import com.laytonsmith.core.natives.interfaces.Mixed;
+import me.pseudoknight.chdiscord.abstraction.events.DiscordGuildChannelEvent;
+import me.pseudoknight.chdiscord.abstraction.events.DiscordGuildEvent;
 import me.pseudoknight.chdiscord.abstraction.jda.Listener;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -29,12 +32,12 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.attribute.IGuildChannelContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -142,104 +145,194 @@ public class Discord {
 		}
 	}
 
-	static Guild GetDefaultGuild() {
+	/**
+	 * Returns the Guild from an event's environment context,
+	 * or the default guild specified when connecting.
+	 *
+	 * @param env The execution environment
+	 * @return Guild
+	 */
+	static Guild GetGuild(Environment env) {
+		BoundEvent.ActiveEvent event = env.getEnv(GlobalEnv.class).GetEvent();
+		if(event != null && event.getUnderlyingEvent() instanceof DiscordGuildEvent) {
+			return ((DiscordGuildEvent) event.getUnderlyingEvent()).getGuild();
+		}
 		return defaultGuild;
 	}
 
-	static Guild GetGuild(Mixed m, Target t) {
-		if(m instanceof CNull) {
+	/**
+	 * Returns the Guild with the given id.
+	 *
+	 * @param id The guild id
+	 * @param t Code target
+	 * @return Guild
+	 */
+	static Guild GetGuild(Mixed id, Target t) {
+		if(id instanceof CNull) {
 			return defaultGuild;
 		}
 
 		Guild guild;
 
 		// Find by unique int id
-		if(m instanceof CInt) {
-			guild = jda.getGuildById(((CInt) m).getInt());
+		if(id instanceof CInt) {
+			guild = jda.getGuildById(((CInt) id).getInt());
 			if(guild == null) {
-				throw new CRENotFoundException("A guild with the id \"" + m.val() + "\" was not found on Discord.", t);
+				throw new CRENotFoundException("A guild with the id \"" + id.val() + "\" was not found.", t);
 			}
 			return guild;
 		}
 
-		if(m.val().isEmpty()) {
+		if(id.val().isEmpty()) {
 			throw new CREIllegalArgumentException("A guild id was expected but was given an empty string.", t);
 		}
 
 		// Find by unique string id.
 		try {
-			guild = jda.getGuildById(m.val());
+			guild = jda.getGuildById(id.val());
 			if(guild != null) {
 				return guild;
 			}
 		} catch (NumberFormatException ignored) {}
 
-		throw new CRENotFoundException("A guild with the id \"" + m.val() + "\" was not found on Discord.", t);
+		throw new CRENotFoundException("A guild with the id \"" + id.val() + "\" was not found.", t);
 	}
 
-	static Member GetMember(Mixed m, Target t) {
-		return GetMember(m, Discord.defaultGuild, t);
-	}
-
-	static Member GetMember(Mixed m, Guild guild, Target t) {
-		Member mem;
+	/**
+	 * Returns the User with the given id.
+	 *
+	 * @param id The user id
+	 * @param t Code target
+	 * @return User
+	 */
+	static User GetUser(Mixed id, Target t) {
+		User usr;
 
 		// Find by unique int id
-		if(m instanceof CInt) {
-			mem = guild.getMemberById(((CInt) m).getInt());
-			if(mem == null) {
-				throw new CRENotFoundException("A member with the id \"" + m.val() + "\" was not found on Discord server.", t);
+		if(id instanceof CInt) {
+			usr = jda.getUserById(((CInt) id).getInt());
+			if(usr == null) {
+				throw new CRENotFoundException("A user with the id \"" + id.val() + "\" was not found.", t);
 			}
-			return mem;
+			return usr;
 		}
 
-		if(m.val().isEmpty()) {
-			throw new CREIllegalArgumentException("A member id was expected but was given an empty string.", t);
+		if(id.val().isEmpty()) {
+			throw new CREIllegalArgumentException("A user id was expected but was given an empty string.", t);
 		}
 
 		// Find by unique string id.
 		try {
-			mem = guild.getMemberById(m.val());
+			usr = jda.getUserById(id.val());
+			if(usr != null) {
+				return usr;
+			}
+		} catch (NumberFormatException ignored) {}
+
+		// Find by username
+		List<User> usrs = jda.getUsersByName(id.val(), false);
+		if(!usrs.isEmpty()) {
+			return usrs.get(0);
+		}
+
+		throw new CRENotFoundException("A user with the id \"" + id.val() + "\" was not found.", t);
+	}
+
+	/**
+	 * Returns the Member with the given user id.
+	 *
+	 * @param id The user id or name
+	 * @param guild The guild server with the desired member
+	 * @param t Code target
+	 * @return Member
+	 */
+	static Member GetMember(Mixed id, Guild guild, Target t) {
+		Member mem;
+
+		// Find by unique int id
+		if(id instanceof CInt) {
+			mem = guild.getMemberById(((CInt) id).getInt());
+			if(mem == null) {
+				throw new CRENotFoundException("A member with the id \"" + id.val() + "\" was not found on Discord server.", t);
+			}
+			return mem;
+		}
+
+		if(id.val().isEmpty()) {
+			throw new CREIllegalArgumentException("A user id was expected but was given an empty string.", t);
+		}
+
+		// Find by unique string id.
+		try {
+			mem = guild.getMemberById(id.val());
 			if(mem != null) {
 				return mem;
 			}
 		} catch (NumberFormatException ignored) {}
 
 		// Find by username
-		List<Member> mems = guild.getMembersByName(m.val(), false);
+		List<Member> mems = guild.getMembersByName(id.val(), false);
 		if(!mems.isEmpty()) {
 			return mems.get(0);
 		}
 
-		throw new CRENotFoundException("A member with the id \"" + m.val() + "\" was not found on Discord server.", t);
+		throw new CRENotFoundException("A member with the id \"" + id.val() + "\" was not found on Discord server.", t);
 	}
 
-	static Role GetRole(Mixed m, Target t) {
-		return GetRole(m, defaultGuild, t);
-	}
-
-	static Role GetRole(Mixed m, Guild guild, Target t) {
+	/**
+	 * Returns the Role of the given id or name.
+	 *
+	 * @param id The role id or name
+	 * @param guild The guild server with the desired role
+	 * @param t Code target
+	 * @return Role
+	 */
+	static Role GetRole(Mixed id, Guild guild, Target t) {
 		Role role;
-		if(m instanceof CInt) {
-			role = guild.getRoleById(((CInt) m).getInt());
+		if(id instanceof CInt) {
+			role = guild.getRoleById(((CInt) id).getInt());
 		} else {
-			if(m.val().isEmpty()) {
+			if(id.val().isEmpty()) {
 				throw new CREIllegalArgumentException("A role id was expected but was given an empty string.", t);
 			}
 			try {
-				role = guild.getRoleById(m.val());
+				role = guild.getRoleById(id.val());
 			} catch (NumberFormatException ex) {
-				List<Role> r = guild.getRolesByName(m.val(), false);
+				List<Role> r = guild.getRolesByName(id.val(), false);
 				if(r.isEmpty()) {
-					throw new CRENotFoundException("A role with the name \"" + m.val() + "\" was not found on Discord server.", t);
+					throw new CRENotFoundException("A role with the name \"" + id.val() + "\" was not found on Discord server.", t);
 				}
 				role = r.get(0);
 			}
 		}
 		if(role == null) {
-			throw new CRENotFoundException("A role with the id \"" + m.val() + "\" was not found on Discord server.", t);
+			throw new CRENotFoundException("A role with the id \"" + id.val() + "\" was not found on Discord server.", t);
 		}
 		return role;
+	}
+
+	/**
+	 * Returns the GuildMessageChannel from the given event bind environment.
+	 * If not running within an event bind environment, this instead returns the default channel of the default guild
+	 * specified during connection.
+	 *
+	 * @param env The runtime Environment
+	 * @param t Code target
+	 * @return GuildMessageChannel
+	 */
+	static GuildMessageChannel GetMessageChannel(Environment env, Target t) {
+		BindableEvent event = env.getEnv(GlobalEnv.class).GetEvent().getUnderlyingEvent();
+		if(event instanceof DiscordGuildChannelEvent) {
+			Channel channel = ((DiscordGuildChannelEvent) event).getChannel();
+			if(channel instanceof GuildMessageChannel) {
+				return (GuildMessageChannel) channel;
+			}
+		}
+		DefaultGuildChannelUnion channel = defaultGuild.getDefaultChannel();
+		if(channel == null) {
+			throw new CRENotFoundException("There is no publicly viewable message channel.", t);
+		}
+		return channel.asStandardGuildMessageChannel();
 	}
 
 	/**
@@ -250,10 +343,19 @@ public class Discord {
 	 * @return GuildMessageChannel
 	 */
 	static GuildMessageChannel GetMessageChannel(Mixed id, Target t) {
-		return GetMessageChannel(id, defaultGuild, t);
+		return GetMessageChannel(id, null, t);
 	}
 
+	/**
+	 * Returns the GuildMessageChannel of the given id.
+	 *
+	 * @param id The channel name or id
+	 * @param guild The guild from which to get the channel
+	 * @param t Code target
+	 * @return GuildMessageChannel
+	 */
 	static GuildMessageChannel GetMessageChannel(Mixed id, Guild guild, Target t) {
+		IGuildChannelContainer container = guild == null ? jda : guild;
 		long channelId;
 		if(id instanceof CInt) {
 			channelId = ((CInt) id).getInt();
@@ -265,44 +367,43 @@ public class Discord {
 				channelId = MiscUtil.parseLong(id.val());
 			} catch (NumberFormatException ex) {
 				// get channel by name
-				List<TextChannel> textChannels = guild.getTextChannelsByName(id.val(), false);
-				if(!textChannels.isEmpty()) {
-					return textChannels.get(0);
+				List<? extends GuildMessageChannel> channels = container.getTextChannelsByName(id.val(), false);
+				if(channels.isEmpty()) {
+					channels = container.getNewsChannelsByName(id.val(), false);
 				}
-				List<NewsChannel> newsChannels = guild.getNewsChannelsByName(id.val(), false);
-				if(!newsChannels.isEmpty()) {
-					return newsChannels.get(0);
+				if(channels.isEmpty()) {
+					channels = container.getVoiceChannelsByName(id.val(), false);
 				}
-				List<VoiceChannel> voiceChannels = guild.getVoiceChannelsByName(id.val(), false);
-				if(!voiceChannels.isEmpty()) {
-					return voiceChannels.get(0);
+				if(channels.isEmpty()) {
+					channels = container.getThreadChannelsByName(id.val(), false);
 				}
-				List<ThreadChannel> threadChannels = guild.getThreadChannelsByName(id.val(), false);
-				if(!threadChannels.isEmpty()) {
-					return threadChannels.get(0);
+				if(channels.isEmpty()) {
+					channels = container.getStageChannelsByName(id.val(), false);
 				}
-				List<StageChannel> stageChannels = guild.getStageChannelsByName(id.val(), false);
-				if(!stageChannels.isEmpty()) {
-					return stageChannels.get(0);
+				if(channels.isEmpty()) {
+					throw new CRENotFoundException("A channel with the name \"" + id.val() + "\" was not found.", t);
 				}
-				throw new CRENotFoundException("A channel with the name \"" + id.val() + "\" was not found on Discord server.", t);
+				if(channels.size() > 1) {
+					Static.getLogger().warning("More than one channel found with the name: " + id.val());
+				}
+				return channels.get(0);
 			}
 		}
-		GuildMessageChannel channel = guild.getTextChannelById(channelId);
+		GuildMessageChannel channel = container.getTextChannelById(channelId);
 		if(channel == null) {
-			channel = guild.getNewsChannelById(channelId);
+			channel = container.getNewsChannelById(channelId);
 		}
 		if(channel == null) {
-			channel = guild.getVoiceChannelById(channelId);
+			channel = container.getVoiceChannelById(channelId);
 		}
 		if(channel == null) {
-			channel = guild.getThreadChannelById(channelId);
+			channel = container.getThreadChannelById(channelId);
 		}
 		if(channel == null) {
-			channel = guild.getStageChannelById(channelId);
+			channel = container.getStageChannelById(channelId);
 		}
 		if(channel == null) {
-			throw new CRENotFoundException("A channel with the id \"" + id.val() + "\" was not found on Discord server.", t);
+			throw new CRENotFoundException("A channel with the id \"" + id.val() + "\" was not found.", t);
 		}
 		return channel;
 	}
@@ -422,30 +523,34 @@ public class Discord {
 		return builder.build();
 	}
 
-	static VoiceChannel GetVoiceChannel(Mixed m, Target t) {
-		return GetVoiceChannel(m, defaultGuild, t);
-	}
-
-	static VoiceChannel GetVoiceChannel(Mixed m, Guild guild, Target t) {
+	/**
+	 * Returns the VoiceChannel of the given id or name.
+	 *
+	 * @param id The voice channel id or name
+	 * @param guild The guild for the voice channel
+	 * @param t Code target
+	 * @return VoiceChannel
+	 */
+	static VoiceChannel GetVoiceChannel(Mixed id, Guild guild, Target t) {
 		VoiceChannel channel;
-		if(m instanceof CInt) {
-			channel = guild.getVoiceChannelById(((CInt) m).getInt());
+		if(id instanceof CInt) {
+			channel = guild.getVoiceChannelById(((CInt) id).getInt());
 		} else {
-			if(m.val().isEmpty()) {
+			if(id.val().isEmpty()) {
 				throw new CREIllegalArgumentException("A voice channel id or name was expected but was given an empty string.", t);
 			}
 			try {
-				channel = guild.getVoiceChannelById(m.val());
+				channel = guild.getVoiceChannelById(id.val());
 			} catch (NumberFormatException ex) {
-				List<VoiceChannel> channels = guild.getVoiceChannelsByName(m.val(), false);
+				List<VoiceChannel> channels = guild.getVoiceChannelsByName(id.val(), false);
 				if(channels.isEmpty()) {
-					throw new CRENotFoundException("A channel with the name \"" + m.val() + "\" was not found on Discord server.", t);
+					throw new CRENotFoundException("A channel with the name \"" + id.val() + "\" was not found on Discord server.", t);
 				}
 				channel = channels.get(0);
 			}
 		}
 		if(channel == null) {
-			throw new CRENotFoundException("A voice channel with the id \"" + m.val() + "\" was not found on Discord server.", t);
+			throw new CRENotFoundException("A voice channel with the id \"" + id.val() + "\" was not found on Discord server.", t);
 		}
 		return channel;
 	}

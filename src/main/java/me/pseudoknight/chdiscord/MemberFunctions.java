@@ -21,8 +21,7 @@ public class MemberFunctions {
 		return "Functions for managing Discord users/members.";
 	}
 
-	static final String MEMBER_ARGUMENT = " The 'member' argument is user's unique int id. A username can also be used,"
-			+ " but if the name is not unique in the guild only the first matching user will be used."
+	static final String MEMBER_ARGUMENT = " The `member` argument is a user's unique int id (or username)."
 			+ " Throws NotFoundException if a member by that id doesn't exist.";
 
 	@api
@@ -33,9 +32,9 @@ public class MemberFunctions {
 		}
 
 		public String docs() {
-			return "void {member, string} Sends a private message to the specified Discord server member."
-					+ MEMBER_ARGUMENT
-					+ " Messages have a 2000 character limit.";
+			return "void {user, string} Sends a private message to the specified Discord user."
+					+ " Will fail if the user is not cached from one of the servers."
+					+ " Messages have a 2000-character limit.";
 		}
 
 		public Integer[] numArgs() {
@@ -44,11 +43,10 @@ public class MemberFunctions {
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
 			Discord.CheckConnection(t);
-			Member mem = Discord.GetMember(args[0], t);
+			User usr = Discord.GetUser(args[0], t);
 			Mixed message = args[1];
-			try {
-				MessageCreateData data = Discord.GetMessage(message, t);
-				mem.getUser().openPrivateChannel().queue(channel -> channel.sendMessage(data).queue());
+			try(MessageCreateData data = Discord.GetMessage(message, t)) {
+				usr.openPrivateChannel().queue(channel -> channel.sendMessage(data).queue());
 			} catch(IllegalArgumentException ex) {
 				throw new CREFormatException(ex.getMessage(), t);
 			}
@@ -68,17 +66,23 @@ public class MemberFunctions {
 		}
 
 		public String docs() {
-			return "string {member} Get the server nickname for a member."
+			return "string {[server], member} Get the server nickname for a member."
+					+ GuildFunctions.SERVER_ARGUMENT
 					+ MEMBER_ARGUMENT;
 		}
 
 		public Integer[] numArgs() {
-			return new Integer[]{1};
+			return new Integer[]{1, 2};
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
 			Discord.CheckConnection(t);
-			Member member = Discord.GetMember(args[0], t);
+			Member member;
+			if(args.length == 2) {
+				member = Discord.GetMember(args[1], Discord.GetGuild(args[0], t), t);
+			} else {
+				member = Discord.GetMember(args[0], Discord.GetGuild(environment), t);
+			}
 			return new CString(member.getNickname(), t);
 		}
 
@@ -95,19 +99,27 @@ public class MemberFunctions {
 		}
 
 		public String docs() {
-			return "void {member, string} Set the server nickname for a member."
+			return "void {[server], member, string} Set the server nickname for a member."
+					+ GuildFunctions.SERVER_ARGUMENT
 					+ MEMBER_ARGUMENT
-					+ " Requires the `Manage Nicknames` permission.";
+					+ " Requires the `Manage Nicknames` permission and a role higher than the target member.";
 		}
 
 		public Integer[] numArgs() {
-			return new Integer[]{2};
+			return new Integer[]{2, 3};
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
 			Discord.CheckConnection(t);
-			Member member = Discord.GetMember(args[0], t);
-			String newNickname = args[1].val();
+			Member member;
+			String newNickname;
+			if(args.length == 3) {
+				member = Discord.GetMember(args[1], Discord.GetGuild(args[0], t), t);
+				newNickname = args[2].val();
+			} else {
+				member = Discord.GetMember(args[0], Discord.GetGuild(environment), t);
+				newNickname = args[1].val();
+			}
 			try {
 				member.modifyNickname(newNickname).queue();
 			} catch (PermissionException ex) {
@@ -132,18 +144,24 @@ public class MemberFunctions {
 		}
 
 		public String docs() {
-			return "string {member} Get the ID of the member's current voice channel."
-					+ " If the member is not connected to a voice channel, null is returned."
-					+ MEMBER_ARGUMENT;
+			return "string {[server], member} Get the ID of the member's current voice channel."
+					+ GuildFunctions.SERVER_ARGUMENT
+					+ MEMBER_ARGUMENT
+					+ " If the member is not connected to a voice channel, null is returned.";
 		}
 
 		public Integer[] numArgs() {
-			return new Integer[]{1};
+			return new Integer[]{1, 2};
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
 			Discord.CheckConnection(t);
-			Member member = Discord.GetMember(args[0], t);
+			Member member;
+			if(args.length == 2) {
+				member = Discord.GetMember(args[1], Discord.GetGuild(args[0], t), t);
+			} else {
+				member = Discord.GetMember(args[0], Discord.GetGuild(environment), t);
+			}
 			try {
 				GuildVoiceState voiceState = member.getVoiceState();
 				if(voiceState == null) {
@@ -172,17 +190,23 @@ public class MemberFunctions {
 		}
 
 		public String docs() {
-			return "boolean {member} Check if a user is muted, either self muted or server muted."
+			return "boolean {[server], member} Check if a user is muted, either self muted or server muted."
+					+ GuildFunctions.SERVER_ARGUMENT
 					+ MEMBER_ARGUMENT;
 		}
 
 		public Integer[] numArgs() {
-			return new Integer[]{1};
+			return new Integer[]{1, 2};
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
 			Discord.CheckConnection(t);
-			Member member = Discord.GetMember(args[0], t);
+			Member member;
+			if(args.length == 2) {
+				member = Discord.GetMember(args[1], Discord.GetGuild(args[0], t), t);
+			} else {
+				member = Discord.GetMember(args[0], Discord.GetGuild(environment), t);
+			}
 			try {
 				GuildVoiceState voiceState = member.getVoiceState();
 				if(voiceState == null) {
@@ -207,21 +231,29 @@ public class MemberFunctions {
 		}
 
 		public String docs() {
-			return "void {member, boolean} Set a user's server muted state."
+			return "void {[server], member, boolean} Set a user's server muted state."
+					+ GuildFunctions.SERVER_ARGUMENT
 					+ MEMBER_ARGUMENT
 					+ " Throws IllegalArgumentException if member is not connected to a voice channel."
 					+ " Requires the 'Mute Members' permission.";
 		}
 
 		public Integer[] numArgs() {
-			return new Integer[]{2};
+			return new Integer[]{2, 3};
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
 			Discord.CheckConnection(t);
-			
-			Member member = Discord.GetMember(args[0], t);
-			boolean muteState = ArgumentValidation.getBooleanObject(args[1], t);
+
+			Member member;
+			boolean muteState;
+			if(args.length == 3) {
+				member = Discord.GetMember(args[1], Discord.GetGuild(args[0], t), t);
+				muteState =  ArgumentValidation.getBooleanObject(args[2], t);
+			} else {
+				member = Discord.GetMember(args[0], Discord.GetGuild(environment), t);
+				muteState =  ArgumentValidation.getBooleanObject(args[1], t);
+			}
 			try {
 				member.mute(muteState).queue();
 			} catch (PermissionException ex) {
@@ -246,20 +278,26 @@ public class MemberFunctions {
 		}
 
 		public String docs() {
-			return "array {member} Gets an array of data for Discord user."
-					+ " Array contains 'userid', 'username', 'bot', "
-					+ " 'nickname' (for server), 'color' array (for server), and 'avatar' url (for server).";
+			return "array {[server], member} Gets an array of data for Discord user."
+					+ GuildFunctions.SERVER_ARGUMENT
+					+ " Array contains 'userid', 'username' and 'bot' (boolean). For this guild server it also contains:"
+					+ " 'nickname' (empty if not set), 'color' array (null if none), and 'avatar' effective url.";
 		}
 
 		public Integer[] numArgs() {
-			return new Integer[]{1};
+			return new Integer[]{1, 2};
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
 			Discord.CheckConnection(t);
 			CArray ret = CArray.GetAssociativeArray(t);
 
-			Member member = Discord.GetMember(args[0], t);
+			Member member;
+			if(args.length == 2) {
+				member = Discord.GetMember(args[1], Discord.GetGuild(args[0], t), t);
+			} else {
+				member = Discord.GetMember(args[0], Discord.GetGuild(environment), t);
+			}
 			ret.set("nickname", member.getNickname());
 			Color color = member.getColor();
 			if(color != null) {

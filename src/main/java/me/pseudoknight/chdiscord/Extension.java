@@ -14,7 +14,7 @@ import java.util.Map;
 public class Extension extends AbstractExtension {
 
 	public Version getVersion() {
-		return new SimpleVersion(2,8,3);
+		return new SimpleVersion(2,9,0, "SNAPSHOT");
 	}
 
 	@Override
@@ -40,12 +40,12 @@ public class Extension extends AbstractExtension {
 			if(elements.containsKey("token")) {
 				token = elements.get("token");
 			} else {
-				throw new Profiles.InvalidProfileException("token and serverId are required parameters in the profile");
+				throw new Profiles.InvalidProfileException("token is a required parameter in the profile");
 			}
 			if(elements.containsKey("serverId")) {
 				serverId = elements.get("serverId");
 			} else {
-				throw new Profiles.InvalidProfileException("token and serverId are required parameters in the profile");
+				throw new Profiles.InvalidProfileException("serverId is a required parameter in the profile");
 			}
 		}
 

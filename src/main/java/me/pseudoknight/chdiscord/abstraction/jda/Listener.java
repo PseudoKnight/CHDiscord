@@ -4,9 +4,7 @@ import com.laytonsmith.abstraction.StaticLayer;
 import com.laytonsmith.core.events.Driver;
 import com.laytonsmith.core.events.EventUtils;
 import me.pseudoknight.chdiscord.Discord;
-import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordGuildMessageReceivedEvent;
-import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordPrivateMessageReceivedEvent;
-import me.pseudoknight.chdiscord.abstraction.jda.Events.JDADiscordVoiceUpdateEvent;
+import me.pseudoknight.chdiscord.abstraction.jda.Events.*;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
@@ -35,11 +33,12 @@ public class Listener extends ListenerAdapter {
 
 	@Override
 	public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent event) {
-		final JDADiscordVoiceUpdateEvent e = new JDADiscordVoiceUpdateEvent(event);
-		if(e.getChannelJoined() != null && e.getChannelLeft() == null) {
+		if(event.getChannelJoined() != null && event.getChannelLeft() == null) {
+			final JDADiscordVoiceJoinedEvent e = new JDADiscordVoiceJoinedEvent(event);
 			StaticLayer.GetConvertor().runOnMainThreadLater(null,
 					() -> EventUtils.TriggerListener(Driver.EXTENSION, "discord_voice_joined", e));
-		} else if(e.getChannelLeft() != null && e.getChannelJoined() == null) {
+		} else if(event.getChannelLeft() != null && event.getChannelJoined() == null) {
+			final JDADiscordVoiceLeftEvent e = new JDADiscordVoiceLeftEvent(event);
 			StaticLayer.GetConvertor().runOnMainThreadLater(null,
 					() -> EventUtils.TriggerListener(Driver.EXTENSION, "discord_voice_left", e));
 		}
@@ -47,14 +46,14 @@ public class Listener extends ListenerAdapter {
 
 	@Override
 	public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
-		final Events.JDADiscordMemberJoinEvent e = new Events.JDADiscordMemberJoinEvent(event);
+		final JDADiscordMemberJoinEvent e = new JDADiscordMemberJoinEvent(event);
 		StaticLayer.GetConvertor().runOnMainThreadLater(null,
 				() -> EventUtils.TriggerListener(Driver.EXTENSION, "discord_member_joined", e));
 	}
 
 	@Override
 	public void onGuildMemberRemove(@NotNull GuildMemberRemoveEvent event) {
-		final Events.JDADiscordMemberLeaveEvent e = new Events.JDADiscordMemberLeaveEvent(event);
+		final JDADiscordMemberLeaveEvent e = new JDADiscordMemberLeaveEvent(event);
 		StaticLayer.GetConvertor().runOnMainThreadLater(null,
 				() -> EventUtils.TriggerListener(Driver.EXTENSION, "discord_member_left", e));
 	}
