@@ -61,7 +61,8 @@ Array contains a list of user int ids.
 ### discord_retrieve_invites(closure)
 Retrieves an array of invite arrays for this guild.  
 Passes the array to the callback closure.  
-Each invite array contains data about the invite, including the keys 'code', 'channelid', and optionally 'userid' of the inviter.  
+Each invite array contains data about the invite, which has the keys 'code' and 'channelid',
+and optionally 'userid' of the inviter, 'uses' and 'max_uses'.  
 Requires the `Manage Server` permission.
 
 ## Channel Functions

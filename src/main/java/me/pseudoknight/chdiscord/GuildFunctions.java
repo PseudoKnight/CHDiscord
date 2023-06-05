@@ -166,8 +166,8 @@ public class GuildFunctions {
 		public String docs() {
 			return "void {closure} Retrieves an array of invite arrays for this guild."
 					+ " Passes the array to the callback closure."
-					+ " Each invite array contains data about the invite, including the keys 'code',"
-					+ " 'channelid', and optionally 'userid' of the inviter."
+					+ " Each invite array contains data about the invite, which has the keys 'code' and "
+					+ " 'channelid', and optionally 'userid' of the inviter, 'uses' and 'max_uses'."
 					+ " Requires the `Manage Server` permission.";
 		}
 
@@ -191,6 +191,10 @@ public class GuildFunctions {
 						User inviter = invite.getInviter();
 						if (inviter != null) {
 							inviteArray.set("userid", new CInt(inviter.getIdLong(), t), t);
+						}
+						if(invite.isExpanded()) {
+							inviteArray.set("uses", new CInt(invite.getUses(), t), t);
+							inviteArray.set("max_uses", new CInt(invite.getMaxUses(), t), t);
 						}
 						array.push(inviteArray, t);
 					}
