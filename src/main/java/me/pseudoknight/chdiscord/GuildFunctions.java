@@ -214,8 +214,8 @@ public class GuildFunctions {
 			return "void {[server], closure} Retrieves an array of invite arrays for this guild server."
 					+ SERVER_ARGUMENT
 					+ " Passes the array to the callback closure."
-					+ " Each invite array contains data about the invite, which has the keys 'code' and "
-					+ " 'channelid', and optionally 'userid' of the inviter, 'uses' and 'max_uses'."
+					+ " Each invite array contains data about the invite, which has the keys 'code', "
+					+ " 'channelid', inviter 'userid', 'uses' and 'max_uses'."
 					+ " Requires the `Manage Server` permission.";
 		}
 
