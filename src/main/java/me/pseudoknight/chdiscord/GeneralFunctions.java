@@ -11,6 +11,7 @@ import com.laytonsmith.core.exceptions.CRE.*;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Guild;
 
 public class GeneralFunctions {
 	public static String docs() {
@@ -167,6 +168,35 @@ public class GeneralFunctions {
 
 		public Class<? extends CREThrowable>[] thrown() {
 			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class};
+		}
+	}
+
+	@api
+	public static class discord_get_servers extends Discord.Function {
+
+		public String getName() {
+			return "discord_get_servers";
+		}
+
+		public String docs() {
+			return "array {} Gets an array of ids for all the guild servers that the bot is added to.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{0};
+		}
+
+		public Mixed exec(Target t, final Environment env, Mixed... args) throws ConfigRuntimeException {
+			Discord.CheckConnection(t);
+			CArray array = new CArray(t);
+			for(Guild guild : Discord.jda.getGuilds()) {
+				array.push(new CInt(guild.getIdLong(), t), t);
+			}
+			return array;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class};
 		}
 	}
 }
