@@ -66,7 +66,7 @@ public class MemberFunctions {
 		}
 
 		public String docs() {
-			return "string {[server], member} Get the server nickname for a member."
+			return "string {[server], member} Get the server nickname for a member. (empty if not set)"
 					+ GuildFunctions.SERVER_ARGUMENT
 					+ MEMBER_ARGUMENT;
 		}
@@ -280,8 +280,8 @@ public class MemberFunctions {
 		public String docs() {
 			return "array {[server], member} Gets an array of data for Discord user."
 					+ GuildFunctions.SERVER_ARGUMENT
-					+ " Array contains 'userid', 'username' and 'bot' (boolean). For this guild server it also contains:"
-					+ " 'nickname' (empty if not set), 'color' array (null if none), and 'avatar' effective url.";
+					+ " Array contains 'userid', 'username', 'displayname', and 'bot' (boolean). For this guild server"
+					+ " it also contains: 'nickname' (empty if not set), 'color' array (null if none), and 'avatar' effective url.";
 		}
 
 		public Integer[] numArgs() {
@@ -314,6 +314,7 @@ public class MemberFunctions {
 			User user = member.getUser();
 			ret.set("userid", new CInt(user.getIdLong(), t), t);
 			ret.set("username", user.getName());
+			ret.set("displayname", user.getEffectiveName());
 			ret.set("bot", CBoolean.get(user.isBot()), t);
 			return ret;
 		}

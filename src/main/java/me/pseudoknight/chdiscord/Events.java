@@ -58,7 +58,7 @@ public class Events {
 			return "{username: <string match> Sender's name | channel: <string match> Channel's name} "
 					+ "This event is called when a user sends a message in the Discord server."
 					+ "{username: The username of the sender"
-					+ " | nickname: The display name of the sender in this guild"
+					+ " | nickname: The effective display name of the sender in this guild server"
 					+ " | userid: The sender's unique id"
 					+ " | bot: If the user is a bot"
 					+ " | serverid: The guild server in which this the message was sent"
@@ -156,6 +156,7 @@ public class Events {
 			return "{} "
 					+ "This event is called when a user sends a private message to the bot."
 					+ "{username: The Discord username | userid: The Discord user's unique id"
+					+ " | displayname: The Discord user's display name"
 					+ " | message: The message the user sent. | id: The message id. | attachments: An array of"
 					+ " attachment arrays, each with the keys 'url', 'filename', and 'description'."
 					+ " | reference: An associative array representing the message this was a reply to, with the keys"
@@ -177,6 +178,7 @@ public class Events {
 			Map<String, Mixed> map = new HashMap<>();
 
 			map.put("username", new CString(event.getAuthor().getName(), t));
+			map.put("displayname", new CString(event.getAuthor().getEffectiveName(), t));
 			map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
 			map.put("message", new CString(msg.getContentDisplay(), t));
 			map.put("id", new CInt(msg.getIdLong(), t));
@@ -217,7 +219,7 @@ public class Events {
 		public String docs() {
 			return "{} "
 					+ "This event is called when a user joins a voice channel on the Discord server."
-					+ "{username: The Discord username | nickname: The display name on Discord"
+					+ "{username: The Discord username | nickname: The effective display name in this guild server"
 					+ " | userid: The Discord user's unique id"
 					+ " | serverid: The guild server in which this event occurred"
 					+ " | channel: The name of the channel the user joined"
@@ -260,7 +262,7 @@ public class Events {
 		public String docs() {
 			return "{} "
 					+ "This event is called when a user leaves a voice channel on the Discord server."
-					+ "{username: The Discord username | nickname: The display name on Discord"
+					+ "{username: The Discord username | nickname: The effective display name in this guild server"
 					+ " | userid: The Discord user's unique id"
 					+ " | serverid: The guild server in which this event occurred"
 					+ " | channel: The name of the channel the user left"
@@ -303,7 +305,7 @@ public class Events {
 		public String docs() {
 			return "{} "
 					+ "This event is called when a user joined the Discord server."
-					+ "{username: The Discord username | nickname: The display name on Discord"
+					+ "{username: The Discord username | nickname: The effective display name in this guild server"
 					+ " | userid: The Discord user's unique id | serverid: The guild server joined } "
 					+ "{} "
 					+ "{}";
@@ -341,7 +343,7 @@ public class Events {
 		public String docs() {
 			return "{} "
 					+ "This event is called when a user left the Discord server, including kick/ban."
-					+ "{username: The Discord username | nickname: The display name on Discord"
+					+ "{username: The Discord username | nickname: The effective display name in this guild server"
 					+ " | userid: The Discord user's unique id | serverid: The guild server left } "
 					+ "{} "
 					+ "{}";
