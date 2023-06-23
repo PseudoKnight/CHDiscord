@@ -139,7 +139,7 @@ Requires the `Manage Channels` permission.
 
 ### discord_member_info([server], member)
 Gets an array of data for Discord user.  
-Array contains 'userid', 'username', and 'bot' (boolean). For this guild server it also contains:
+Array contains 'userid', 'username', 'displayname', and 'bot' (boolean). For this guild server it also contains:
 'nickname' (empty if not set), 'color' array (null if none), and 'avatar' effective url.
 
 ### discord_member_get_roles([server], member)
@@ -155,7 +155,7 @@ Throws NotFoundException if a role by that id doesn't exist.
 Requires the `Manage Roles` permission and a role higher than any set roles.
 
 ### discord_member_get_nickname([server], member)
-Get the server nickname for a guild server member.  
+Get the server nickname for a guild server member. (empty if not set)  
 
 ### discord_member_set_nickname([server], member, string)
 Set the server nickname for a guild server member.  
@@ -191,7 +191,7 @@ This event is called when a user sends a message in the guild server.
 
 ### discord_private_message_received
 This event is called when a user sends a private message to the bot.  
-**Data:** userid, username, message, id (of message), attachments {{url, filename, description}}, reference {{id, userid, username, message}}
+**Data:** userid, username, displayname, message, id (of message), attachments {{url, filename, description}}, reference {{id, userid, username, message}}
 
 ### discord_voice_joined
 This event is called when a user joined a voice channel.  
