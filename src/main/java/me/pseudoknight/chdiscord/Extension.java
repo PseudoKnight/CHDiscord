@@ -9,26 +9,25 @@ import com.laytonsmith.core.extensions.AbstractExtension;
 import com.laytonsmith.core.extensions.MSExtension;
 
 import java.util.Map;
-import java.util.logging.Level;
 
 @MSExtension("CHDiscord")
 public class Extension extends AbstractExtension {
 
 	public Version getVersion() {
-		return new SimpleVersion(2,6,0, "SNAPSHOT");
+		return new SimpleVersion(2,9,0);
 	}
 
 	@Override
 	public void onStartup() {
 		if(!Implementation.GetServerType().equals(Implementation.Type.SHELL)) {
-			Static.getLogger().log(Level.INFO, "CHDiscord " + getVersion() + " loaded.");
+			Static.getLogger().info("CHDiscord " + getVersion() + " loaded.");
 		}
 	}
 
 	@Override
 	public void onShutdown() {
 		if(!Implementation.GetServerType().equals(Implementation.Type.SHELL)) {
-			Static.getLogger().log(Level.INFO, "CHDiscord " + getVersion() + " unloaded.");
+			Static.getLogger().info( "CHDiscord " + getVersion() + " unloaded.");
 		}
 	}
 
@@ -41,12 +40,12 @@ public class Extension extends AbstractExtension {
 			if(elements.containsKey("token")) {
 				token = elements.get("token");
 			} else {
-				throw new Profiles.InvalidProfileException("token and serverId are required parameters in the profile");
+				throw new Profiles.InvalidProfileException("token is a required parameter in the profile");
 			}
 			if(elements.containsKey("serverId")) {
 				serverId = elements.get("serverId");
 			} else {
-				throw new Profiles.InvalidProfileException("token and serverId are required parameters in the profile");
+				throw new Profiles.InvalidProfileException("serverId is a required parameter in the profile");
 			}
 		}
 

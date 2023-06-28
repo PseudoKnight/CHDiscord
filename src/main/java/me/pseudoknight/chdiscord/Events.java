@@ -54,12 +54,23 @@ public class Events {
 
 		@Override
 		public String docs() {
-			return "{username: <string match> | channel: <string match>} "
+			return "{username: <string match> Sender's name | channel: <string match> Channel's name} "
 					+ "This event is called when a user sends a message in the Discord server."
-					+ "{username: The Discord username | nickname: The display name on Discord"
-					+ " | userid: The Discord user's unique id"
-					+ " | channel: The channel the message was sent | message: The message the user sent."
-					+ " | id: The message id.} "
+					+ "{username: The username of the sender"
+					+ " | nickname: The effective display name of the sender in this guild server"
+					+ " | userid: The sender's unique id"
+					+ " | bot: If the user is a bot"
+					+ " | serverid: The guild server in which this the message was sent"
+					+ " | channel: The name of the channel in which the message was sent"
+					+ " | channelid: The unique id for the channel."
+					+ " | channeltype: The type of channel. (TEXT, VOICE, NEWS, GUILD_NEWS_THREAD, GUILD_PUBLIC_THREAD,"
+					+ " or GUILD_PRIVATE_THREAD)"
+					+ " | message: The message the user sent."
+					+ " | id: The message id."
+					+ " | attachments: An array of attachment arrays, each with the keys 'url', 'filename', and"
+					+ " 'description'."
+					+ " | reference: An associative array representing the message this was a reply to, with the keys"
+					+ " 'id', 'userid', 'username', and 'message'. Will be null if the message was not a reply.}"
 					+ "{} "
 					+ "{}";
 		}
@@ -69,10 +80,12 @@ public class Events {
 			if (e instanceof DiscordGuildMessageReceivedEvent) {
 				DiscordGuildMessageReceivedEvent event = (DiscordGuildMessageReceivedEvent)e;
 
-				if(prefilter.containsKey("username") && !event.getMember().getUser().getName().equals(prefilter.get("username").val())) {
+				if(prefilter.containsKey("username")
+						&& !event.getMember().getUser().getName().equals(prefilter.get("username").val())) {
 					return false;
 				}
-				if(prefilter.containsKey("channel") && !event.getChannel().getName().equals(prefilter.get("channel").val())) {
+				if(prefilter.containsKey("channel")
+						&& !event.getChannel().getName().equals(prefilter.get("channel").val())) {
 					return false;
 				}
 
@@ -97,9 +110,33 @@ public class Events {
 
 			map.put("username", new CString(event.getAuthor().getName(), t));
 			map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
+			map.put("bot", CBoolean.get(event.getAuthor().isBot()));
+			map.put("serverid", new CInt(event.getGuild().getIdLong(), t));
 			map.put("channel", new CString(event.getChannel().getName(), t));
+			map.put("channelid", new CInt(event.getChannel().getIdLong(), t));
+			map.put("channeltype", new CString(event.getChannel().getType().name(), t));
 			map.put("message", new CString(msg.getContentDisplay(), t));
 			map.put("id", new CInt(msg.getIdLong(), t));
+			CArray attachments = new CArray(t);
+			for(Message.Attachment msgAttachment : msg.getAttachments()) {
+				CArray attachment = CArray.GetAssociativeArray(t);
+				attachment.set("url", new CString(msgAttachment.getUrl(), t), t);
+				attachment.set("filename", new CString(msgAttachment.getFileName(), t), t);
+				attachment.set("description", new CString(msgAttachment.getDescription(), t), t);
+				attachments.push(attachment, t);
+			}
+			map.put("attachments", attachments);
+			if(msg.getReferencedMessage() != null) {
+				CArray reference = CArray.GetAssociativeArray(t);
+				Message referencedMsg = msg.getReferencedMessage();
+				reference.set("id", new CInt(referencedMsg.getIdLong(), t), t);
+				reference.set("username", new CString(referencedMsg.getAuthor().getName(), t), t);
+				reference.set("userid", new CInt(referencedMsg.getAuthor().getIdLong(), t), t);
+				reference.set("message", new CString(referencedMsg.getContentDisplay(), t), t);
+				map.put("reference", reference);
+			} else {
+				map.put("reference", CNull.NULL);
+			}
 
 			return map;
 		}
@@ -118,7 +155,11 @@ public class Events {
 			return "{} "
 					+ "This event is called when a user sends a private message to the bot."
 					+ "{username: The Discord username | userid: The Discord user's unique id"
-					+ " | message: The message the user sent. | id: The message id.} "
+					+ " | displayname: The Discord user's display name"
+					+ " | message: The message the user sent. | id: The message id. | attachments: An array of"
+					+ " attachment arrays, each with the keys 'url', 'filename', and 'description'."
+					+ " | reference: An associative array representing the message this was a reply to, with the keys"
+					+ " 'id', 'userid', 'username', and 'message'. Will be null if the message was not a reply.}"
 					+ "{} "
 					+ "{}";
 		}
@@ -136,9 +177,30 @@ public class Events {
 			Map<String, Construct> map = new HashMap<>();
 
 			map.put("username", new CString(event.getAuthor().getName(), t));
+			map.put("displayname", new CString(event.getAuthor().getEffectiveName(), t));
 			map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
 			map.put("message", new CString(msg.getContentDisplay(), t));
 			map.put("id", new CInt(msg.getIdLong(), t));
+			CArray attachments = new CArray(t);
+			for(Message.Attachment msgAttachment : msg.getAttachments()) {
+				CArray attachment = CArray.GetAssociativeArray(t);
+				attachment.set("url", new CString(msgAttachment.getUrl(), t), t);
+				attachment.set("filename", new CString(msgAttachment.getFileName(), t), t);
+				attachment.set("description", new CString(msgAttachment.getDescription(), t), t);
+				attachments.push(attachment, t);
+			}
+			map.put("attachments", attachments);
+			if(msg.getReferencedMessage() != null) {
+				CArray reference = CArray.GetAssociativeArray(t);
+				Message referencedMsg = msg.getReferencedMessage();
+				reference.set("id", new CInt(referencedMsg.getIdLong(), t), t);
+				reference.set("username", new CString(referencedMsg.getAuthor().getName(), t), t);
+				reference.set("userid", new CInt(referencedMsg.getAuthor().getIdLong(), t), t);
+				reference.set("message", new CString(referencedMsg.getContentDisplay(), t), t);
+				map.put("reference", reference);
+			} else {
+				map.put("reference", CNull.NULL);
+			}
 
 			return map;
 		}
@@ -156,28 +218,32 @@ public class Events {
 		public String docs() {
 			return "{} "
 					+ "This event is called when a user joins a voice channel on the Discord server."
-					+ "{username: The Discord username | nickname: The display name on Discord"
+					+ "{username: The Discord username | nickname: The effective display name in this guild server"
 					+ " | userid: The Discord user's unique id"
-					+ " | channel: The channel the user joined} "
+					+ " | serverid: The guild server in which this event occurred"
+					+ " | channel: The name of the channel the user joined"
+					+ " | channelid: The unique id for the channel.}"
 					+ "{} "
 					+ "{}";
 		}
 
 		@Override
 		public boolean matches(Map<String, Construct> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-			return e instanceof DiscordVoiceJoinEvent;
+			return e instanceof DiscordVoiceJoinedEvent;
 		}
 
 		@Override
 		public Map<String, Construct> evaluate(BindableEvent e) throws EventException {
-			DiscordVoiceJoinEvent event = (DiscordVoiceJoinEvent) e;
+			DiscordVoiceJoinedEvent event = (DiscordVoiceJoinedEvent) e;
 			Target t = Target.UNKNOWN;
 			Map<String, Construct> map = new HashMap<>();
 
 			map.put("username", new CString(event.getMember().getUser().getName(), t));
 			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
 			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
+			map.put("serverid", new CInt(event.getGuild().getIdLong(), t));
 			map.put("channel", new CString(event.getChannel().getName(), t));
+			map.put("channelid", new CInt(event.getChannel().getIdLong(), t));
 
 			return map;
 		}
@@ -195,16 +261,18 @@ public class Events {
 		public String docs() {
 			return "{} "
 					+ "This event is called when a user leaves a voice channel on the Discord server."
-					+ "{username: The Discord username | nickname: The display name on Discord"
+					+ "{username: The Discord username | nickname: The effective display name in this guild server"
 					+ " | userid: The Discord user's unique id"
-					+ " | channel: The channel the user left} "
+					+ " | serverid: The guild server in which this event occurred"
+					+ " | channel: The name of the channel the user left"
+					+ " | channelid: The unique id for the channel.}"
 					+ "{} "
 					+ "{}";
 		}
 
 		@Override
 		public boolean matches(Map<String, Construct> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-			if(e instanceof DiscordVoiceLeaveEvent) {
+			if(e instanceof DiscordVoiceLeftEvent) {
 				return true;
 			}
 			return false;
@@ -212,14 +280,16 @@ public class Events {
 
 		@Override
 		public Map<String, Construct> evaluate(BindableEvent e) throws EventException {
-			DiscordVoiceLeaveEvent event = (DiscordVoiceLeaveEvent) e;
+			DiscordVoiceLeftEvent event = (DiscordVoiceLeftEvent) e;
 			Target t = Target.UNKNOWN;
 			Map<String, Construct> map = new HashMap<>();
 
 			map.put("username", new CString(event.getMember().getUser().getName(), t));
 			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
 			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
+			map.put("serverid", new CInt(event.getGuild().getIdLong(), t));
 			map.put("channel", new CString(event.getChannel().getName(), t));
+			map.put("channelid", new CInt(event.getChannel().getIdLong(), t));
 
 			return map;
 		}
@@ -237,8 +307,8 @@ public class Events {
 		public String docs() {
 			return "{} "
 					+ "This event is called when a user joined the Discord server."
-					+ "{username: The Discord username | nickname: The display name on Discord"
-					+ " | userid: The Discord user's unique id} "
+					+ "{username: The Discord username | nickname: The effective display name in this guild server"
+					+ " | userid: The Discord user's unique id | serverid: The guild server joined } "
 					+ "{} "
 					+ "{}";
 		}
@@ -257,6 +327,7 @@ public class Events {
 			map.put("username", new CString(event.getMember().getUser().getName(), t));
 			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
 			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
+			map.put("serverid", new CInt(event.getGuild().getIdLong(), t));
 
 			return map;
 		}
@@ -274,8 +345,8 @@ public class Events {
 		public String docs() {
 			return "{} "
 					+ "This event is called when a user left the Discord server, including kick/ban."
-					+ "{username: The Discord username | nickname: The display name on Discord"
-					+ " | userid: The Discord user's unique id} "
+					+ "{username: The Discord username | nickname: The effective display name in this guild server"
+					+ " | userid: The Discord user's unique id | serverid: The guild server left } "
 					+ "{} "
 					+ "{}";
 		}
@@ -300,6 +371,7 @@ public class Events {
 			} else {
 				map.put("nickname", new CString(user.getName(), t));
 			}
+			map.put("serverid", new CInt(event.getGuild().getIdLong(), t));
 
 			return map;
 		}

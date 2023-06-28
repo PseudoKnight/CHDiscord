@@ -9,8 +9,8 @@ import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.environments.GlobalEnv;
 import com.laytonsmith.core.exceptions.CRE.*;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
-import com.laytonsmith.core.natives.interfaces.Mixed;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Guild;
 
 public class GeneralFunctions {
 	public static String docs() {
@@ -25,7 +25,7 @@ public class GeneralFunctions {
 		}
 
 		public String docs() {
-			return "boolean {token, server_id, [callback] | profile, [callback]} Connects to Discord server via token and server id."
+			return "boolean {token, serverId, [callback] | profile, [callback]} Connects to Discord server via token and server id."
 					+ " The server id can be retrieved by right-clicking the server name and clicking \"Copy ID\"."
 					+ " The optional callback closure will be executed when a connection is made. The profile may be"
 					+ " a string, which should refer to a profile defined in profiles.xml, with the keys token and"
@@ -52,7 +52,7 @@ public class GeneralFunctions {
 
 		public Construct exec(Target t, Environment env, Construct... args) throws ConfigRuntimeException {
 			CClosure callback = null;
-			Mixed profile = null;
+			Construct profile = null;
 			String token = null;
 			String serverId = null;
 			switch (args.length) {
@@ -96,7 +96,7 @@ public class GeneralFunctions {
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{};
+			return new Class[]{CRECastException.class, CREIllegalArgumentException.class};
 		}
 	}
 
@@ -121,7 +121,7 @@ public class GeneralFunctions {
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
-			return new Class[]{};
+			return null;
 		}
 	}
 
@@ -137,7 +137,7 @@ public class GeneralFunctions {
 					+ " Activity type can be one of " + StringUtils.Join(Activity.ActivityType.values(), ", ", ", or ") + "."
 					+ " Activity string can be anything but an empty string."
 					+ " If streaming, a valid Twitch URL must also be provided."
-					+ " If not, or it's invalid, type will revert to DEFAULT (ie. playing).";
+					+ " If not, or it's invalid, type will revert to PLAYING.";
 		}
 
 		public Integer[] numArgs() {
@@ -145,9 +145,7 @@ public class GeneralFunctions {
 		}
 
 		public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
-			if(Discord.guild == null) {
-				throw new CRENotFoundException("Not connected to Discord server.", t);
-			}
+			Discord.CheckConnection(t);
 			try {
 				Activity.ActivityType type = Activity.ActivityType.valueOf(args[0].val().toUpperCase());
 				Activity activity = null;
@@ -169,6 +167,35 @@ public class GeneralFunctions {
 
 		public Class<? extends CREThrowable>[] thrown() {
 			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class};
+		}
+	}
+
+	@api
+	public static class discord_get_servers extends Discord.Function {
+
+		public String getName() {
+			return "discord_get_servers";
+		}
+
+		public String docs() {
+			return "array {} Gets an array of ids for all the guild servers that the bot is added to.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{0};
+		}
+
+		public Construct exec(Target t, final Environment env, Construct... args) throws ConfigRuntimeException {
+			Discord.CheckConnection(t);
+			CArray array = new CArray(t);
+			for(Guild guild : Discord.jda.getGuilds()) {
+				array.push(new CInt(guild.getIdLong(), t), t);
+			}
+			return array;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class};
 		}
 	}
 }
