@@ -28,7 +28,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-beta.12</version>
+            <version>5.0.0-beta.13</version>
             <exclusions>
                 <exclusion>
                     <groupId>club.minnced</groupId>
@@ -202,6 +202,12 @@
                                     </excludes>
                                 </filter>
                                 <filter>
+                                    <artifact>com.squareup.okio:okio-jvm:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
                                     <artifact>com.squareup.okio:okio:jar:*</artifact>
                                     <excludes>
                                         <exclude>META-INF/**</exclude>
@@ -316,6 +322,12 @@
                                 </filter>
                                 <filter>
                                     <artifact>com.squareup.okio:okio:jar:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.squareup.okio:okio-jvm:jar:*</artifact>
                                     <excludes>
                                         <exclude>META-INF/**</exclude>
                                     </excludes>
