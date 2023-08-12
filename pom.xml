@@ -49,7 +49,7 @@
         <dependency>
             <groupId>com.squareup.okio</groupId>
             <artifactId>okio</artifactId>
-            <version>3.0.0</version> <!-- enforce later dependency version used by jda -->
+            <version>3.4.0</version> <!-- enforce later dependency version used by jda -->
         </dependency>
     </dependencies>
 
