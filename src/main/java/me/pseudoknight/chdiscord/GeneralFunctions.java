@@ -1,19 +1,26 @@
 package me.pseudoknight.chdiscord;
 
 import com.laytonsmith.PureUtilities.Common.StringUtils;
+import com.laytonsmith.abstraction.StaticLayer;
 import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.ArgumentValidation;
 import com.laytonsmith.core.Profiles;
+import com.laytonsmith.core.Static;
 import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.environments.StaticRuntimeEnv;
 import com.laytonsmith.core.exceptions.CRE.*;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
+import com.laytonsmith.core.exceptions.MarshalException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.exceptions.ParsingException;
+import net.dv8tion.jda.api.requests.*;
+import net.dv8tion.jda.api.utils.data.DataObject;
 import net.dv8tion.jda.api.utils.messages.MessageRequest;
+import net.dv8tion.jda.internal.requests.RestActionImpl;
 
 import java.util.EnumSet;
 
@@ -163,6 +170,7 @@ public class GeneralFunctions {
 				} else {
 					activity = Activity.of(type, args[1].val());
 				}
+				// TODO: withState
 				Discord.jda.getPresence().setActivity(activity);
 			} catch (IllegalArgumentException ex) {
 				throw new CREIllegalArgumentException(ex.getMessage(), t);
@@ -245,6 +253,106 @@ public class GeneralFunctions {
 
 		public Class<? extends CREThrowable>[] thrown() {
 			return new Class[]{CRENotFoundException.class};
+		}
+	}
+
+	@api
+	public static class discord_request extends Discord.Function {
+
+		public String getName() {
+			return "discord_request";
+		}
+
+		public String docs() {
+			return "void {method, route, [dataObject], [onSuccess], [onFailure]} Sends a custom HTTP request to Discord."
+					+ " This is for advanced users that need to use Discord API that is not yet added to this extension."
+					+ " You must refer to the Discord documentation for routes, methods, parameters, and permissions."
+					+ " The method argument can be one of GET, PATCH, DELETE, PUT or POST."
+					+ " The dataObject argument is the JSON parameters, and can be an array, string or null."
+					+ " If the request was successful, the onSuccess closure will be executed and passed an array of"
+					+ " response data. If the request failed, the onFailure closure will instead be executed and passed"
+					+ " a failure message. If not provided, the default handler will instead log any failures.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{2, 3, 4, 5};
+		}
+
+		public Mixed exec(Target t, final Environment env, Mixed... args) throws ConfigRuntimeException {
+			Discord.CheckConnection(t);
+
+			Method method;
+			try {
+				method = Method.valueOf(args[0].val());
+			} catch (IllegalArgumentException ex) {
+				throw new CREIllegalArgumentException("Invalid HTTP method: " + args[0].val(), t);
+			}
+			Route route = Route.custom(method, args[1].val());
+
+			DataObject dataObject;
+			if(args.length < 3) {
+				dataObject = null;
+			} else if(args[2].isInstanceOf(CArray.TYPE)) {
+				try {
+					dataObject = DataObject.fromJson(Construct.json_encode(args[2], t));
+				} catch (MarshalException e) {
+					throw new CREFormatException(e.getMessage(), t);
+				}
+			} else {
+				String data = Construct.nval(args[2]);
+				if(data == null) {
+					dataObject = null;
+				} else {
+					try {
+						dataObject = DataObject.fromJson(data);
+					} catch (ParsingException ex) {
+						throw new CREFormatException(ex.getMessage(), t);
+					}
+				}
+			}
+			if(dataObject != null && (method == Method.GET || method == Method.HEAD)) {
+				throw new CREIllegalArgumentException("Method " + method.name() + " most not have data", t);
+			}
+
+			CClosure onSuccess;
+			if(args.length > 3) {
+				if (!(args[3] instanceof CClosure)) {
+					throw new CREIllegalArgumentException("Expected onSuccess to be a closure but got: " + args[3].val(), t);
+				}
+				onSuccess = (CClosure) args[3];
+			} else {
+				onSuccess = null;
+			}
+
+			CClosure onFailure;
+			if(args.length > 4) {
+				if (!(args[4] instanceof CClosure)) {
+					throw new CREIllegalArgumentException("Expected onFailure to be a closure but got: " + args[4].val(), t);
+				}
+				onFailure = (CClosure) args[4];
+			} else {
+				onFailure = null;
+			}
+
+			Route.CompiledRoute compiledRoute = route.compile();
+			RestAction<Mixed> action = new RestActionImpl<>(Discord.jda, compiledRoute, dataObject, (response, request) -> {
+				try {
+					return Construct.json_decode(response.getObject().toString(), t);
+				} catch (MarshalException e) {
+					Static.getLogger().severe(e.getMessage());
+					return CNull.NULL;
+				}
+			});
+			action.queue(onSuccess == null ? null :(Mixed m) -> StaticLayer.GetConvertor().runOnMainThreadLater(null, () -> {
+				onSuccess.executeCallable(m);
+			}), onFailure == null ? null : (Throwable ex) -> StaticLayer.GetConvertor().runOnMainThreadLater(null, () -> {
+				onFailure.executeCallable(new CString(ex.getMessage(), t));
+			}));
+			return CVoid.VOID;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class, CREFormatException.class};
 		}
 	}
 }
