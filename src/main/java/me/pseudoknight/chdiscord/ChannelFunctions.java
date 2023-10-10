@@ -3,11 +3,18 @@ package me.pseudoknight.chdiscord;
 import com.laytonsmith.abstraction.StaticLayer;
 import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.ArgumentValidation;
+import com.laytonsmith.core.Optimizable;
+import com.laytonsmith.core.ParseTree;
+import com.laytonsmith.core.compiler.CompilerEnvironment;
+import com.laytonsmith.core.compiler.CompilerWarning;
+import com.laytonsmith.core.compiler.FileOptions;
 import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.exceptions.CRE.*;
+import com.laytonsmith.core.exceptions.ConfigCompileException;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
@@ -55,11 +62,13 @@ public class ChannelFunctions {
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
 			Discord.CheckConnection(t);
+			Guild guild = null;
 			GuildMessageChannel channel;
 			Mixed message;
 			CClosure callback;
 			if (args.length == 4) {
-				channel = Discord.GetMessageChannel(args[1], Discord.GetGuild(args[0], t), t);
+				guild = Discord.GetGuild(args[0], t);
+				channel = Discord.GetMessageChannel(args[1], guild, t);
 				message = args[2];
 				if (!(args[3] instanceof CClosure)) {
 					throw new CREIllegalArgumentException("Expected a closure but got: " + args[3].val(), t);
@@ -71,7 +80,8 @@ public class ChannelFunctions {
 					message = args[1];
 					callback = (CClosure) args[2];
 				} else {
-					channel = Discord.GetMessageChannel(args[1], Discord.GetGuild(args[0], t), t);
+					guild = Discord.GetGuild(args[0], t);
+					channel = Discord.GetMessageChannel(args[1], guild, t);
 					message = args[2];
 					callback = null;
 				}
@@ -96,7 +106,7 @@ public class ChannelFunctions {
 						callback.executeCallable(new CInt(msg.getIdLong(), t)));
 			}
 			try {
-				MessageCreateData data = Discord.GetMessage(message, t);
+				MessageCreateData data = Discord.CreateMessage(message, guild, t);
 				channel.sendMessage(data).queue(onSuccess);
 			} catch(PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);

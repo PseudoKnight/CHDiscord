@@ -27,11 +27,7 @@ import me.pseudoknight.chdiscord.abstraction.jda.Listener;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.attribute.IGuildChannelContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
@@ -46,6 +42,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -407,7 +404,7 @@ public class Discord {
 		return channel;
 	}
 
-	static MessageCreateData GetMessage(Mixed m, Target t) {
+	static MessageCreateData CreateMessage(Mixed m, Guild guild, Target t) {
 		MessageCreateBuilder  builder = new MessageCreateBuilder();
 		if(m instanceof CArray) {
 			CArray array = ArgumentValidation.getArray(m, t);
@@ -426,6 +423,49 @@ public class Discord {
 			}
 			if(array.containsKey("content")) {
 				builder.setContent(array.get("content", t).val());
+			}
+			if(array.containsKey("allowed_mentions")) {
+				CArray allowedMentionsArray = ArgumentValidation.getArray(array.get("allowed_mentions", t), t);
+				if(!allowedMentionsArray.isAssociative()) {
+					throw new CREIllegalArgumentException("Allowed mentions array must be associative.", t);
+				}
+				if(allowedMentionsArray.containsKey("parse")) {
+					CArray parseArray =  ArgumentValidation.getArray(allowedMentionsArray.get("parse", t), t);
+					if(parseArray.isAssociative()) {
+						throw new CREIllegalArgumentException("Allowed mention parse array must not be associative.", t);
+					}
+					EnumSet<Message.MentionType> mentionTypes = EnumSet.noneOf(Message.MentionType.class);
+					for (Mixed value : parseArray.asList()) {
+						try {
+							mentionTypes.add(Message.MentionType.valueOf(value.val()));
+						} catch (IllegalArgumentException ex) {
+							throw new CREIllegalArgumentException("Invalid mention type: " + value.val(), t);
+						}
+					}
+					builder.setAllowedMentions(mentionTypes);
+				}
+				if(allowedMentionsArray.containsKey("users")) {
+					CArray usersArray = ArgumentValidation.getArray(allowedMentionsArray.get("users", t), t);
+					if(usersArray.isAssociative()) {
+						throw new CREIllegalArgumentException("User mention array must not be associative.", t);
+					}
+					List<String> usersMentions = new ArrayList<>((int) usersArray.size());
+					for(Mixed value : usersArray.asList()) {
+						usersMentions.add((guild == null ? GetUser(value, t) : GetMember(value, guild, t)).getId());
+					}
+					builder.mentionUsers(usersMentions);
+				}
+				if(allowedMentionsArray.containsKey("roles")) {
+					CArray rolesArray = ArgumentValidation.getArray(allowedMentionsArray.get("roles", t), t);
+					if(rolesArray.isAssociative()) {
+						throw new CREIllegalArgumentException("Role mention array must not be associative.", t);
+					}
+					List<String> roleMentions = new ArrayList<>((int) rolesArray.size());
+					for(Mixed value : rolesArray.asList()) {
+						roleMentions.add(GetRole(value, guild == null ? defaultGuild : guild, t).getId());
+					}
+					builder.mentionRoles(roleMentions);
+				}
 			}
 		} else {
 			builder.setContent(m.val());

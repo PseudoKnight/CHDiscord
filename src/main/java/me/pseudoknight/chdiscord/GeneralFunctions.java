@@ -12,6 +12,10 @@ import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.utils.messages.MessageRequest;
+
+import java.util.EnumSet;
 
 public class GeneralFunctions {
 	public static String docs() {
@@ -168,6 +172,50 @@ public class GeneralFunctions {
 
 		public Class<? extends CREThrowable>[] thrown() {
 			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class};
+		}
+	}
+
+	@api
+	public static class discord_set_allowed_mentions extends Discord.Function {
+
+		public String getName() {
+			return "discord_set_allowed_mentions";
+		}
+
+		public String docs() {
+			return "void {array} Sets a list of mention types that will be parsed by default in sent messages."
+					+ " Array can include 'USER', 'ROLE', and 'EVERYONE'."
+					+ " If given null, it resets the default to all types.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{1};
+		}
+
+		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			Discord.CheckConnection(t);
+			if(args[0] instanceof CNull) {
+				MessageRequest.setDefaultMentions(null);
+				return CVoid.VOID;
+			}
+			CArray array = ArgumentValidation.getArray(args[0], t);
+			if(array.isAssociative()) {
+				throw new CREIllegalArgumentException("Mention type array must not be associative.", t);
+			}
+			EnumSet<Message.MentionType> mentionTypes = EnumSet.noneOf(Message.MentionType.class);
+			for(Mixed value : array.asList()) {
+				try {
+					mentionTypes.add(Message.MentionType.valueOf(value.val()));
+				} catch (IllegalArgumentException ex) {
+					throw new CREIllegalArgumentException("Invalid mention type: " + value.val(), t);
+				}
+			}
+			MessageRequest.setDefaultMentions(mentionTypes);
+			return CVoid.VOID;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class, CRECastException.class};
 		}
 	}
 

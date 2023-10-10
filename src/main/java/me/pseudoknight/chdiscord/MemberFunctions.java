@@ -45,7 +45,7 @@ public class MemberFunctions {
 			Discord.CheckConnection(t);
 			User usr = Discord.GetUser(args[0], t);
 			Mixed message = args[1];
-			try(MessageCreateData data = Discord.GetMessage(message, t)) {
+			try(MessageCreateData data = Discord.CreateMessage(message, null, t)) {
 				usr.openPrivateChannel().queue(channel -> channel.sendMessage(data).queue());
 			} catch(IllegalArgumentException ex) {
 				throw new CREFormatException(ex.getMessage(), t);

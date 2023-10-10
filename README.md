@@ -53,6 +53,11 @@ Sends a private message to the specified Discord user.
 Will fail if the user is not a cached member on one of the connected servers.  
 Messages have a 2000-character limit.
 
+### discord_set_allowed_mentions(array)
+Sets a list of mention types that will be parsed by default in sent messages.  
+Array can include 'USER', 'ROLE', and 'EVERYONE'.  
+If given null, it resets the default to all types.
+
 ### discord_get_servers()
 Gets an array of ids for all the guild servers that the bot is added to.
 
@@ -82,6 +87,7 @@ If channel is omitted, the channel from an event or first publicly viewable chan
 Message can be a string or a message array object.  
 Callback closure is eventually executed with the message id for this message. (cannot be null)  
 Message array must contain at least one of the following keys: 'content', 'embed', or 'embeds'.  
+It can also contain 'allowed_mentions' to override default behavior set by discord_set_allowed_mentions().  
 Embed array can include any of the following keys: 'title', 'url', 'description',
 'image' (URL), 'thumbnail' (URL), 'color' (rgb array), 'footer' (contains 'text' and optionally 'icon_url'),
 'author' (contains 'name' and optionally 'url' and/or 'icon_url'), and 'fields'
@@ -89,7 +95,7 @@ Embed array can include any of the following keys: 'title', 'url', 'description'
 Messages have a 2000 character limit.  
 Requires the `View Channels` and `Send Messages` permissions. (or `Send Messages in Threads` for thread channels)
 
-Message object array format: (as displayed, top to bottom, left to right)
+Message object array format: (embeds are as displayed, top to bottom, left to right)
 ```
 {
   content: "This displays above the embed as normal text.",
@@ -120,7 +126,12 @@ Message object array format: (as displayed, top to bottom, left to right)
         icon_url: "https://website.com/footer_icon.png",
         text: "Small text at the bottom."
     }
-  }]
+  }],
+  allowed_mentions: {
+    parse: [],
+    users: ["PseudoKnight"],
+    roles: ["moderator"],
+  }
 }
 ```
 
