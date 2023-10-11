@@ -426,14 +426,40 @@ public class Discord {
 			}
 			if(array.containsKey("allowed_mentions")) {
 				CArray allowedMentionsArray = ArgumentValidation.getArray(array.get("allowed_mentions", t), t);
-				if(!allowedMentionsArray.isAssociative()) {
-					throw new CREIllegalArgumentException("Allowed mentions array must be associative.", t);
-				}
-				if(allowedMentionsArray.containsKey("parse")) {
-					CArray parseArray =  ArgumentValidation.getArray(allowedMentionsArray.get("parse", t), t);
-					if(parseArray.isAssociative()) {
-						throw new CREIllegalArgumentException("Allowed mention parse array must not be associative.", t);
+				CArray parseArray = null;
+				if(allowedMentionsArray.isAssociative()) {
+					if(allowedMentionsArray.containsKey("parse")) {
+						parseArray = ArgumentValidation.getArray(allowedMentionsArray.get("parse", t), t);
+						if(parseArray.isAssociative()) {
+							throw new CREIllegalArgumentException("Allowed mention parse array must not be associative.", t);
+						}
 					}
+					if(allowedMentionsArray.containsKey("users")) {
+						CArray usersArray = ArgumentValidation.getArray(allowedMentionsArray.get("users", t), t);
+						if(usersArray.isAssociative()) {
+							throw new CREIllegalArgumentException("User mention array must not be associative.", t);
+						}
+						List<String> usersMentions = new ArrayList<>((int) usersArray.size());
+						for(Mixed value : usersArray.asList()) {
+							usersMentions.add((guild == null ? GetUser(value, t) : GetMember(value, guild, t)).getId());
+						}
+						builder.mentionUsers(usersMentions);
+					}
+					if(allowedMentionsArray.containsKey("roles")) {
+						CArray rolesArray = ArgumentValidation.getArray(allowedMentionsArray.get("roles", t), t);
+						if(rolesArray.isAssociative()) {
+							throw new CREIllegalArgumentException("Role mention array must not be associative.", t);
+						}
+						List<String> roleMentions = new ArrayList<>((int) rolesArray.size());
+						for(Mixed value : rolesArray.asList()) {
+							roleMentions.add(GetRole(value, guild == null ? defaultGuild : guild, t).getId());
+						}
+						builder.mentionRoles(roleMentions);
+					}
+				} else {
+					parseArray = allowedMentionsArray;
+				}
+				if(parseArray != null) {
 					EnumSet<Message.MentionType> mentionTypes = EnumSet.noneOf(Message.MentionType.class);
 					for (Mixed value : parseArray.asList()) {
 						try {
@@ -443,28 +469,6 @@ public class Discord {
 						}
 					}
 					builder.setAllowedMentions(mentionTypes);
-				}
-				if(allowedMentionsArray.containsKey("users")) {
-					CArray usersArray = ArgumentValidation.getArray(allowedMentionsArray.get("users", t), t);
-					if(usersArray.isAssociative()) {
-						throw new CREIllegalArgumentException("User mention array must not be associative.", t);
-					}
-					List<String> usersMentions = new ArrayList<>((int) usersArray.size());
-					for(Mixed value : usersArray.asList()) {
-						usersMentions.add((guild == null ? GetUser(value, t) : GetMember(value, guild, t)).getId());
-					}
-					builder.mentionUsers(usersMentions);
-				}
-				if(allowedMentionsArray.containsKey("roles")) {
-					CArray rolesArray = ArgumentValidation.getArray(allowedMentionsArray.get("roles", t), t);
-					if(rolesArray.isAssociative()) {
-						throw new CREIllegalArgumentException("Role mention array must not be associative.", t);
-					}
-					List<String> roleMentions = new ArrayList<>((int) rolesArray.size());
-					for(Mixed value : rolesArray.asList()) {
-						roleMentions.add(GetRole(value, guild == null ? defaultGuild : guild, t).getId());
-					}
-					builder.mentionRoles(roleMentions);
 				}
 			}
 		} else {
