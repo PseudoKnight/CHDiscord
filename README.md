@@ -102,7 +102,7 @@ Embed array can include any of the following keys: 'title', 'url', 'description'
 'image' (URL), 'thumbnail' (URL), 'color' (rgb array), 'footer' (contains 'text' and optionally 'icon_url'),
 'author' (contains 'name' and optionally 'url' and/or 'icon_url'), and 'fields'
 (an array of field arrays, each with 'name', 'value', and optionally an 'inline' boolean).  
-Messages have a 2000 character limit.  
+Messages have a 2000-character limit.  
 Requires the `View Channels` and `Send Messages` permissions. (or `Send Messages in Threads` for thread channels)
 
 Message object array format: (embeds are as displayed, top to bottom, left to right)
@@ -206,8 +206,13 @@ Requires the `Mute Members` permission.
 ## Events
 
 ### discord_message_received
-This event is called when a user sends a message in the guild server.  
+This event is called when a user sends a message in a guild server.  
 **Prefilters:** username, channel (name)  
+**Data:** userid, username, nickname, bot (boolean), serverid, channel (name), channelid, channeltype, message, id (of message), attachments {{url, filename, description}}, reference {{id, userid, username, message}}
+
+### discord_message_updated
+This event is called when a user edits a message in a Discord server.
+**Prefilters:** channel (name)  
 **Data:** userid, username, nickname, bot (boolean), serverid, channel (name), channelid, channeltype, message, id (of message), attachments {{url, filename, description}}, reference {{id, userid, username, message}}
 
 ### discord_private_message_received

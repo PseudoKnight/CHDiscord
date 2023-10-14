@@ -45,6 +45,32 @@ public class Events {
 		}
 	}
 
+	private static void EvaluateMessage(Message msg, Map<String, Mixed> map) {
+		Target t = Target.UNKNOWN;
+		map.put("message", new CString(msg.getContentDisplay(), t));
+		map.put("id", new CInt(msg.getIdLong(), t));
+		CArray attachments = new CArray(t);
+		for(Message.Attachment msgAttachment : msg.getAttachments()) {
+			CArray attachment = CArray.GetAssociativeArray(t);
+			attachment.set("url", new CString(msgAttachment.getUrl(), t), t);
+			attachment.set("filename", new CString(msgAttachment.getFileName(), t), t);
+			attachment.set("description", new CString(msgAttachment.getDescription(), t), t);
+			attachments.push(attachment, t);
+		}
+		map.put("attachments", attachments);
+		if(msg.getReferencedMessage() != null) {
+			CArray reference = CArray.GetAssociativeArray(t);
+			Message referencedMsg = msg.getReferencedMessage();
+			reference.set("id", new CInt(referencedMsg.getIdLong(), t), t);
+			reference.set("username", new CString(referencedMsg.getAuthor().getName(), t), t);
+			reference.set("userid", new CInt(referencedMsg.getAuthor().getIdLong(), t), t);
+			reference.set("message", new CString(referencedMsg.getContentDisplay(), t), t);
+			map.put("reference", reference);
+		} else {
+			map.put("reference", CNull.NULL);
+		}
+	}
+
 	@api
 	public static class discord_message_received extends DiscordEvent {
 
@@ -56,7 +82,7 @@ public class Events {
 		@Override
 		public String docs() {
 			return "{username: <string match> Sender's name | channel: <string match> Channel's name} "
-					+ "This event is called when a user sends a message in the Discord server."
+					+ "This event is called when a user sends a message in a Discord server."
 					+ "{username: The username of the sender"
 					+ " | nickname: The effective display name of the sender in this guild server"
 					+ " | userid: The sender's unique id"
@@ -79,7 +105,7 @@ public class Events {
 		@Override
 		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
 			if (e instanceof DiscordGuildMessageReceivedEvent) {
-				DiscordGuildMessageReceivedEvent event = (DiscordGuildMessageReceivedEvent)e;
+				DiscordGuildMessageReceivedEvent event = (DiscordGuildMessageReceivedEvent) e;
 
 				if(prefilter.containsKey("username")
 						&& !event.getMember().getUser().getName().equals(prefilter.get("username").val())) {
@@ -98,17 +124,11 @@ public class Events {
 		@Override
 		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
 			DiscordGuildMessageReceivedEvent event = (DiscordGuildMessageReceivedEvent) e;
-			Message msg = event.getMessage();
 			Target t = Target.UNKNOWN;
 			Map<String, Mixed> map = new HashMap<>();
 
 			Member mem = event.getMember();
-			if(mem != null) {
-				map.put("nickname", new CString(mem.getEffectiveName(), t));
-			} else {
-				map.put("nickname", new CString(event.getAuthor().getName(), t));
-			}
-
+			map.put("nickname", new CString(mem != null ? mem.getEffectiveName() : event.getAuthor().getEffectiveName(), t));
 			map.put("username", new CString(event.getAuthor().getName(), t));
 			map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
 			map.put("bot", CBoolean.get(event.getAuthor().isBot()));
@@ -116,29 +136,71 @@ public class Events {
 			map.put("channel", new CString(event.getChannel().getName(), t));
 			map.put("channelid", new CInt(event.getChannel().getIdLong(), t));
 			map.put("channeltype", new CString(event.getChannel().getType().name(), t));
-			map.put("message", new CString(msg.getContentDisplay(), t));
-			map.put("id", new CInt(msg.getIdLong(), t));
-			CArray attachments = new CArray(t);
-			for(Message.Attachment msgAttachment : msg.getAttachments()) {
-				CArray attachment = CArray.GetAssociativeArray(t);
-				attachment.set("url", new CString(msgAttachment.getUrl(), t), t);
-				attachment.set("filename", new CString(msgAttachment.getFileName(), t), t);
-				attachment.set("description", new CString(msgAttachment.getDescription(), t), t);
-				attachments.push(attachment, t);
-			}
-			map.put("attachments", attachments);
-			if(msg.getReferencedMessage() != null) {
-				CArray reference = CArray.GetAssociativeArray(t);
-				Message referencedMsg = msg.getReferencedMessage();
-				reference.set("id", new CInt(referencedMsg.getIdLong(), t), t);
-				reference.set("username", new CString(referencedMsg.getAuthor().getName(), t), t);
-				reference.set("userid", new CInt(referencedMsg.getAuthor().getIdLong(), t), t);
-				reference.set("message", new CString(referencedMsg.getContentDisplay(), t), t);
-				map.put("reference", reference);
-			} else {
-				map.put("reference", CNull.NULL);
-			}
+			EvaluateMessage(event.getMessage(), map);
+			return map;
+		}
+	}
 
+	@api
+	public static class discord_message_updated extends DiscordEvent {
+
+		@Override
+		public String getName() {
+			return "discord_message_updated";
+		}
+
+		@Override
+		public String docs() {
+			return "{channel: <string match> Channel's name} "
+					+ "This event is called when a user edits a message in a Discord server."
+					+ "{username: The username of the author"
+					+ " | nickname: The effective display name of the author in this guild server"
+					+ " | userid: The author's unique id"
+					+ " | bot: If the author is a bot"
+					+ " | serverid: The guild server in which this the message was sent"
+					+ " | channel: The name of the channel in which the message was sent"
+					+ " | channelid: The unique id for the channel."
+					+ " | channeltype: The type of channel. (TEXT, VOICE, NEWS, GUILD_NEWS_THREAD, GUILD_PUBLIC_THREAD,"
+					+ " or GUILD_PRIVATE_THREAD)"
+					+ " | message: The message the author edited."
+					+ " | id: The message id."
+					+ " | attachments: An array of attachment arrays, each with the keys 'url', 'filename', and"
+					+ " 'description'."
+					+ " | reference: An associative array representing the message this was a reply to, with the keys"
+					+ " 'id', 'userid', 'username', and 'message'. Will be null if the message was not a reply.}"
+					+ "{} "
+					+ "{}";
+		}
+
+		@Override
+		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
+			if (e instanceof DiscordGuildMessageUpdatedEvent) {
+				DiscordGuildMessageUpdatedEvent event = (DiscordGuildMessageUpdatedEvent) e;
+				if(prefilter.containsKey("channel")
+						&& !event.getChannel().getName().equals(prefilter.get("channel").val())) {
+					return false;
+				}
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
+			DiscordGuildMessageUpdatedEvent event = (DiscordGuildMessageUpdatedEvent) e;
+			Target t = Target.UNKNOWN;
+			Map<String, Mixed> map = new HashMap<>();
+
+			Member mem = event.getMember();
+			map.put("nickname", new CString(mem != null ? mem.getEffectiveName() : event.getAuthor().getEffectiveName(), t));
+			map.put("serverid", new CInt(event.getGuild().getIdLong(), t));
+			map.put("channel", new CString(event.getChannel().getName(), t));
+			map.put("channelid", new CInt(event.getChannel().getIdLong(), t));
+			map.put("channeltype", new CString(event.getChannel().getType().name(), t));
+			map.put("bot", CBoolean.get(event.getAuthor().isBot()));
+			map.put("username", new CString(event.getAuthor().getName(), t));
+			map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
+			EvaluateMessage(event.getMessage(), map);
 			return map;
 		}
 	}
@@ -173,36 +235,13 @@ public class Events {
 		@Override
 		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
 			DiscordPrivateMessageReceivedEvent event = (DiscordPrivateMessageReceivedEvent) e;
-			Message msg = event.getMessage();
 			Target t = Target.UNKNOWN;
 			Map<String, Mixed> map = new HashMap<>();
 
 			map.put("username", new CString(event.getAuthor().getName(), t));
 			map.put("displayname", new CString(event.getAuthor().getEffectiveName(), t));
 			map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
-			map.put("message", new CString(msg.getContentDisplay(), t));
-			map.put("id", new CInt(msg.getIdLong(), t));
-			CArray attachments = new CArray(t);
-			for(Message.Attachment msgAttachment : msg.getAttachments()) {
-				CArray attachment = CArray.GetAssociativeArray(t);
-				attachment.set("url", new CString(msgAttachment.getUrl(), t), t);
-				attachment.set("filename", new CString(msgAttachment.getFileName(), t), t);
-				attachment.set("description", new CString(msgAttachment.getDescription(), t), t);
-				attachments.push(attachment, t);
-			}
-			map.put("attachments", attachments);
-			if(msg.getReferencedMessage() != null) {
-				CArray reference = CArray.GetAssociativeArray(t);
-				Message referencedMsg = msg.getReferencedMessage();
-				reference.set("id", new CInt(referencedMsg.getIdLong(), t), t);
-				reference.set("username", new CString(referencedMsg.getAuthor().getName(), t), t);
-				reference.set("userid", new CInt(referencedMsg.getAuthor().getIdLong(), t), t);
-				reference.set("message", new CString(referencedMsg.getContentDisplay(), t), t);
-				map.put("reference", reference);
-			} else {
-				map.put("reference", CNull.NULL);
-			}
-
+			EvaluateMessage(event.getMessage(), map);
 			return map;
 		}
 	}

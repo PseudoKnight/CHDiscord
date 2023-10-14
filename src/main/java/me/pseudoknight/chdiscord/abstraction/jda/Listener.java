@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,6 +29,18 @@ public class Listener extends ListenerAdapter {
 			final JDADiscordGuildMessageReceivedEvent e = new JDADiscordGuildMessageReceivedEvent(event);
 			StaticLayer.GetConvertor().runOnMainThreadLater(null,
 					() -> EventUtils.TriggerListener(Driver.EXTENSION, "discord_message_received", e));
+		}
+	}
+
+	@Override
+	public void onMessageUpdate(@NotNull MessageUpdateEvent event) {
+		if(Discord.jda == null || event.getAuthor().equals(Discord.jda.getSelfUser())) {
+			return;
+		}
+		if(event.getChannelType() != ChannelType.PRIVATE) {
+			final JDADiscordGuildMessageUpdatedEvent e = new JDADiscordGuildMessageUpdatedEvent(event);
+			StaticLayer.GetConvertor().runOnMainThreadLater(null,
+					() -> EventUtils.TriggerListener(Driver.EXTENSION, "discord_message_updated", e));
 		}
 	}
 
