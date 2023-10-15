@@ -3,15 +3,9 @@ package me.pseudoknight.chdiscord;
 import com.laytonsmith.abstraction.StaticLayer;
 import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.ArgumentValidation;
-import com.laytonsmith.core.Optimizable;
-import com.laytonsmith.core.ParseTree;
-import com.laytonsmith.core.compiler.CompilerEnvironment;
-import com.laytonsmith.core.compiler.CompilerWarning;
-import com.laytonsmith.core.compiler.FileOptions;
 import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.exceptions.CRE.*;
-import com.laytonsmith.core.exceptions.ConfigCompileException;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import net.dv8tion.jda.api.entities.Guild;
@@ -152,7 +146,7 @@ public class ChannelFunctions {
 				id = ArgumentValidation.getInt(args[1], t);
 			}
 			try {
-				channel.deleteMessageById(id).queue();
+				channel.deleteMessageById(id).queue(null, (ex) -> Discord.HandleFailure(ex, t));
 			} catch(PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);
 			} catch(IllegalArgumentException ex) {
@@ -201,7 +195,7 @@ public class ChannelFunctions {
 			try {
 				ChannelManager<?, ?> channelManager = channel.getManager();
 				if(channelManager instanceof StandardGuildMessageChannelManager) {
-					((StandardGuildMessageChannelManager<?, ?>) channelManager).setTopic(topic).queue();
+					((StandardGuildMessageChannelManager<?, ?>) channelManager).setTopic(topic).queue(null, (ex) -> Discord.HandleFailure(ex, t));
 				} else {
 					throw new CREIllegalArgumentException("Cannot set topic for this channel type.", t);
 				}

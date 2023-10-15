@@ -1,5 +1,6 @@
 package me.pseudoknight.chdiscord;
 
+import com.laytonsmith.PureUtilities.Common.StackTraceUtils;
 import com.laytonsmith.PureUtilities.DaemonManager;
 import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.abstraction.MCColor;
@@ -36,6 +37,7 @@ import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.MiscUtil;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
@@ -45,6 +47,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.TimeoutException;
 
 public class Discord {
 
@@ -92,6 +96,8 @@ public class Discord {
 				return;
 			}
 
+			RestAction.setDefaultFailure((ex) -> HandleFailure(ex, Target.UNKNOWN));
+
 			if(callback != null) {
 				StaticLayer.GetConvertor().runOnMainThreadLater(dm, () -> {
 					try {
@@ -125,6 +131,17 @@ public class Discord {
 		defaultGuild = null;
 		dm = null;
 		connection = null;
+	}
+
+	static void HandleFailure(Throwable ex, Target t) {
+		if(ex instanceof CancellationException || ex instanceof TimeoutException || t != Target.UNKNOWN) {
+			MSLog.GetLogger().e(MSLog.Tags.GENERAL, ex.getMessage(), t);
+		} else if(ex.getCause() != null) {
+			MSLog.GetLogger().e(MSLog.Tags.GENERAL, ex.getMessage() + "\nCaused by: "
+					+ StackTraceUtils.GetStacktrace(ex.getCause()), t);
+		} else {
+			MSLog.GetLogger().e(MSLog.Tags.GENERAL, ex, t);
+		}
 	}
 
 	public static abstract class Function extends AbstractFunction {

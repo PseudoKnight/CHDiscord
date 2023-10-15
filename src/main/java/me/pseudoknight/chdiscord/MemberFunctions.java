@@ -46,7 +46,7 @@ public class MemberFunctions {
 			User usr = Discord.GetUser(args[0], t);
 			Mixed message = args[1];
 			try(MessageCreateData data = Discord.CreateMessage(message, null, t)) {
-				usr.openPrivateChannel().queue(channel -> channel.sendMessage(data).queue());
+				usr.openPrivateChannel().queue(channel -> channel.sendMessage(data).queue(null, (ex) -> Discord.HandleFailure(ex, t)));
 			} catch(IllegalArgumentException ex) {
 				throw new CREFormatException(ex.getMessage(), t);
 			}
@@ -121,7 +121,7 @@ public class MemberFunctions {
 				newNickname = args[1].val();
 			}
 			try {
-				member.modifyNickname(newNickname).queue();
+				member.modifyNickname(newNickname).queue(null, (ex) -> Discord.HandleFailure(ex, t));
 			} catch (PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);
 			} catch (IllegalArgumentException ex) {
@@ -255,7 +255,7 @@ public class MemberFunctions {
 				muteState =  ArgumentValidation.getBooleanObject(args[1], t);
 			}
 			try {
-				member.mute(muteState).queue();
+				member.mute(muteState).queue(null, (ex) -> Discord.HandleFailure(ex, t));
 			} catch (PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);
 			} catch (IllegalStateException ex) {

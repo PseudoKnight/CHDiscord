@@ -18,11 +18,13 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.exceptions.ParsingException;
 import net.dv8tion.jda.api.requests.*;
+import net.dv8tion.jda.api.requests.Method;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.dv8tion.jda.api.utils.messages.MessageRequest;
 import net.dv8tion.jda.internal.requests.RestActionImpl;
 
 import java.util.EnumSet;
+import java.util.function.Consumer;
 
 public class GeneralFunctions {
 	public static String docs() {
@@ -314,24 +316,30 @@ public class GeneralFunctions {
 				throw new CREIllegalArgumentException("Method " + method.name() + " most not have data", t);
 			}
 
-			CClosure onSuccess;
+			Consumer<Mixed> onSuccess;
 			if(args.length > 3) {
 				if (!(args[3] instanceof CClosure)) {
 					throw new CREIllegalArgumentException("Expected onSuccess to be a closure but got: " + args[3].val(), t);
 				}
-				onSuccess = (CClosure) args[3];
+				final CClosure callback = (CClosure) args[3];
+				onSuccess = (Mixed m) -> StaticLayer.GetConvertor().runOnMainThreadLater(null, () -> {
+					callback.executeCallable(m);
+				});
 			} else {
 				onSuccess = null;
 			}
 
-			CClosure onFailure;
+			Consumer<? super Throwable> onFailure;
 			if(args.length > 4) {
 				if (!(args[4] instanceof CClosure)) {
 					throw new CREIllegalArgumentException("Expected onFailure to be a closure but got: " + args[4].val(), t);
 				}
-				onFailure = (CClosure) args[4];
+				final CClosure callback = (CClosure) args[4];
+				onFailure = (Throwable ex) -> StaticLayer.GetConvertor().runOnMainThreadLater(null, () -> {
+					callback.executeCallable(new CString(ex.getMessage(), t));
+				});
 			} else {
-				onFailure = null;
+				onFailure = (Throwable ex) -> Discord.HandleFailure(ex, t);
 			}
 
 			Route.CompiledRoute compiledRoute = route.compile();
@@ -343,11 +351,7 @@ public class GeneralFunctions {
 					return CNull.NULL;
 				}
 			});
-			action.queue(onSuccess == null ? null :(Mixed m) -> StaticLayer.GetConvertor().runOnMainThreadLater(null, () -> {
-				onSuccess.executeCallable(m);
-			}), onFailure == null ? null : (Throwable ex) -> StaticLayer.GetConvertor().runOnMainThreadLater(null, () -> {
-				onFailure.executeCallable(new CString(ex.getMessage(), t));
-			}));
+			action.queue(onSuccess, onFailure);
 			return CVoid.VOID;
 		}
 
