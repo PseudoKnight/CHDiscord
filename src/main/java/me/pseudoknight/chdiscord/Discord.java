@@ -429,12 +429,12 @@ public class Discord {
 				throw new CREIllegalArgumentException("Message array must be associative.", t);
 			}
 			if(array.containsKey("embed")) {
-				builder.setEmbeds(GetEmbed(array.get("embed", t), t));
+				builder.setEmbeds(CreateEmbed(array.get("embed", t), t));
 			} else if(array.containsKey("embeds")) {
 				CArray cEmbeds = ArgumentValidation.getArray(array.get("embeds", t), t);
 				MessageEmbed[] embeds = new MessageEmbed[(int) cEmbeds.size()];
 				for(int i = 0; i < cEmbeds.size(); i++) {
-					embeds[i] = GetEmbed(cEmbeds.get(i, t), t);
+					embeds[i] = CreateEmbed(cEmbeds.get(i, t), t);
 				}
 				builder.setEmbeds(embeds);
 			}
@@ -494,7 +494,7 @@ public class Discord {
 		return builder.build();
 	}
 
-	static MessageEmbed GetEmbed(Mixed m, Target t) {
+	static MessageEmbed CreateEmbed(Mixed m, Target t) {
 		CArray embed = ArgumentValidation.getArray(m, t);
 		if(!embed.isAssociative()) {
 			throw new CREIllegalArgumentException("Embed array must be associative.", t);
