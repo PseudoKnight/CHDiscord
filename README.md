@@ -98,7 +98,7 @@ Message can be a string or a message array object.
 Callback closure is eventually executed with the message id for this message. (cannot be null)  
 Message array must contain at least one of the following keys: 'content', 'embed', or 'embeds'.  
 It can also contain 'allowed_mentions' to override default behavior set by discord_set_allowed_mentions().  
-Embed array can include any of the following keys: 'title', 'url', 'description',
+Embed array can include any of the following keys: 'title', 'url', 'description', 'timestamp',
 'image' (URL), 'thumbnail' (URL), 'color' (rgb array), 'footer' (contains 'text' and optionally 'icon_url'),
 'author' (contains 'name' and optionally 'url' and/or 'icon_url'), and 'fields'
 (an array of field arrays, each with 'name', 'value', and optionally an 'inline' boolean).  
@@ -135,7 +135,8 @@ Message object array format: (embeds are as displayed, top to bottom, left to ri
     footer: {
         icon_url: "https://website.com/footer_icon.png",
         text: "Small text at the bottom."
-    }
+    },
+    timestamp: 1698213238389
   }],
   allowed_mentions: {
     parse: [],

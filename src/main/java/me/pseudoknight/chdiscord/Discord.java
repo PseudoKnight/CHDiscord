@@ -44,6 +44,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.awt.Color;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -579,6 +580,10 @@ public class Discord {
 				}
 				builder.addField(name, value, inline);
 			}
+		}
+		if(embed.containsKey("timestamp")) {
+			long timestamp = ArgumentValidation.getInt(embed.get("timestamp", t), t);
+			builder.setTimestamp(Instant.ofEpochMilli(timestamp));
 		}
 		return builder.build();
 	}
