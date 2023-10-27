@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.awt.Color;
@@ -32,7 +34,8 @@ public class MemberFunctions {
 		}
 
 		public String docs() {
-			return "void {user, string} Sends a private message to the specified Discord user."
+			return "void {user, message} Sends a private message to the specified Discord user."
+					+ " See discord_broadcast() for message format."
 					+ " Will fail if the user is not cached from one of the servers."
 					+ " Messages have a 2000-character limit.";
 		}
@@ -45,11 +48,34 @@ public class MemberFunctions {
 			Discord.CheckConnection(t);
 			User usr = Discord.GetUser(args[0], t);
 			Mixed message = args[1];
-			try(MessageCreateData data = Discord.CreateMessage(message, null, t)) {
-				usr.openPrivateChannel().queue(channel -> channel.sendMessage(data).queue(null, (ex) -> Discord.HandleFailure(ex, t)));
+
+			final MessageCreateData data;
+			final long referenceId;
+			try {
+				if(message.isInstanceOf(CArray.TYPE)) {
+					CArray messageArray = (CArray) message;
+					data = Discord.CreateMessage(messageArray, null, t);
+					if(messageArray.containsKey("reference_id")) {
+						referenceId = ArgumentValidation.getInt(messageArray.get("reference_id", t), t);
+					} else {
+						referenceId = 0;
+					}
+				} else {
+					data = new MessageCreateBuilder().setContent(message.val()).build();
+					referenceId = 0;
+				}
 			} catch(IllegalArgumentException ex) {
 				throw new CREFormatException(ex.getMessage(), t);
 			}
+
+			usr.openPrivateChannel().queue(channel -> {
+				MessageCreateAction action = channel.sendMessage(data);
+				if(referenceId != 0) {
+					action.setMessageReference(referenceId);
+				}
+				action.queue(null, (ex) -> Discord.HandleFailure(ex, t));
+				data.close();
+			});
 			return CVoid.VOID;
 		}
 

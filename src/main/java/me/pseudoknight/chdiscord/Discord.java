@@ -422,75 +422,73 @@ public class Discord {
 		return channel;
 	}
 
-	static MessageCreateData CreateMessage(Mixed m, Guild guild, Target t) {
+	static MessageCreateData CreateMessage(CArray array, Guild guild, Target t) {
 		MessageCreateBuilder  builder = new MessageCreateBuilder();
-		if(m instanceof CArray) {
-			CArray array = ArgumentValidation.getArray(m, t);
-			if(!array.isAssociative()) {
-				throw new CREIllegalArgumentException("Message array must be associative.", t);
+		if(!array.isAssociative()) {
+			throw new CREIllegalArgumentException("Message array must be associative.", t);
+		}
+		if(array.containsKey("embed")) {
+			builder.setEmbeds(CreateEmbed(array.get("embed", t), t));
+		} else if(array.containsKey("embeds")) {
+			CArray cEmbeds = ArgumentValidation.getArray(array.get("embeds", t), t);
+			MessageEmbed[] embeds = new MessageEmbed[(int) cEmbeds.size()];
+			for(int i = 0; i < cEmbeds.size(); i++) {
+				embeds[i] = CreateEmbed(cEmbeds.get(i, t), t);
 			}
-			if(array.containsKey("embed")) {
-				builder.setEmbeds(CreateEmbed(array.get("embed", t), t));
-			} else if(array.containsKey("embeds")) {
-				CArray cEmbeds = ArgumentValidation.getArray(array.get("embeds", t), t);
-				MessageEmbed[] embeds = new MessageEmbed[(int) cEmbeds.size()];
-				for(int i = 0; i < cEmbeds.size(); i++) {
-					embeds[i] = CreateEmbed(cEmbeds.get(i, t), t);
+			builder.setEmbeds(embeds);
+		}
+		if(array.containsKey("content")) {
+			builder.setContent(array.get("content", t).val());
+		}
+		if(array.containsKey("allowed_mentions")) {
+			CArray allowedMentionsArray = ArgumentValidation.getArray(array.get("allowed_mentions", t), t);
+			CArray parseArray = null;
+			if(allowedMentionsArray.isAssociative()) {
+				if(allowedMentionsArray.containsKey("parse")) {
+					parseArray = ArgumentValidation.getArray(allowedMentionsArray.get("parse", t), t);
+					if(parseArray.isAssociative()) {
+						throw new CREIllegalArgumentException("Allowed mention parse array must not be associative.", t);
+					}
 				}
-				builder.setEmbeds(embeds);
-			}
-			if(array.containsKey("content")) {
-				builder.setContent(array.get("content", t).val());
-			}
-			if(array.containsKey("allowed_mentions")) {
-				CArray allowedMentionsArray = ArgumentValidation.getArray(array.get("allowed_mentions", t), t);
-				CArray parseArray = null;
-				if(allowedMentionsArray.isAssociative()) {
-					if(allowedMentionsArray.containsKey("parse")) {
-						parseArray = ArgumentValidation.getArray(allowedMentionsArray.get("parse", t), t);
-						if(parseArray.isAssociative()) {
-							throw new CREIllegalArgumentException("Allowed mention parse array must not be associative.", t);
-						}
+				if(allowedMentionsArray.containsKey("users")) {
+					CArray usersArray = ArgumentValidation.getArray(allowedMentionsArray.get("users", t), t);
+					if(usersArray.isAssociative()) {
+						throw new CREIllegalArgumentException("User mention array must not be associative.", t);
 					}
-					if(allowedMentionsArray.containsKey("users")) {
-						CArray usersArray = ArgumentValidation.getArray(allowedMentionsArray.get("users", t), t);
-						if(usersArray.isAssociative()) {
-							throw new CREIllegalArgumentException("User mention array must not be associative.", t);
-						}
-						List<String> usersMentions = new ArrayList<>((int) usersArray.size());
-						for(Mixed value : usersArray.asList()) {
-							usersMentions.add((guild == null ? GetUser(value, t) : GetMember(value, guild, t)).getId());
-						}
-						builder.mentionUsers(usersMentions);
+					List<String> usersMentions = new ArrayList<>((int) usersArray.size());
+					for(Mixed value : usersArray.asList()) {
+						usersMentions.add((guild == null ? GetUser(value, t) : GetMember(value, guild, t)).getId());
 					}
-					if(allowedMentionsArray.containsKey("roles")) {
-						CArray rolesArray = ArgumentValidation.getArray(allowedMentionsArray.get("roles", t), t);
-						if(rolesArray.isAssociative()) {
-							throw new CREIllegalArgumentException("Role mention array must not be associative.", t);
-						}
-						List<String> roleMentions = new ArrayList<>((int) rolesArray.size());
-						for(Mixed value : rolesArray.asList()) {
-							roleMentions.add(GetRole(value, guild == null ? defaultGuild : guild, t).getId());
-						}
-						builder.mentionRoles(roleMentions);
-					}
-				} else {
-					parseArray = allowedMentionsArray;
+					builder.mentionUsers(usersMentions);
 				}
-				if(parseArray != null) {
-					EnumSet<Message.MentionType> mentionTypes = EnumSet.noneOf(Message.MentionType.class);
-					for (Mixed value : parseArray.asList()) {
-						try {
-							mentionTypes.add(Message.MentionType.valueOf(value.val()));
-						} catch (IllegalArgumentException ex) {
-							throw new CREIllegalArgumentException("Invalid mention type: " + value.val(), t);
-						}
+				if(allowedMentionsArray.containsKey("roles")) {
+					CArray rolesArray = ArgumentValidation.getArray(allowedMentionsArray.get("roles", t), t);
+					if(rolesArray.isAssociative()) {
+						throw new CREIllegalArgumentException("Role mention array must not be associative.", t);
 					}
-					builder.setAllowedMentions(mentionTypes);
+					List<String> roleMentions = new ArrayList<>((int) rolesArray.size());
+					for(Mixed value : rolesArray.asList()) {
+						roleMentions.add(GetRole(value, guild == null ? defaultGuild : guild, t).getId());
+					}
+					builder.mentionRoles(roleMentions);
 				}
+				if(allowedMentionsArray.containsKey("replied_user")) {
+					builder.mentionRepliedUser(ArgumentValidation.getBooleanObject(allowedMentionsArray.get("replied_user", t), t));
+				}
+			} else {
+				parseArray = allowedMentionsArray;
 			}
-		} else {
-			builder.setContent(m.val());
+			if(parseArray != null) {
+				EnumSet<Message.MentionType> mentionTypes = EnumSet.noneOf(Message.MentionType.class);
+				for (Mixed value : parseArray.asList()) {
+					try {
+						mentionTypes.add(Message.MentionType.valueOf(value.val()));
+					} catch (IllegalArgumentException ex) {
+						throw new CREIllegalArgumentException("Invalid mention type: " + value.val(), t);
+					}
+				}
+				builder.setAllowedMentions(mentionTypes);
+			}
 		}
 		return builder.build();
 	}

@@ -48,8 +48,9 @@ Activity string can be anything but an empty string.
 If streaming, a valid Twitch URL must also be provided.  
 If not, or it's invalid, type will revert to PLAYING.
 
-### discord_private_message(member, string)
+### discord_private_message(user, message)
 Sends a private message to the specified Discord user.  
+See discord_broadcast() documentation for message format.  
 Will fail if the user is not a cached member on one of the connected servers.  
 Messages have a 2000-character limit.
 
@@ -97,53 +98,60 @@ If channel is omitted, the channel from an event or first publicly viewable chan
 Message can be a string or a message array object.  
 Callback closure is eventually executed with the message id for this message. (cannot be null)  
 Message array must contain at least one of the following keys: 'content', 'embed', or 'embeds'.  
-It can also contain 'allowed_mentions' to override default behavior set by discord_set_allowed_mentions().  
-Embed array can include any of the following keys: 'title', 'url', 'description', 'timestamp',
-'image' (URL), 'thumbnail' (URL), 'color' (rgb array), 'footer' (contains 'text' and optionally 'icon_url'),
-'author' (contains 'name' and optionally 'url' and/or 'icon_url'), and 'fields'
+It can also contain 'reference_id' (int) for replies,
+and 'allowed_mentions' (array with optional 'parse', 'users', 'roles', and 'replied_user' keys)
+to override default behavior set by discord_set_allowed_mentions().  
+Embed array can include any of the following keys: 'title', 'url', 'description', 'timestamp' (int), 
+'image' (URL), 'thumbnail' (URL), 'color' (rgb array), 'footer' (array with 'text' and optionally 'icon_url' keys),
+'author' (array with 'name' and optionally 'url' and/or 'icon_url' keys), and 'fields'
 (an array of field arrays, each with 'name', 'value', and optionally an 'inline' boolean).  
 Messages have a 2000-character limit.  
 Requires the `View Channels` and `Send Messages` permissions. (or `Send Messages in Threads` for thread channels)
+Also requires `Read Message History` permission for channel replies using 'reference_id'.
 
-Message object array format: (embeds are as displayed, top to bottom, left to right)
+Example message/embed object array format: (embeds are as displayed, top to bottom, left to right)
 ```
-{
+array(
   content: "This displays above the embed as normal text.",
-  embeds: [{
-    color: {
-      r: 255,
-      g: 255,
-      b: 255
-    },
-    author: {
-      icon_url: "https://website.com/author_avatar.png",
-      name: "PseudoKnight",
-      url: "https://website.com/author_link/"
-    },
-    thumbnail: "https://website.com/top_right_thumbnail.png",
-    title: "Large Bold Text",
-    url: "https://website.com/title_link/",
-    description: "Normal sized text just under title.",
-    fields: [
-      {
-        name: "Field A",
-        value: "Value A Below Name",
-        inline: true
-      }
-    ],
-    image: "https://website.com/image.png",
-    footer: {
-        icon_url: "https://website.com/footer_icon.png",
-        text: "Small text at the bottom."
-    },
-    timestamp: 1698213238389
-  }],
-  allowed_mentions: {
-    parse: [],
-    users: ["PseudoKnight"],
-    roles: ["moderator"],
-  }
-}
+  embeds: array(
+    array(
+      color: array(
+        r: 255,
+        g: 255,
+        b: 255,
+      ),
+      author: array(
+        icon_url: "https://website.com/author_avatar.png",
+        name: "PseudoKnight",
+        url: "https://website.com/author_link/",
+      ),
+      thumbnail: "https://website.com/top_right_thumbnail.png",
+      title: "Large Bold Text",
+      url: "https://website.com/title_link/",
+      description: "Normal sized text just under title.",
+      fields: array(
+        array(
+          name: "Field A",
+          value: "Value A Below Name",
+          inline: true,
+        )
+      ),
+      image: "https://website.com/image.png",
+      footer: array(
+          icon_url: "https://website.com/footer_icon.png",
+          text: "Small text at the bottom.",
+      ),
+      timestamp: 1698213238389,
+    ),
+  ),
+  allowed_mentions: array(
+    parse: array(),
+    users: array("PseudoKnight"),
+    roles: array("moderator"),
+    replied_user: true,
+  ),
+  reference_id: 1167309410398388254,
+)
 ```
 
 ### discord_delete_message([server], channel, id)

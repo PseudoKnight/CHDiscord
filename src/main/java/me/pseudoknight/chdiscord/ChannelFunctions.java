@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.managers.channel.ChannelManager;
 import net.dv8tion.jda.api.managers.channel.middleman.StandardGuildMessageChannelManager;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.util.function.Consumer;
@@ -41,13 +42,18 @@ public class ChannelFunctions {
 					+ " Message can be a string or a message array object."
 					+ " Callback closure is eventually executed with the message id for this message. (cannot be null)"
 					+ " Message array must contain at least one of the following keys: 'content', 'embed', or 'embeds'."
+					+ " It can also contain 'reference_id' (int) for replies,"
+					+ " and 'allowed_mentions' (array with optional 'parse', 'users', 'roles', and 'replied_user' keys)"
+					+ " to override default behavior set by discord_set_allowed_mentions()."
 					+ " Embed array can include any of the following keys: 'title', 'url', 'description',"
-					+ " 'image', 'thumbnail', 'color' (rgb array), 'footer' (contains 'text' and optionally 'icon_url'),"
-					+ " 'author' (contains 'name' and optionally 'url' and/or 'icon_url'), and 'fields'"
+					+ " 'timestamp' (int), 'image' (URL), 'thumbnail' (URL), 'color' (rgb array),"
+					+ " 'footer' (array with 'text' and optionally 'icon_url' keys),"
+					+ " 'author' (array with 'name' and optionally 'url' and/or 'icon_url' keys), and 'fields'"
 					+ " (an array of field arrays, each with 'name', 'value', and optionally an 'inline' boolean)."
 					+ " Messages have a 2000 character limit."
 					+ " Requires the `View Channels` and `Send Messages` permissions."
-					+ " (or `Send Messages in Threads` for thread channels)";
+					+ " (or `Send Messages in Threads` for thread channels)"
+					+ " Also requires `Read Message History` permission for channel replies using 'reference_id'.";
 		}
 
 		public Integer[] numArgs() {
@@ -100,8 +106,18 @@ public class ChannelFunctions {
 						callback.executeCallable(new CInt(msg.getIdLong(), t)));
 			}
 			try {
-				MessageCreateData data = Discord.CreateMessage(message, guild, t);
-				channel.sendMessage(data).queue(onSuccess);
+				if(message.isInstanceOf(CArray.TYPE)) {
+					CArray messageArray = (CArray) message;
+					try(MessageCreateData data = Discord.CreateMessage(messageArray, guild, t)) {
+						MessageCreateAction action = channel.sendMessage(data);
+						if (messageArray.containsKey("reference_id")) {
+							action.setMessageReference(ArgumentValidation.getInt(messageArray.get("reference_id", t), t));
+						}
+						action.queue(onSuccess);
+					}
+				} else {
+					channel.sendMessage(message.val()).queue(onSuccess);
+				}
 			} catch(PermissionException ex) {
 				throw new CREInsufficientPermissionException(ex.getMessage(), t);
 			} catch(IllegalArgumentException ex) {
