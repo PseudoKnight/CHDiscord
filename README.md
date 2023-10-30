@@ -54,10 +54,11 @@ See discord_broadcast() documentation for message format.
 Will fail if the user is not a cached member on one of the connected servers.  
 Messages have a 2000-character limit.
 
-### discord_set_allowed_mentions(array)
-Sets a list of mention types that will be parsed by default in sent messages.  
-Array can include 'USER', 'ROLE', and 'EVERYONE'.  
-If given null, it resets the default to all types.
+### discord_set_allowed_mentions(array, [replied_user])
+Sets mentions that are allowed by default in sent messages.  
+Array can include 'USER', 'ROLE', and 'EVERYONE' for parsed mentions.  
+If null, it resets the default to all types.  
+The replied_user argument is a boolean for whether users in referenced messages are mentioned. (default: true)
 
 ### discord_get_servers()
 Gets an array of ids for all the guild servers that the bot is added to.

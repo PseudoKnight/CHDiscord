@@ -193,17 +193,22 @@ public class GeneralFunctions {
 		}
 
 		public String docs() {
-			return "void {array} Sets a list of mention types that will be parsed by default in sent messages."
-					+ " Array can include 'USER', 'ROLE', and 'EVERYONE'."
-					+ " If given null, it resets the default to all types.";
+			return "void {array, [replied_user]} Sets mentions that are allowed by default in sent messages."
+					+ " Array can include 'USER', 'ROLE', and 'EVERYONE' for parsed mentions."
+					+ " If null, it resets the default to all types."
+					+ " The replied_user argument is a boolean for whether users in referenced messages are mentioned."
+					+ " (default: true)";
 		}
 
 		public Integer[] numArgs() {
-			return new Integer[]{1};
+			return new Integer[]{1, 2};
 		}
 
 		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
 			Discord.CheckConnection(t);
+			if(args.length == 2) {
+				MessageRequest.setDefaultMentionRepliedUser(ArgumentValidation.getBooleanObject(args[1], t));
+			}
 			if(args[0] instanceof CNull) {
 				MessageRequest.setDefaultMentions(null);
 				return CVoid.VOID;
