@@ -270,6 +270,7 @@ public class GeneralFunctions {
 					+ " This is for advanced users that need to use Discord API that is not yet added to this extension."
 					+ " You must refer to the Discord documentation for routes, methods, parameters, and permissions."
 					+ " The method argument can be one of GET, PATCH, DELETE, PUT or POST."
+					+ " The route must not start with a forward slash."
 					+ " The dataObject argument is the JSON parameters, and can be an array, string or null."
 					+ " If the request was successful, the onSuccess closure will be executed and passed an array of"
 					+ " response data. If the request failed, the onFailure closure will instead be executed and passed"

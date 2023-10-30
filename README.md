@@ -66,11 +66,30 @@ Gets an array of ids for all the guild servers that the bot is added to.
 Sends a custom HTTP request to Discord.  
 This is for advanced users that need to use Discord API that is not yet added to this extension.  
 You must refer to the Discord documentation for routes, methods, parameters, and permissions.  
-The method argument can be one of GET, PATCH, DELETE, PUT or POST.  
+The method argument can be one of GET, PATCH, DELETE, PUT or POST. 
+The route must not start with a forward slash.
 The dataObject argument is the JSON parameters, and can be an array, string or null.  
 If the request was successful, the onSuccess closure will be executed and passed an array of response data.  
 If the request failed, the onFailure closure will instead be executed and passed a failure message.  
 If not provided, the default handler will instead log any failures.
+
+Example GET:
+```
+discord_request('GET', 'guilds/'.@guildId.'/members?limit=20', null, closure(@result) {
+	foreach(@member in @result) {
+		msg(@member['username']);
+	}
+}, closure(@failure) {
+	msg('Request failed: '.@failure);
+});
+```
+
+Example POST:
+```
+discord_request('POST', 'channels/'.@channelId.'/messages', array(content: @message), null, closure(@failure) {
+	msg('Request failed: '.@failure);
+});
+```
 
 ## Guild Server Functions
 * The `server` argument is the guild server's unique int id. It is always optional and will fall back to event bind context or the default server.
