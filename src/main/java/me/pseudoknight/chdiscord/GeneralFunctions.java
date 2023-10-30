@@ -346,7 +346,7 @@ public class GeneralFunctions {
 			Route.CompiledRoute compiledRoute = route.compile();
 			RestAction<Mixed> action = new RestActionImpl<>(Discord.jda, compiledRoute, dataObject, (response, request) -> {
 				try {
-					return Construct.json_decode(response.getObject().toString(), t);
+					return Construct.json_decode(response.getString(), t);
 				} catch (MarshalException e) {
 					Static.getLogger().severe(e.getMessage());
 					return CNull.NULL;
