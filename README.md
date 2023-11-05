@@ -67,8 +67,8 @@ Gets an array of ids for all the guild servers that the bot is added to.
 Sends a custom HTTP request to Discord.  
 This is for advanced users that need to use Discord API that is not yet added to this extension.  
 You must refer to the Discord documentation for routes, methods, parameters, and permissions.  
-The method argument can be one of GET, PATCH, DELETE, PUT or POST. 
-The route must not start with a forward slash.
+The method argument can be one of GET, PATCH, DELETE, PUT or POST.  
+The route must not start with a forward slash.  
 The dataObject argument is the JSON parameters, and can be an array, string or null.  
 If the request was successful, the onSuccess closure will be executed and passed an array of response data.  
 If the request failed, the onFailure closure will instead be executed and passed a failure message.  
@@ -87,9 +87,7 @@ discord_request('GET', 'guilds/'.@guildId.'/members?limit=20', null, closure(@re
 
 Example POST:
 ```
-discord_request('POST', 'channels/'.@channelId.'/messages', array(content: @message), null, closure(@failure) {
-	msg('Request failed: '.@failure);
-});
+discord_request('POST', 'channels/'.@channelId.'/messages', array(content: @message));
 ```
 
 ## Guild Server Functions
@@ -114,19 +112,19 @@ Requires the `Manage Server` permission.
 
 ### discord_broadcast([server], [channel], message, [callback])
 Broadcasts text and embeds to the specified channel.  
-If channel is omitted, the channel from an event or first publicly viewable channel will be used.
+If channel is omitted, the channel from an event or first publicly viewable channel will be used.  
 Message can be a string or a message array object.  
 Callback closure is eventually executed with the message id for this message. (cannot be null)  
 Message array must contain at least one of the following keys: 'content', 'embed', or 'embeds'.  
 It can also contain 'reference_id' (int) for replies,
 and 'allowed_mentions' (array with optional 'parse', 'users', 'roles', and 'replied_user' keys)
 to override default behavior set by discord_set_allowed_mentions().  
-Embed array can include any of the following keys: 'title', 'url', 'description', 'timestamp' (int), 
+Embed array can include any of the following keys: 'title', 'url', 'description', 'timestamp' (int),
 'image' (URL), 'thumbnail' (URL), 'color' (rgb array), 'footer' (array with 'text' and optionally 'icon_url' keys),
 'author' (array with 'name' and optionally 'url' and/or 'icon_url' keys), and 'fields'
 (an array of field arrays, each with 'name', 'value', and optionally an 'inline' boolean).  
 Messages have a 2000-character limit.  
-Requires the `View Channels` and `Send Messages` permissions. (or `Send Messages in Threads` for thread channels)
+Requires the `View Channels` and `Send Messages` permissions. (or `Send Messages in Threads` for thread channels)  
 Also requires `Read Message History` permission for channel replies using 'reference_id'.
 
 Example message/embed object array format: (embeds are as displayed, top to bottom, left to right)
@@ -189,7 +187,8 @@ Requires the `Manage Channels` permission.
 
 ### discord_member_info([server], member)
 Gets an array of data for Discord user.  
-Array contains 'userid', 'username', 'displayname', and 'bot' (boolean). For this guild server it also contains:
+Array contains 'userid', 'username', 'displayname', and 'bot' (boolean).  
+For this guild server it also contains:  
 'nickname' (empty if not set), 'color' array (null if none), and 'avatar' effective url.
 
 ### discord_member_get_roles([server], member)
