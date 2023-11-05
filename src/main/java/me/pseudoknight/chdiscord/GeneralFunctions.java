@@ -295,7 +295,12 @@ public class GeneralFunctions {
 			} catch (IllegalArgumentException ex) {
 				throw new CREIllegalArgumentException("Invalid HTTP method: " + args[0].val(), t);
 			}
-			Route route = Route.custom(method, args[1].val());
+			Route route;
+			try {
+				route = Route.custom(method, args[1].val());
+			} catch (IllegalArgumentException ex) {
+				throw new CREFormatException(ex.getMessage(), t);
+			}
 
 			DataObject dataObject;
 			if(args.length < 3) {
