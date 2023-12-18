@@ -247,6 +247,122 @@ public class Events {
 	}
 
 	@api
+	public static class discord_reaction_added extends DiscordEvent {
+
+		@Override
+		public String getName() {
+			return "discord_reaction_added";
+		}
+
+		@Override
+		public String docs() {
+			return "{channel: <string match> Channel's name} "
+					+ "This event is called when a user adds a reaction to a message."
+					+ "{username: The username of the reactor"
+					+ " | nickname: The effective display name of the reactor in this guild server"
+					+ " | userid: The reactor's unique user id"
+					+ " | bot: If the reactor is a bot"
+					+ " | serverid: The guild server in which the message exists"
+					+ " | channel: The name of the channel in which the message exists"
+					+ " | channelid: The unique id for the channel"
+					+ " | messageid: The unique id of the message being reacted to"
+					+ " | emoji: The emoji character or custom code}"
+					+ "{} "
+					+ "{}";
+		}
+
+		@Override
+		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
+			if (e instanceof DiscordReactionAddedEvent) {
+				DiscordReactionAddedEvent event = (DiscordReactionAddedEvent) e;
+				if(prefilter.containsKey("channel")
+						&& !event.getChannel().getName().equals(prefilter.get("channel").val())) {
+					return false;
+				}
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
+			DiscordReactionAddedEvent event = (DiscordReactionAddedEvent) e;
+			Target t = Target.UNKNOWN;
+			Map<String, Mixed> map = new HashMap<>();
+
+			Member mem = event.getReactor();
+			map.put("nickname", new CString(mem.getEffectiveName(), t));
+			map.put("username", new CString(mem.getUser().getName(), t));
+			map.put("userid", new CInt(mem.getIdLong(), t));
+			map.put("bot", CBoolean.get(mem.getUser().isBot()));
+			map.put("serverid", new CInt(event.getGuild().getIdLong(), t));
+			map.put("channel", new CString(event.getChannel().getName(), t));
+			map.put("channelid", new CInt(event.getChannel().getIdLong(), t));
+			map.put("messageid", new CInt(event.getMessageId(), t));
+			map.put("emoji", new CString(event.getEmoji().getFormatted(), t));
+			return map;
+		}
+	}
+
+	@api
+	public static class discord_reaction_removed extends DiscordEvent {
+
+		@Override
+		public String getName() {
+			return "discord_reaction_removed";
+		}
+
+		@Override
+		public String docs() {
+			return "{channel: <string match> Channel's name} "
+					+ "This event is called when a user removes a reaction on a message."
+					+ "{username: The username of the reactor"
+					+ " | nickname: The effective display name of the reactor in this guild server"
+					+ " | userid: The reactor's unique user id"
+					+ " | bot: If the reactor is a bot"
+					+ " | serverid: The guild server in which the message exists"
+					+ " | channel: The name of the channel in which the message exists"
+					+ " | channelid: The unique id for the channel"
+					+ " | messageid: The unique id of the message being reacted to"
+					+ " | emoji: The emoji character or custom code}"
+					+ "{} "
+					+ "{}";
+		}
+
+		@Override
+		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
+			if (e instanceof DiscordReactionRemovedEvent) {
+				DiscordReactionRemovedEvent event = (DiscordReactionRemovedEvent) e;
+				if(prefilter.containsKey("channel")
+						&& !event.getChannel().getName().equals(prefilter.get("channel").val())) {
+					return false;
+				}
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
+			DiscordReactionRemovedEvent event = (DiscordReactionRemovedEvent) e;
+			Target t = Target.UNKNOWN;
+			Map<String, Mixed> map = new HashMap<>();
+
+			Member mem = event.getReactor();
+			map.put("nickname", new CString(mem.getEffectiveName(), t));
+			map.put("username", new CString(mem.getUser().getName(), t));
+			map.put("userid", new CInt(mem.getIdLong(), t));
+			map.put("bot", CBoolean.get(mem.getUser().isBot()));
+			map.put("serverid", new CInt(event.getGuild().getIdLong(), t));
+			map.put("channel", new CString(event.getChannel().getName(), t));
+			map.put("channelid", new CInt(event.getChannel().getIdLong(), t));
+			map.put("messageid", new CInt(event.getMessageId(), t));
+			map.put("emoji", new CString(event.getEmoji().getFormatted(), t));
+			return map;
+		}
+	}
+
+	@api
 	public static class discord_voice_joined extends DiscordEvent {
 
 		@Override

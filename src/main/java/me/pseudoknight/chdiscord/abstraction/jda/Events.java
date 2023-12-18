@@ -3,12 +3,16 @@ package me.pseudoknight.chdiscord.abstraction.jda;
 import me.pseudoknight.chdiscord.abstraction.events.*;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 
 public class Events {
 	public static class JDADiscordGuildEvent implements DiscordGuildEvent {
@@ -110,6 +114,77 @@ public class Events {
 		@Override
 		public Guild getGuild() {
 			return e.getGuild();
+		}
+
+		@Override
+		public Object _GetObject() {
+			return e;
+		}
+	}
+
+	public static class JDADiscordReactionAddedEvent implements DiscordReactionAddedEvent {
+		private final MessageReactionAddEvent e;
+		private final Member m;
+
+		JDADiscordReactionAddedEvent(MessageReactionAddEvent e, Member m) {
+			this.e = e;
+			this.m = m;
+		}
+
+		public MessageChannel getChannel() {
+			return e.getChannel();
+		}
+
+		public Member getReactor() {
+			return m;
+		}
+
+		public long getMessageId() {
+			return e.getMessageIdLong();
+		}
+
+		public Guild getGuild() {
+			return e.getGuild();
+		}
+
+		public EmojiUnion getEmoji() {
+			return e.getEmoji();
+		}
+
+		@Override
+		public Object _GetObject() {
+			return e;
+		}
+	}
+
+
+	public static class JDADiscordReactionRemovedEvent implements DiscordReactionRemovedEvent {
+		private final MessageReactionRemoveEvent e;
+		private final Member m;
+
+		JDADiscordReactionRemovedEvent(MessageReactionRemoveEvent e, Member m) {
+			this.e = e;
+			this.m = m;
+		}
+
+		public MessageChannel getChannel() {
+			return e.getChannel();
+		}
+
+		public Member getReactor() {
+			return m;
+		}
+
+		public long getMessageId() {
+			return e.getMessageIdLong();
+		}
+
+		public Guild getGuild() {
+			return e.getGuild();
+		}
+
+		public EmojiUnion getEmoji() {
+			return e.getEmoji();
 		}
 
 		@Override

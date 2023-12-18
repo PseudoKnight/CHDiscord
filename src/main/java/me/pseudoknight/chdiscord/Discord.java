@@ -73,7 +73,8 @@ public class Discord {
 		connection = new Thread(() -> {
 			try {
 				jda = JDABuilder.create(token, EnumSet.of(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES,
-								GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.MESSAGE_CONTENT))
+								GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.MESSAGE_CONTENT,
+								GatewayIntent.GUILD_MESSAGE_REACTIONS))
 						.disableCache(EnumSet.of(CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS, CacheFlag.STICKER,
 								CacheFlag.EMOJI, CacheFlag.MEMBER_OVERRIDES, CacheFlag.ONLINE_STATUS,
 								CacheFlag.SCHEDULED_EVENTS, CacheFlag.ROLE_TAGS, CacheFlag.FORUM_TAGS))

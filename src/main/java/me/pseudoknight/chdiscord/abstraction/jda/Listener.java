@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +27,7 @@ public class Listener extends ListenerAdapter {
 			final JDADiscordPrivateMessageReceivedEvent e = new JDADiscordPrivateMessageReceivedEvent(event);
 			StaticLayer.GetConvertor().runOnMainThreadLater(null,
 					() -> EventUtils.TriggerListener(Driver.EXTENSION, "discord_private_message_received", e));
-		} else {
+		} else if(event.isFromGuild()) {
 			final JDADiscordGuildMessageReceivedEvent e = new JDADiscordGuildMessageReceivedEvent(event);
 			StaticLayer.GetConvertor().runOnMainThreadLater(null,
 					() -> EventUtils.TriggerListener(Driver.EXTENSION, "discord_message_received", e));
@@ -34,14 +36,36 @@ public class Listener extends ListenerAdapter {
 
 	@Override
 	public void onMessageUpdate(@NotNull MessageUpdateEvent event) {
-		if(Discord.jda == null || event.getAuthor().equals(Discord.jda.getSelfUser())) {
+		if(!event.isFromGuild() || Discord.jda == null || event.getAuthor().equals(Discord.jda.getSelfUser())) {
 			return;
 		}
-		if(event.getChannelType() != ChannelType.PRIVATE) {
-			final JDADiscordGuildMessageUpdatedEvent e = new JDADiscordGuildMessageUpdatedEvent(event);
-			StaticLayer.GetConvertor().runOnMainThreadLater(null,
-					() -> EventUtils.TriggerListener(Driver.EXTENSION, "discord_message_updated", e));
+		final JDADiscordGuildMessageUpdatedEvent e = new JDADiscordGuildMessageUpdatedEvent(event);
+		StaticLayer.GetConvertor().runOnMainThreadLater(null,
+				() -> EventUtils.TriggerListener(Driver.EXTENSION, "discord_message_updated", e));
+	}
+
+	@Override
+	public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
+		if(!event.isFromGuild() || Discord.jda == null || Discord.jda.getSelfUser().equals(event.getUser())) {
+			return;
 		}
+		event.retrieveMember().queue((member) -> {
+			final JDADiscordReactionAddedEvent e = new JDADiscordReactionAddedEvent(event, member);
+			StaticLayer.GetConvertor().runOnMainThreadLater(null,
+					() -> EventUtils.TriggerListener(Driver.EXTENSION, "discord_reaction_added", e));
+		});
+	}
+
+	@Override
+	public void onMessageReactionRemove(@NotNull MessageReactionRemoveEvent event) {
+		if(!event.isFromGuild() || Discord.jda == null || Discord.jda.getSelfUser().equals(event.getUser())) {
+			return;
+		}
+		event.retrieveMember().queue((member) -> {
+			final JDADiscordReactionRemovedEvent e = new JDADiscordReactionRemovedEvent(event, member);
+			StaticLayer.GetConvertor().runOnMainThreadLater(null,
+					() -> EventUtils.TriggerListener(Driver.EXTENSION, "discord_reaction_removed", e));
+		});
 	}
 
 	@Override

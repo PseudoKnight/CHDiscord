@@ -25,7 +25,9 @@ public class ChannelFunctions {
 	}
 
 	static final String CHANNEL_ARGUMENT = " The `channel` argument can be a channel's unique int id. A channel's exact"
-			+ " name can also be used, but if it's not unique, the first matching channel will be used.";
+			+ " name can also be used, but if it's not unique, the first matching channel will be used."
+			+ " If a channel is omitted, it will attempt to use the channel from the event bind context."
+			+ " If not in an event bind, it will use the default channel.";
 
 	@api
 	public static class discord_broadcast extends Discord.Function {

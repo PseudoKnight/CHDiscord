@@ -108,7 +108,9 @@ Each invite array contains data about the invite, which has the keys 'code', 'ch
 Requires the `Manage Server` permission.
 
 ## Channel Functions
-* The `channel` argument can be a channel's unique int id. A channel's exact name can also be used, but if it's not unique, the first matching channel will be used.
+* The `channel` argument can be a channel's unique int id. A channel's exact name can also be used, but if it's not unique,
+the first matching channel will be used. If a channel is omitted, it will attempt to use the channel from the event bind context.
+If not in an event bind, it will use the default channel.
 
 ### discord_broadcast([server], [channel], message, [callback])
 Broadcasts text and embeds to the specified channel.  
@@ -246,6 +248,16 @@ This event is called when a user edits a message in a Discord server.
 ### discord_private_message_received
 This event is called when a user sends a private message to the bot.  
 **Data:** userid, username, displayname, message, id (of message), attachments {{url, filename, description}}, reference {{id, userid, username, message}}
+
+### discord_reaction_added
+This event is called when a user adds a reaction to a message.  
+**Prefilters:** channel (name)  
+**Data:** userid, username, nickname, bot (boolean), serverid, channel (name), channelid, messageid, emoji
+
+### discord_reaction_removed
+This event is called when a user removes a reaction on a message.  
+**Prefilters:** channel (name)  
+**Data:** userid, username, nickname, bot (boolean), serverid, channel (name), channelid, messageid, emoji
 
 ### discord_voice_joined
 This event is called when a user joined a voice channel.  
