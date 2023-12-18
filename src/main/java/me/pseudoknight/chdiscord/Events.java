@@ -266,7 +266,7 @@ public class Events {
 					+ " | channel: The name of the channel in which the message exists"
 					+ " | channelid: The unique id for the channel"
 					+ " | messageid: The unique id of the message being reacted to"
-					+ " | emoji: The emoji character or custom code}"
+					+ " | emoji: The unicode character or custom code}"
 					+ "{} "
 					+ "{}";
 		}
@@ -324,7 +324,7 @@ public class Events {
 					+ " | channel: The name of the channel in which the message exists"
 					+ " | channelid: The unique id for the channel"
 					+ " | messageid: The unique id of the message being reacted to"
-					+ " | emoji: The emoji character or custom code}"
+					+ " | emoji: The unicode character or custom code}"
 					+ "{} "
 					+ "{}";
 		}
