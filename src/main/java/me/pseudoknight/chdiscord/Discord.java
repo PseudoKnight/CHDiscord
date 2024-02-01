@@ -3,12 +3,10 @@ package me.pseudoknight.chdiscord;
 import com.laytonsmith.PureUtilities.Common.StackTraceUtils;
 import com.laytonsmith.PureUtilities.DaemonManager;
 import com.laytonsmith.PureUtilities.Version;
-import com.laytonsmith.abstraction.MCColor;
 import com.laytonsmith.abstraction.StaticLayer;
 import com.laytonsmith.core.ArgumentValidation;
 import com.laytonsmith.core.MSLog;
 import com.laytonsmith.core.MSVersion;
-import com.laytonsmith.core.ObjectGenerator;
 import com.laytonsmith.core.Static;
 import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.environments.Environment;
@@ -16,8 +14,10 @@ import com.laytonsmith.core.environments.GlobalEnv;
 import com.laytonsmith.core.environments.StaticRuntimeEnv;
 import com.laytonsmith.core.events.BindableEvent;
 import com.laytonsmith.core.events.BoundEvent;
+import com.laytonsmith.core.exceptions.CRE.CREFormatException;
 import com.laytonsmith.core.exceptions.CRE.CREIllegalArgumentException;
 import com.laytonsmith.core.exceptions.CRE.CRENotFoundException;
+import com.laytonsmith.core.exceptions.CRE.CRERangeException;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.exceptions.ProgramFlowManipulationException;
 import com.laytonsmith.core.functions.AbstractFunction;
@@ -519,14 +519,7 @@ public class Discord {
 			builder.setThumbnail(embed.get("thumbnail", t).val());
 		}
 		if(embed.containsKey("color")) {
-			Mixed mColor = embed.get("color", t);
-			MCColor color;
-			if(mColor instanceof CArray) {
-				color = ObjectGenerator.GetGenerator().color((CArray) mColor, t);
-			} else {
-				color = StaticLayer.GetConvertor().GetColor(mColor.val(), t);
-			}
-			builder.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+			builder.setColor(GetColor(embed.get("color", t), t));
 		}
 		if(embed.containsKey("footer")) {
 			Mixed cFooter = embed.get("footer", t);
@@ -617,5 +610,80 @@ public class Discord {
 			throw new CRENotFoundException("A voice channel with the id \"" + id.val() + "\" was not found on Discord server.", t);
 		}
 		return channel;
+	}
+
+	enum ColorName {
+		WHITE(Color.WHITE),
+		SILVER(Color.LIGHT_GRAY),
+		GRAY(Color.GRAY),
+		BLACK(Color.BLACK),
+		RED(Color.RED),
+		MAROON(128, 0, 0),
+		YELLOW(Color.YELLOW),
+		OLIVE(128, 128, 0),
+		LIME(Color.GREEN),
+		GREEN(0, 128, 0),
+		AQUA(Color.CYAN),
+		TEAL(0, 128, 128),
+		BLUE(Color.BLUE),
+		NAVY(0, 0, 128),
+		FUCHSIA(Color.MAGENTA),
+		PURPLE(128, 0, 128),
+		ORANGE(255, 165, 0);
+
+		final Color c;
+
+		ColorName(int r, int g, int b) {
+			this.c = new Color(r, g, b);
+		}
+
+		ColorName(Color c) {
+			this.c = c;
+		}
+
+		Color getColor() {
+			return c;
+		}
+	}
+
+	static Color GetColor(Mixed m, Target t) {
+		if(m instanceof CArray) {
+			CArray array = (CArray) m;
+			int red;
+			int green;
+			int blue;
+			if(array.isAssociative()) {
+				if(array.containsKey("r")) {
+					red = ArgumentValidation.getInt32(array.get("r", t), t);
+					green = ArgumentValidation.getInt32(array.get("g", t), t);
+					blue = ArgumentValidation.getInt32(array.get("b", t), t);
+				} else if(array.containsKey("red")) {
+					red = ArgumentValidation.getInt32(array.get("red", t), t);
+					green = ArgumentValidation.getInt32(array.get("green", t), t);
+					blue = ArgumentValidation.getInt32(array.get("blue", t), t);
+				} else if(array.containsKey(0)) {
+					red = ArgumentValidation.getInt32(array.get(0, t), t);
+					green = ArgumentValidation.getInt32(array.get(1, t), t);
+					blue = ArgumentValidation.getInt32(array.get(2, t), t);
+				} else {
+					throw new CREFormatException("Expected a color array but was missing rgb keys.", t);
+				}
+			} else {
+				red = ArgumentValidation.getInt32(array.get(0, t), t);
+				green = ArgumentValidation.getInt32(array.get(1, t), t);
+				blue = ArgumentValidation.getInt32(array.get(2, t), t);
+			}
+			try {
+				return new Color(red, green, blue);
+			} catch (IllegalArgumentException ex) {
+				throw new CRERangeException(ex.getMessage(), t, ex);
+			}
+		} else {
+			try {
+				return ColorName.valueOf(m.val()).getColor();
+			} catch(IllegalArgumentException ignore){}
+			MSLog.GetLogger().w(MSLog.Tags.RUNTIME, "Invalid color: " + m.val(), t);
+			return null;
+		}
 	}
 }
