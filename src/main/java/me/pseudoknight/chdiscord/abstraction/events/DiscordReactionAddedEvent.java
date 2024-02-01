@@ -7,4 +7,5 @@ public interface DiscordReactionAddedEvent extends DiscordGuildChannelEvent {
 	Member getReactor();
 	long getMessageId();
 	EmojiUnion getEmoji();
+	long getMessageAuthorId();
 }

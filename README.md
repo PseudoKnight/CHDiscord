@@ -252,7 +252,7 @@ This event is called when a user sends a private message to the bot.
 ### discord_reaction_added
 This event is called when a user adds a reaction to a message.  
 **Prefilters:** channel (name)  
-**Data:** userid, username, nickname, bot (boolean), serverid, channel (name), channelid, messageid, emoji (unicode character or custom emoji code)
+**Data:** userid, username, nickname, bot (boolean), serverid, channel (name), channelid, messageid, messageuserid, emoji (unicode character or custom emoji code)
 
 ### discord_reaction_removed
 This event is called when a user removes a reaction on a message.  

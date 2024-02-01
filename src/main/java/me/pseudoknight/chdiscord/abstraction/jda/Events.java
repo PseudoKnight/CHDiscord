@@ -152,6 +152,11 @@ public class Events {
 		}
 
 		@Override
+		public long getMessageAuthorId() {
+			return e.getMessageAuthorIdLong();
+		}
+
+		@Override
 		public Object _GetObject() {
 			return e;
 		}

@@ -266,6 +266,7 @@ public class Events {
 					+ " | channel: The name of the channel in which the message exists"
 					+ " | channelid: The unique id for the channel"
 					+ " | messageid: The unique id of the message being reacted to"
+					+ " | messageuserid: The unique id of the author of the message being reacted to"
 					+ " | emoji: The unicode character or custom code}"
 					+ "{} "
 					+ "{}";
@@ -299,6 +300,7 @@ public class Events {
 			map.put("channel", new CString(event.getChannel().getName(), t));
 			map.put("channelid", new CInt(event.getChannel().getIdLong(), t));
 			map.put("messageid", new CInt(event.getMessageId(), t));
+			map.put("messageuserid", new CInt(event.getMessageAuthorId(), t));
 			map.put("emoji", new CString(event.getEmoji().getFormatted(), t));
 			return map;
 		}
