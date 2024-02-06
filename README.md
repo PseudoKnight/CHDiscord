@@ -191,7 +191,7 @@ Requires the `Manage Channels` permission.
 Gets an array of data for Discord user.  
 Array contains 'userid', 'username', 'displayname', and 'bot' (boolean).  
 For this guild server it also contains:  
-'nickname' (empty if not set), 'color' array (null if none), and 'avatar' effective url.
+'nickname' (empty if not set), 'color' array (null if none), 'joined_at' timestamp, and 'avatar' effective url.
 
 ### discord_member_get_roles([server], member)
 Gets an associative array of all guild server roles for a member.  

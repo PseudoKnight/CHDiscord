@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.awt.Color;
+import java.time.Instant;
 
 public class MemberFunctions {
 	public static String docs() {
@@ -307,7 +308,8 @@ public class MemberFunctions {
 			return "array {[server], member} Gets an array of data for Discord user."
 					+ GuildFunctions.SERVER_ARGUMENT
 					+ " Array contains 'userid', 'username', 'displayname', and 'bot' (boolean). For this guild server"
-					+ " it also contains: 'nickname' (empty if not set), 'color' array (null if none), and 'avatar' effective url.";
+					+ " it also contains: 'nickname' (empty if not set), 'color' array (null if none),"
+					+ " 'joined_at' timestamp, and 'avatar' effective url.";
 		}
 
 		public Integer[] numArgs() {
@@ -336,6 +338,7 @@ public class MemberFunctions {
 				ret.set("color", CNull.NULL, t);
 			}
 			ret.set("avatar", member.getEffectiveAvatarUrl());
+			ret.set("joined_at", new CInt(Instant.from(member.getTimeJoined()).toEpochMilli(), t), t);
 
 			User user = member.getUser();
 			ret.set("userid", new CInt(user.getIdLong(), t), t);
