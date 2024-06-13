@@ -20,7 +20,7 @@ public class Listener extends ListenerAdapter {
 
 	@Override
 	public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-		if(Discord.jda == null || event.getAuthor().equals(Discord.jda.getSelfUser())) {
+		if(Discord.jda == null || event.getAuthor().equals(Discord.jda.getSelfUser()) || event.getAuthor().isSystem()) {
 			return;
 		}
 		if(event.getChannelType() == ChannelType.PRIVATE) {
@@ -36,7 +36,8 @@ public class Listener extends ListenerAdapter {
 
 	@Override
 	public void onMessageUpdate(@NotNull MessageUpdateEvent event) {
-		if(!event.isFromGuild() || Discord.jda == null || event.getAuthor().equals(Discord.jda.getSelfUser())) {
+		if(!event.isFromGuild() || Discord.jda == null || event.getAuthor().equals(Discord.jda.getSelfUser())
+				|| event.getAuthor().isSystem()) {
 			return;
 		}
 		final JDADiscordGuildMessageUpdatedEvent e = new JDADiscordGuildMessageUpdatedEvent(event);
