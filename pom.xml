@@ -151,7 +151,7 @@
                                     <include>org.slf4j:slf4j-api:jar:*</include>
                                     <include>ch.qos.logback:logback-classic:jar:*</include>
                                     <include>ch.qos.logback:logback-core:jar:*</include>
-                                    <include>net.sf.trove4j:trove4j:jar:*</include>
+                                    <include>net.sf.trove4j:core:jar:*</include>
                                     <include>com.fasterxml.jackson.core:jackson-databind:jar:*</include>
                                     <include>com.fasterxml.jackson.core:jackson-annotations:jar:*</include>
                                     <include>com.fasterxml.jackson.core:jackson-core:jar:*</include>
@@ -214,7 +214,7 @@
                                     </excludes>
                                 </filter>
                                 <filter>
-                                    <artifact>net.sf.trove4j:trove4j:jar:*</artifact>
+                                    <artifact>net.sf.trove4j:core:jar:*</artifact>
                                     <excludes>
                                         <exclude>META-INF/**</exclude>
                                     </excludes>
@@ -270,7 +270,7 @@
                                     <include>com.squareup.okio:okio:jar:*</include>
                                     <include>com.squareup.okio:okio-jvm:jar:*</include>
                                     <include>org.slf4j:slf4j-api:*</include>
-                                    <include>net.sf.trove4j:trove4j:jar:*</include>
+                                    <include>net.sf.trove4j:core:jar:*</include>
                                     <include>com.fasterxml.jackson.core:jackson-databind:jar:*</include>
                                     <include>com.fasterxml.jackson.core:jackson-annotations:jar:*</include>
                                     <include>com.fasterxml.jackson.core:jackson-core:jar:*</include>
@@ -333,7 +333,7 @@
                                     </excludes>
                                 </filter>
                                 <filter>
-                                    <artifact>net.sf.trove4j:trove4j:jar:*</artifact>
+                                    <artifact>net.sf.trove4j:core:jar:*</artifact>
                                     <excludes>
                                         <exclude>META-INF/**</exclude>
                                     </excludes>
