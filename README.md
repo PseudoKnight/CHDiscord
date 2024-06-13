@@ -1,13 +1,15 @@
-# CHDiscord
+This is an extension for the CommandHelper plugin that uses the JDA library to talk to your Discord server.
 
-This is extension for the CommandHelper plugin that uses the JDA library to talk to your Discord server.
+## Download
+[CHDiscord 2.13.1](https://letsbuild.net/jenkins/job/CHDiscord/)
 
-CommandHelper 3.3.4 build #3978 or later is required.  
-There are builds backported to CommandHelper 3.3.2 as well.
+The latest version requires CommandHelper 3.3.4 build #3978 or later.
+
+The CHDiscord branch named [3.3.2](https://github.com/PseudoKnight/CHDiscord/tree/3.3.2) is back-ported for CommandHelper 3.3.2.
 
 ## Instructions
 
-You'll first need to have create a Discord application [here](https://discordapp.com/developers/applications/me).
+You'll first need to create a Discord application [here](https://discordapp.com/developers/applications/me).
 Then add a Bot to it. Copy the TOKEN for the Bot, as you'll use this later in your connection script.
 Be sure to enable `SERVER MEMBERS INTENT` and `MESSAGE CONTENT INTENT` of the Privileged Gateway Intents.
 
