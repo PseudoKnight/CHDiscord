@@ -186,6 +186,11 @@ Standard channels have a 1024-character limit for topics.
 Only Text and News channels support topics, otherwise an IllegalArgumentException is thrown.  
 Requires the `Manage Channels` permission.
 
+### discord_channel_members([server], channel)
+Returns an array of ids for members in a channel.  
+For voice channels, this returns all members that are currently connected to the channel.  
+Otherwise, for text channels this returns all members with the `View Channels` permission.
+
 ## Member Functions
 * The `member` argument is a user's unique int id (or username). Throws NotFoundException if a member by that id doesn't exist.
 

@@ -370,7 +370,7 @@ public class Discord {
 	 * @return GuildMessageChannel
 	 */
 	static GuildMessageChannel GetMessageChannel(Mixed id, Guild guild, Target t) {
-		IGuildChannelContainer container = guild == null ? jda : guild;
+		IGuildChannelContainer<?> container = guild == null ? jda : guild;
 		long channelId;
 		if(id instanceof CInt) {
 			channelId = ((CInt) id).getInt();

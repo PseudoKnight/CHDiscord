@@ -9,7 +9,9 @@ import com.laytonsmith.core.exceptions.CRE.*;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.attribute.IMemberContainer;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.managers.channel.ChannelManager;
@@ -17,6 +19,7 @@ import net.dv8tion.jda.api.managers.channel.middleman.StandardGuildMessageChanne
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public class ChannelFunctions {
@@ -223,6 +226,54 @@ public class ChannelFunctions {
 				throw new CREFormatException(ex.getMessage(), t);
 			}
 			return CVoid.VOID;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class, CREFormatException.class, CREIllegalArgumentException.class,
+					CREInsufficientPermissionException.class};
+		}
+	}
+
+	@api
+	public static class discord_channel_members extends Discord.Function {
+
+		public String getName() {
+			return "discord_channel_members";
+		}
+
+		public String docs() {
+			return "array {[server], channel} Returns an array of ids for members in a channel."
+					+ "For voice channels, this returns all members that are currently connected to the channel."
+					+ "Otherwise, for text channels this returns all members with the `View Channels` permission.";
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{1, 2};
+		}
+
+		public Mixed exec(Target t, Environment environment, Mixed... args) throws ConfigRuntimeException {
+			Discord.CheckConnection(t);
+			GuildMessageChannel channel;
+			if(args.length == 2) {
+				channel = Discord.GetMessageChannel(args[1], Discord.GetGuild(args[0], t), t);
+			} else {
+				channel = Discord.GetMessageChannel(args[0], t);
+			}
+			try {
+				if(channel instanceof IMemberContainer) {
+					List<Member> memberList = ((IMemberContainer) channel).getMembers();
+					CArray memberArray = new CArray(t, memberList.size());
+					for(Member mem : memberList) {
+						memberArray.push(new CInt(mem.getIdLong(), t), t);
+					}
+					return memberArray;
+				}
+				return new CArray(t);
+			} catch(PermissionException ex) {
+				throw new CREInsufficientPermissionException(ex.getMessage(), t);
+			} catch(IllegalArgumentException ex) {
+				throw new CREFormatException(ex.getMessage(), t);
+			}
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
