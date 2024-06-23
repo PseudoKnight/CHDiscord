@@ -4,6 +4,7 @@ import com.laytonsmith.PureUtilities.Common.StackTraceUtils;
 import com.laytonsmith.PureUtilities.DaemonManager;
 import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.abstraction.StaticLayer;
+import com.laytonsmith.commandhelper.CommandHelperPlugin;
 import com.laytonsmith.core.ArgumentValidation;
 import com.laytonsmith.core.MSLog;
 import com.laytonsmith.core.MSVersion;
@@ -44,6 +45,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.awt.Color;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -126,6 +128,11 @@ public class Discord {
 	static void Disconnect() {
 		if(jda != null) {
 			jda.shutdownNow();
+			if(!CommandHelperPlugin.self.isEnabled()) {
+				try {
+					jda.awaitShutdown(Duration.ofSeconds(1));
+				} catch (InterruptedException proceedAnyway) {}
+			}
 			dm.deactivateThread(connection);
 		}
 
