@@ -451,6 +451,53 @@ public class Events {
 	}
 
 	@api
+	public static class discord_voice_moved extends DiscordEvent {
+
+		@Override
+		public String getName() {
+			return "discord_voice_moved";
+		}
+
+		@Override
+		public String docs() {
+			return "{} "
+					+ "This event is called when a user moves between voice channels on the Discord server."
+					+ "{username: The Discord username | nickname: The effective display name in this guild server"
+					+ " | userid: The Discord user's unique id"
+					+ " | serverid: The guild server in which this event occurred"
+					+ " | joined: The name of the channel the user joined"
+					+ " | joinedid: The unique id of the channel the user joined"
+					+ " | left: The name of the channel the user left"
+					+ " | leftid: The unique id of the channel the user left}"
+					+ "{} "
+					+ "{}";
+		}
+
+		@Override
+		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
+			return e instanceof DiscordVoiceMovedEvent;
+		}
+
+		@Override
+		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
+			DiscordVoiceMovedEvent event = (DiscordVoiceMovedEvent) e;
+			Target t = Target.UNKNOWN;
+			Map<String, Mixed> map = new HashMap<>();
+
+			map.put("username", new CString(event.getMember().getUser().getName(), t));
+			map.put("userid", new CInt(event.getMember().getUser().getIdLong(), t));
+			map.put("nickname", new CString(event.getMember().getEffectiveName(), t));
+			map.put("serverid", new CInt(event.getGuild().getIdLong(), t));
+			map.put("joined", new CString(event.getChannel().getName(), t));
+			map.put("joinedid", new CInt(event.getChannel().getIdLong(), t));
+			map.put("left", new CString(event.getChannelLeft().getName(), t));
+			map.put("leftid", new CInt(event.getChannelLeft().getIdLong(), t));
+
+			return map;
+		}
+	}
+
+	@api
 	public static class discord_member_joined extends DiscordEvent {
 
 		@Override

@@ -4,6 +4,7 @@ import me.pseudoknight.chdiscord.abstraction.events.*;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -232,6 +233,34 @@ public class Events {
 		@Override
 		public Channel getChannel() {
 			return e.getChannelLeft();
+		}
+
+		public Member getMember() {
+			return e.getMember();
+		}
+
+		@Override
+		public Object _GetObject() {
+			return e;
+		}
+	}
+
+	public static class JDADiscordVoiceMovedEvent extends JDADiscordGuildEvent implements DiscordVoiceMovedEvent {
+		private final GuildVoiceUpdateEvent e;
+
+		JDADiscordVoiceMovedEvent(GuildVoiceUpdateEvent e) {
+			super(e);
+			this.e = e;
+		}
+
+		@Override
+		public AudioChannelUnion getChannelLeft() {
+			return e.getChannelLeft();
+		}
+
+		@Override
+		public AudioChannelUnion getChannel() {
+			return e.getChannelJoined();
 		}
 
 		public Member getMember() {

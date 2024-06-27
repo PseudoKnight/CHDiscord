@@ -274,6 +274,10 @@ This event is called when a user joined a voice channel.
 This event is called when a user left a voice channel.  
 **Data:** userid, username, nickname, serverid, channel (name), channelid
 
+### discord_voice_moved
+This event is called when a user moves between voice channels.
+**Data:** userid, username, nickname, serverid, joined, joinedid, left, leftid.
+
 ### discord_member_joined
 This event is called when a user joined the guild server.  
 **Data:** userid, username, nickname. serverid

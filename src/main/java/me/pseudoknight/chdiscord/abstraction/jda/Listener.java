@@ -79,6 +79,10 @@ public class Listener extends ListenerAdapter {
 			final JDADiscordVoiceLeftEvent e = new JDADiscordVoiceLeftEvent(event);
 			StaticLayer.GetConvertor().runOnMainThreadLater(null,
 					() -> EventUtils.TriggerListener(Driver.EXTENSION, "discord_voice_left", e));
+		} else {
+			final JDADiscordVoiceMovedEvent e = new JDADiscordVoiceMovedEvent(event);
+			StaticLayer.GetConvertor().runOnMainThreadLater(null,
+					() -> EventUtils.TriggerListener(Driver.EXTENSION, "discord_voice_moved", e));
 		}
 	}
 
