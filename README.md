@@ -228,6 +228,7 @@ If the member is not connected to a voice channel, null is returned.
 ### discord_member_move_voice_channel([server], member, channel)
 Moves a member to another voice channel.  
 The member must already be connected to a voice channel in the guild server.  
+Channel can be null to disconnect user.  
 Throws IllegalArgumentException if member is not connected to a voice channel.  
 Throws InsufficientPermissionException if the member and bot do not have access to the destination channel.  
 Requires the `Move Members` permission.

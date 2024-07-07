@@ -162,6 +162,7 @@ public class GuildFunctions {
 					+ MemberFunctions.MEMBER_ARGUMENT
 					+ " The member must already be connected to a voice channel in the guild."
 					+ ChannelFunctions.CHANNEL_ARGUMENT
+					+ " Channel can be null to disconnect user."
 					+ " Throws IllegalArgumentException if member is not connected to a voice channel."
 					+ " Throws InsufficientPermissionException if the member and bot do not have access to the destination channel."
 					+ " Requires the `Move Members` permission.";
@@ -176,15 +177,19 @@ public class GuildFunctions {
 
 			Guild guild;
 			Member member;
-			VoiceChannel channel;
+			VoiceChannel channel = null;
 			if(args.length == 2) {
 				guild = Discord.GetGuild(environment);
 				member = Discord.GetMember(args[0], guild, t);
-				channel = Discord.GetVoiceChannel(args[1], guild, t);
+				if(!(args[1] instanceof CNull)) {
+					channel = Discord.GetVoiceChannel(args[1], guild, t);
+				}
 			} else {
 				guild = Discord.GetGuild(args[0], t);
 				member = Discord.GetMember(args[1], guild, t);
-				channel = Discord.GetVoiceChannel(args[2], guild, t);
+				if(!(args[2] instanceof CNull)) {
+					channel = Discord.GetVoiceChannel(args[2], guild, t);
+				}
 			}
 
 			try {
