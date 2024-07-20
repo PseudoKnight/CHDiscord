@@ -1,7 +1,7 @@
 This is an extension for the CommandHelper plugin that uses the JDA library to talk to your Discord server.
 
 ## Download
-[CHDiscord 2.13.2](https://letsbuild.net/jenkins/job/CHDiscord/)
+[CHDiscord 2.14.0](https://letsbuild.net/jenkins/job/CHDiscord/)
 
 The latest version requires CommandHelper 3.3.4 build #3978 or later.
 
