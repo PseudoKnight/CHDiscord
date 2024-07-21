@@ -7,6 +7,7 @@ import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.exceptions.CRE.*;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Member;
@@ -344,6 +345,42 @@ public class GuildFunctions {
 			CArray array = new CArray(t, (int) memberCache.size());
 			members.forEach((Member mem) -> array.push(new CInt(mem.getIdLong(), t), t));
 			return array;
+		}
+
+		public Class<? extends CREThrowable>[] thrown() {
+			return new Class[]{CRENotFoundException.class, CREIllegalArgumentException.class};
+		}
+	}
+
+	@api
+	public static class discord_get_permissions extends Discord.Function {
+
+		public String getName() {
+			return "discord_get_permissions";
+		}
+
+		public String docs() {
+			return "array {[server]} Gets an array of all permissions for this bot in this guild server."
+					+ SERVER_ARGUMENT;
+		}
+
+		public Integer[] numArgs() {
+			return new Integer[]{0, 1};
+		}
+
+		public Mixed exec(Target t, final Environment env, Mixed... args) throws ConfigRuntimeException {
+			Discord.CheckConnection(t);
+			Guild guild;
+			if(args.length == 0) {
+				guild = Discord.GetGuild(env);
+			} else {
+				guild = Discord.GetGuild(args[0], t);
+			}
+			CArray list = new CArray(t);
+			for(Permission perm : guild.getSelfMember().getPermissions()) {
+				list.push(new CString(perm.name(), t), t);
+			}
+			return list;
 		}
 
 		public Class<? extends CREThrowable>[] thrown() {
