@@ -14,11 +14,13 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.utils.cache.MemberCacheView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class GuildFunctions {
 	public static String docs() {
@@ -360,24 +362,34 @@ public class GuildFunctions {
 		}
 
 		public String docs() {
-			return "array {[server]} Gets an array of all permissions for this bot in this guild server."
+			return "array {[server], [channel]} Gets an array of all permissions for this bot in this guild server or channel."
 					+ SERVER_ARGUMENT;
 		}
 
 		public Integer[] numArgs() {
-			return new Integer[]{0, 1};
+			return new Integer[]{0, 1, 2};
 		}
 
 		public Mixed exec(Target t, final Environment env, Mixed... args) throws ConfigRuntimeException {
 			Discord.CheckConnection(t);
 			Guild guild;
+			GuildChannel channel = null;
 			if(args.length == 0) {
 				guild = Discord.GetGuild(env);
 			} else {
 				guild = Discord.GetGuild(args[0], t);
 			}
+			if(args.length == 2) {
+				channel = Discord.GetMessageChannel(args[1], guild, t);
+			}
+			Set<Permission> permissions;
+			if(channel == null) {
+				permissions = guild.getSelfMember().getPermissions();
+			} else {
+				permissions = guild.getSelfMember().getPermissions(channel);
+			}
 			CArray list = new CArray(t);
-			for(Permission perm : guild.getSelfMember().getPermissions()) {
+			for(Permission perm : permissions) {
 				list.push(new CString(perm.name(), t), t);
 			}
 			return list;
