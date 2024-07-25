@@ -94,6 +94,7 @@ public class Events {
 					+ " or GUILD_PRIVATE_THREAD)"
 					+ " | message: The message the user sent."
 					+ " | id: The message id."
+					+ " | webhook: Whether the message is a webhook message."
 					+ " | attachments: An array of attachment arrays, each with the keys 'url', 'filename', and"
 					+ " 'description'."
 					+ " | reference: An associative array representing the message this was a reply to, with the keys"
@@ -136,6 +137,7 @@ public class Events {
 			map.put("channel", new CString(event.getChannel().getName(), t));
 			map.put("channelid", new CInt(event.getChannel().getIdLong(), t));
 			map.put("channeltype", new CString(event.getChannel().getType().name(), t));
+			map.put("webhook", CBoolean.get(event.getMessage().isWebhookMessage()));
 			EvaluateMessage(event.getMessage(), map);
 			return map;
 		}
@@ -164,6 +166,7 @@ public class Events {
 					+ " or GUILD_PRIVATE_THREAD)"
 					+ " | message: The message the author edited."
 					+ " | id: The message id."
+					+ " | webhook: Whether the message is a webhook message."
 					+ " | attachments: An array of attachment arrays, each with the keys 'url', 'filename', and"
 					+ " 'description'."
 					+ " | reference: An associative array representing the message this was a reply to, with the keys"
@@ -200,6 +203,7 @@ public class Events {
 			map.put("bot", CBoolean.get(event.getAuthor().isBot()));
 			map.put("username", new CString(event.getAuthor().getName(), t));
 			map.put("userid", new CInt(event.getAuthor().getIdLong(), t));
+			map.put("webhook", CBoolean.get(event.getMessage().isWebhookMessage()));
 			EvaluateMessage(event.getMessage(), map);
 			return map;
 		}
