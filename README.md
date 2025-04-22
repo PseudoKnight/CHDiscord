@@ -1,7 +1,7 @@
 This is an extension for the CommandHelper plugin that uses the JDA library to talk to your Discord server.
 
 ## Download
-[CHDiscord 2.14.0](https://letsbuild.net/jenkins/job/CHDiscord/)
+[CHDiscord 2.15.0](https://letsbuild.net/jenkins/job/CHDiscord/)
 
 The latest version requires CommandHelper 3.3.4 build #3978 or later.
 
@@ -246,12 +246,12 @@ Requires the `Mute Members` permission.
 ### discord_message_received
 This event is called when a user sends a message in a guild server.  
 **Prefilters:** username, channel (name)  
-**Data:** userid, username, nickname, bot (boolean), serverid, channel (name), channelid, channeltype, message, id (of message), attachments {{url, filename, description}}, reference {{id, userid, username, message}}
+**Data:** userid, username, nickname, bot (boolean), serverid, channel (name), channelid, channeltype, message, id (of message), webhook, attachments {{url, filename, description}}, reference {{id, userid, username, message}}
 
 ### discord_message_updated
 This event is called when a user edits a message in a Discord server.
 **Prefilters:** channel (name)  
-**Data:** userid, username, nickname, bot (boolean), serverid, channel (name), channelid, channeltype, message, id (of message), attachments {{url, filename, description}}, reference {{id, userid, username, message}}
+**Data:** userid, username, nickname, bot (boolean), serverid, channel (name), channelid, channeltype, message, id (of message), webhook, attachments {{url, filename, description}}, reference {{id, userid, username, message}}
 
 ### discord_private_message_received
 This event is called when a user sends a private message to the bot.  
