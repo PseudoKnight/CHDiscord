@@ -108,8 +108,6 @@ public class Discord {
 						callback.executeCallable();
 					} catch (ConfigRuntimeException ex) {
 						ConfigRuntimeException.HandleUncaughtException(ex, env);
-					} catch (ProgramFlowManipulationException ex) {
-						// do nothing
 					}
 				});
 			}
