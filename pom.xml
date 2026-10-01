@@ -28,7 +28,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.4.0</version>
+            <version>6.7.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>club.minnced</groupId>
@@ -49,7 +49,7 @@
         <dependency>
             <groupId>com.squareup.okio</groupId>
             <artifactId>okio</artifactId>
-            <version>3.6.0</version> <!-- enforce later dependency version used by jda -->
+            <version>3.18.1</version> <!-- enforce later dependency version used by jda -->
         </dependency>
     </dependencies>
 
@@ -144,8 +144,7 @@
                                     <include>net.dv8tion:JDA:jar:*</include>
                                     <include>com.neovisionaries:nv-websocket-client:jar:*</include>
                                     <include>org.apache.commons:commons-collections4:jar:*</include>
-                                    <include>com.squareup.okhttp3:okhttp:jar:*</include>
-                                    <include>com.squareup.okio:okio:jar:*</include>
+                                    <include>com.squareup.okhttp3:okhttp-jvm:jar:*</include>
                                     <include>com.squareup.okio:okio-jvm:jar:*</include>
                                     <include>org.slf4j:slf4j-api:jar:*</include>
                                     <include>ch.qos.logback:logback-classic:jar:*</include>
@@ -195,19 +194,7 @@
                                     </excludes>
                                 </filter>
                                 <filter>
-                                    <artifact>com.squareup.okhttp3:okhttp:jar:*</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/**</exclude>
-                                    </excludes>
-                                </filter>
-                                <filter>
-                                    <artifact>com.squareup.okio:okio-jvm:jar:*</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/**</exclude>
-                                    </excludes>
-                                </filter>
-                                <filter>
-                                    <artifact>com.squareup.okio:okio:jar:*</artifact>
+                                    <artifact>com.squareup.okhttp3:okhttp-jvm:jar:*</artifact>
                                     <excludes>
                                         <exclude>META-INF/**</exclude>
                                     </excludes>

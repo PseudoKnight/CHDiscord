@@ -327,7 +327,7 @@ public class MemberFunctions {
 				member = Discord.GetMember(args[0], Discord.GetGuild(environment), t);
 			}
 			ret.set("nickname", member.getNickname());
-			Color color = member.getColor();
+			Color color = member.getColors().getPrimary();
 			if(color != null) {
 				CArray colorArray = CArray.GetAssociativeArray(t);
 				colorArray.set("r", new CInt(color.getRed(), t), t);

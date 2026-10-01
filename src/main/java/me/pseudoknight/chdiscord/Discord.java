@@ -78,7 +78,8 @@ public class Discord {
 								GatewayIntent.GUILD_MESSAGE_REACTIONS))
 						.disableCache(EnumSet.of(CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS, CacheFlag.STICKER,
 								CacheFlag.EMOJI, CacheFlag.MEMBER_OVERRIDES, CacheFlag.ONLINE_STATUS,
-								CacheFlag.SCHEDULED_EVENTS, CacheFlag.ROLE_TAGS, CacheFlag.FORUM_TAGS))
+								CacheFlag.SCHEDULED_EVENTS, CacheFlag.ROLE_TAGS, CacheFlag.FORUM_TAGS,
+								CacheFlag.SOUNDBOARD_SOUNDS))
 						.setAutoReconnect(true)
 						.addEventListeners(new Listener())
 						.build()
