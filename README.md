@@ -109,12 +109,15 @@ Passes the array to the callback closure.
 Each invite array contains data about the invite, which has the keys 'code', 'channelid', inviter 'userid', 'uses' and 'max_uses'.  
 Requires the `Manage Server` permission.
 
+### discord_get_permissions([[server], channel])
+Gets an array of all permissions for this bot in this guild server or channel.
+
 ## Channel Functions
 * The `channel` argument can be a channel's unique int id. A channel's exact name can also be used, but if it's not unique,
 the first matching channel will be used. If a channel is omitted, it will attempt to use the channel from the event bind context.
 If not in an event bind, it will use the default channel.
 
-### discord_broadcast([server], [channel], message, [callback])
+### discord_broadcast([[server], channel], message, [callback])
 Broadcasts text and embeds to the specified channel.  
 If channel is omitted, the channel from an event or first publicly viewable channel will be used.  
 Message can be a string or a message array object.  
